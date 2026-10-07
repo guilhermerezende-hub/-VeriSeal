@@ -1,12 +1,29 @@
-/* VeriSeal — cena de rolagem: garrafa de whisky, líquido e lacre inteligente.
-   Script clássico que importa o Three.js dinamicamente, para funcionar tanto em file:// quanto em servidor. */
+/* VeriSeal — cena 3D dentro do quadro: garrafa de whisky, líquido e lacre inteligente com a marca VeriSeal.
+   Script clássico que importa o Three.js dinamicamente, para funcionar tanto em file:// quanto em servidor.
+   Capítulos, botões e "pular animação" ficam em site.js; aqui ficam a cena, a física e os balões do lacre. */
 (async () => {
   const stage = document.getElementById('stage');
   const canvas = document.getElementById('scene');
   const track = document.getElementById('track');
+  const trackPin = document.getElementById('trackPin');
   const hud = document.getElementById('hud');
-  const hint = document.getElementById('hint');
   const reduceMotion = matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  // logos da marca: os mesmos paths do sprite SVG da página, desenhados no canvas das texturas
+  const logoPath = (id, part) => new Path2D(document.querySelector(`#${id} .lg-${part}`).getAttribute('d'));
+  const WM = { w: 977, h: 161, ink: logoPath('vs-wordmark', 'ink'), acc: logoPath('vs-wordmark', 'accent') };
+  const MK = { w: 668, h: 359, ink: logoPath('vs-mark', 'ink'), acc: logoPath('vs-mark', 'accent') };
+  function drawLogo(g, L, x, y, w, ink, acc) {
+    const s = w / L.w; g.save(); g.translate(x, y); g.scale(s, s);
+    g.fillStyle = ink; g.fill(L.ink); g.fillStyle = acc; g.fill(L.acc); g.restore();
+  }
+  // símbolo de aproximação: quatro arcos abrindo para a direita
+  function drawContactless(g, x, y, size, color, width) {
+    g.save(); g.strokeStyle = color; g.lineWidth = width; g.lineCap = 'round';
+    [0.22, 0.47, 0.72, 0.97].forEach(f => { g.beginPath(); g.arc(x, y, size * f * 0.62, -0.9, 0.9); g.stroke(); });
+    g.restore();
+  }
+  const SANS = 'Inter, "Segoe UI", Roboto, sans-serif', MONO = '"JetBrains Mono", Consolas, monospace';
 
   let THREE;
   try {
@@ -14,6 +31,7 @@
   } catch (err) {
     console.error('Three.js não carregou', err);
     stage.classList.add('is-nogl');
+    hud.style.display = 'none';
     return;
   }
 
