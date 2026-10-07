@@ -809,3 +809,11 @@ h1,h2,h3,p{margin:0}
 .ap-sym.ok,.ap-sym.bad{box-shadow:0 0 0 2cqi rgba(20,166,74,.13),0 3cqi 7cqi rgba(20,166,74,.3)}
 .ap-sym.bad{box-shadow:0 0 0 2cqi rgba(217,48,37,.13),0 3cqi 7cqi rgba(217,48,37,.3)}
 .ap-btn{margin-top:auto}
+/* balões do lacre: números ligam etiqueta e ponto no celular (sem linhas cruzando a garrafa) */
+.callout .cn{display:none}
+@media (max-width:719px){
+  .hud polyline{display:none}
+  .callout .cn{display:inline-grid;place-items:center;width:20px;height:20px;margin-right:8px;border-radius:50%;background:var(--navy);color:#fff;font:700 11px/1 var(--mono);vertical-align:-4px}
+  .dot{width:22px;height:22px;display:grid;place-items:center;background:var(--navy);box-shadow:0 0 0 3px rgba(255,255,255,.9),0 4px 12px rgba(4,37,85,.35)}
+  .dot::after{content:attr(data-n);color:#fff;font:700 11px/1 var(--mono)}
+}
