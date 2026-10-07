@@ -434,7 +434,7 @@
       b.addEventListener('focus', () => { considering = true; }); b.addEventListener('blur', () => { considering = false; });
     });
     function fallback(bad) {
-      const liq = bad ? '#c2b47a' : '#d98a2b';
+      const liq = '#d98a2b';
       const svg = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 190 380">'
         + '<path d="M80 44h30v56c0 12 40 22 40 50v196a10 10 0 0 1-10 10H50a10 10 0 0 1-10-10V150c0-28 40-38 40-50z" fill="' + liq + '" fill-opacity=".85"/>'
         + '<path d="M80 44h30v56c0 12 40 22 40 50v196a10 10 0 0 1-10 10H50a10 10 0 0 1-10-10V150c0-28 40-38 40-50z" fill="none" stroke="#fff" stroke-opacity=".6" stroke-width="2"/>'

@@ -837,7 +837,7 @@
   }
 
   /* fotos da garrafa renderizadas pela própria cena (usadas no jogo "qual delas é original?"):
-     bad = true troca o whisky por uma bebida turva e gira a tampa, rompendo o lacre */
+     bad = true só gira a tampa, rompendo o lacre (a bebida tem a mesma cor: por fora, as duas são idênticas) */
   let glowPlane = null;
   function renderBottle({ bad = false, w = 380, h = 760, bg = 0x030b1c } = {}) {
     const prev = {
@@ -862,7 +862,6 @@
     }
     glowPlane.visible = true;
     bottle.rotation.set(0, 0.42, 0); capGroup.rotation.y = bad ? 0.8 : 0; capGroup.position.y = bad ? 0.05 : 0;
-    if (bad) { liquid.material.attenuationColor.set(0xbdb57c); liquid.material.roughness = 0.4; surface.material.color.set(0xc4b98a); }
     liquidUniforms.uTilt.value.set(0, 0); liquidUniforms.uSym.value = 0; liquidUniforms.uRip.value = 0.0004; liquidUniforms.uSwirl.value = 0;
     camera.clearViewOffset(); camera.aspect = w / h; camera.updateProjectionMatrix();
     const d = 13.4; camera.position.set(0, 2.98 + d * Math.sin(0.05), d * Math.cos(0.05)); camera.lookAt(0, 2.98, 0);
