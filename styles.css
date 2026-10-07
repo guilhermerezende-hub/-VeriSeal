@@ -803,3 +803,9 @@ h1,h2,h3,p{margin:0}
 .ap-checks li{border-radius:3.2cqi}
 .ph-banner{border-radius:5cqi}
 .ap-badge,.ap-hero,.ap-ring,.ap-scan{display:none}
+.ap-scr{top:33cqi}
+.ap-sym{width:32cqi;height:32cqi}
+@keyframes symWave{0%{transform:scale(1);opacity:.85}100%{transform:scale(1.35);opacity:0}}
+.ap-sym.ok,.ap-sym.bad{box-shadow:0 0 0 2cqi rgba(20,166,74,.13),0 3cqi 7cqi rgba(20,166,74,.3)}
+.ap-sym.bad{box-shadow:0 0 0 2cqi rgba(217,48,37,.13),0 3cqi 7cqi rgba(217,48,37,.3)}
+.ap-btn{margin-top:auto}
