@@ -180,6 +180,7 @@
       const r = s.el.getBoundingClientRect();
       s.top = r.top + scrollY; s.h = s.el.offsetHeight;
       s.len = Math.max(1, s.h - (s.pin ? s.pin.offsetHeight : vh));
+      if (s.el.id === 'track') s.pinOffset = navH;   // o quadro gruda logo abaixo da nav
     }
     sections.forEach(o => { const r = o.el.getBoundingClientRect(); o.top = r.top + scrollY; o.bottom = o.top + o.el.offsetHeight; });
     hero.layout(); how.layout(); dash.layout();

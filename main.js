@@ -111,7 +111,6 @@
     // lateral lens shift in world units at the target depth (negative = bottle to the right of the text)
     offx: kf([[0, -1.6], [0.14, -1.6], [0.2, 1.8], [0.4, 1.8], [0.46, -1.3], [0.64, -1.1], [0.72, 0], [0.88, 0], [1, -0.3]]),
     hud:  kf([[0, 0], [0.8, 0], [0.84, 1], [1, 1]]),
-    hint: kf([[0, 1], [0.06, 0]]),
   };
 
   /* ---------- liquid model: one height field shared by the volume, its surface, the glass and the shadow ----------
@@ -238,33 +237,61 @@
     const t = new THREE.CanvasTexture(c); t.colorSpace = THREE.SRGBColorSpace; t.userData.redraw = () => { draw(c); t.needsUpdate = true; };
     return t;
   }
+  const lsOf = g => v => { if ('letterSpacing' in g) g.letterSpacing = v; };
+  const rrectOf = g => (x, y, w, h, r) => { g.beginPath(); if (g.roundRect) g.roundRect(x, y, w, h, r); else g.rect(x, y, w, h); };
   function drawLabel(c) {
-    // black label for the flat front face, drawn in a 1000 x 1180 design space
-    const g = c.getContext('2d'), s = c.width / 1000;
+    // rótulo preto da face frontal (o whisky), desenhado num espaço de 1000 x 1180; o selo VeriSeal fica embaixo
+    const g = c.getContext('2d'), s = c.width / 1000, ls = lsOf(g), rr = rrectOf(g);
     g.setTransform(s, 0, 0, s, 0, 0);
     g.fillStyle = '#121010'; g.fillRect(0, 0, 1000, 1180);
     for (let i = 0; i < 6000; i++) { g.fillStyle = `rgba(255,240,210,${Math.random() * 0.05})`; g.fillRect(Math.random() * 1000, Math.random() * 1180, 1.5, 1.5); }
     g.strokeStyle = '#c9a45c'; g.lineWidth = 4; g.strokeRect(34, 34, 932, 1112);
     g.lineWidth = 1.2; g.strokeRect(50, 50, 900, 1080);
     g.fillStyle = '#eadfc6'; g.textAlign = 'center'; g.textBaseline = 'alphabetic';
-    const ls = v => { if ('letterSpacing' in g) g.letterSpacing = v; };
-    ls('10px'); g.font = '500 24px "IBM Plex Mono", monospace'; g.fillText('SINGLE MALT', 500, 150);
-    g.fillStyle = '#c9a45c'; g.fillRect(430, 176, 140, 1.5); g.fillStyle = '#eadfc6';
-    ls('0px'); g.font = '300 390px "Fraunces", Georgia, serif'; g.fillText('12', 500, 565);
-    g.font = 'italic 300 66px "Fraunces", Georgia, serif'; g.fillText('anos', 500, 650);
-    ls('16px'); g.font = '500 42px "IBM Plex Mono", monospace'; g.fillText('WHISKY', 508, 795);
-    g.fillStyle = '#c9a45c'; g.fillRect(430, 835, 140, 1.5); g.fillStyle = '#eadfc6';
-    ls('4px'); g.font = '400 22px "IBM Plex Mono", monospace'; g.fillText('ENVELHECIDO EM CARVALHO', 500, 905);
-    g.fillText('40% vol   ·   700 ml', 500, 1050);
+    ls('12px'); g.font = `600 26px ${SANS}`; g.fillText('SINGLE MALT', 506, 150);
+    g.fillStyle = '#c9a45c'; g.fillRect(430, 178, 140, 1.5); g.fillStyle = '#eadfc6';
+    ls('-12px'); g.font = `200 400px ${SANS}`; g.fillText('12', 494, 560);
+    ls('20px'); g.font = `500 42px ${SANS}`; g.fillText('ANOS', 510, 640);
+    ls('16px'); g.font = `700 48px ${SANS}`; g.fillText('WHISKY', 508, 770);
+    g.fillStyle = '#c9a45c'; g.fillRect(430, 806, 140, 1.5); g.fillStyle = '#eadfc6';
+    ls('5px'); g.font = `400 22px ${MONO}`; g.fillText('ENVELHECIDO EM CARVALHO', 500, 868);
+    g.fillText('40% vol  ·  700 ml', 500, 912);
     ls('0px');
-    g.save(); g.translate(500, 982);
-    g.strokeStyle = '#c9a45c'; g.lineWidth = 2; g.beginPath(); g.arc(0, 0, 28, 0, PI * 2); g.stroke();
-    g.fillStyle = '#c9a45c'; g.font = 'italic 400 22px "Fraunces", Georgia, serif'; g.fillText('VS', 0, 8);
-    g.restore();
+    // selo "protegido por VeriSeal"
+    const bx = 290, by = 960, bw = 420, bh = 112;
+    const bg = g.createLinearGradient(bx, by, bx + bw, by + bh); bg.addColorStop(0, '#0b3474'); bg.addColorStop(1, '#03204f');
+    g.fillStyle = bg; rr(bx, by, bw, bh, 22); g.fill();
+    g.strokeStyle = 'rgba(3,173,249,.7)'; g.lineWidth = 2; rr(bx + 6, by + 6, bw - 12, bh - 12, 17); g.stroke();
+    drawLogo(g, MK, bx + 26, by + bh / 2 - 26, 97, '#ffffff', '#03adf9');
+    g.textAlign = 'left'; g.fillStyle = 'rgba(255,255,255,.72)'; ls('5px'); g.font = `500 17px ${MONO}`; g.fillText('PROTEGIDO POR', bx + 144, by + 46); ls('0px');
+    drawLogo(g, WM, bx + 144, by + 58, 236, '#ffffff', '#03adf9');
+  }
+  function drawBackLabel(c) {
+    // contrarrótulo VeriSeal na face de trás, 800 x 900
+    const g = c.getContext('2d'), s = c.width / 800, ls = lsOf(g);
+    g.setTransform(s, 0, 0, s, 0, 0);
+    const bg = g.createLinearGradient(0, 0, 800, 900); bg.addColorStop(0, '#0d3a80'); bg.addColorStop(.55, '#062a63'); bg.addColorStop(1, '#021a42');
+    g.fillStyle = bg; g.fillRect(0, 0, 800, 900);
+    g.strokeStyle = 'rgba(95,208,255,.1)'; g.lineWidth = 1.4;
+    for (let i = 0; i < 12; i++) { g.beginPath(); for (let x = 0; x <= 800; x += 10) { const y = 450 + 330 * Math.sin(x * 0.011 + i * 0.5) * (0.6 + 0.4 * Math.sin(x * 0.004 - i)); x ? g.lineTo(x, y) : g.moveTo(x, y); } g.stroke(); }
+    g.strokeStyle = 'rgba(3,173,249,.6)'; g.lineWidth = 3; g.strokeRect(26, 26, 748, 848);
+    drawLogo(g, WM, 190, 80, 420, '#ffffff', '#03adf9');
+    g.fillStyle = '#03adf9'; g.fillRect(360, 186, 80, 4);
+    g.textAlign = 'center'; g.fillStyle = '#ffffff'; ls('1px'); g.font = `700 46px ${SANS}`;
+    g.fillText('ESTA GARRAFA TEM', 400, 280); g.fillText('IDENTIDADE DIGITAL', 400, 336);
+    drawContactless(g, 352, 485, 190, '#ffffff', 13);
+    ls('0px'); g.font = `500 34px ${SANS}`; g.fillStyle = 'rgba(255,255,255,.88)';
+    g.fillText('Aproxime o celular do lacre', 400, 650); g.fillText('para confirmar a autenticidade.', 400, 696);
+    g.fillStyle = 'rgba(255,255,255,.2)'; g.fillRect(120, 750, 560, 1.5);
+    ls('6px'); g.font = `600 30px ${MONO}`; g.fillStyle = '#fff'; g.fillText('Nº A7F3K9B21', 403, 815);
+    ls('0px');
   }
   const labelTex = canvasTex(1600, 1888, drawLabel);
-  const lateRedraw = [labelTex];
-  document.fonts?.ready.then(() => lateRedraw.forEach(t => t.userData.redraw()));
+  const backTex = canvasTex(1024, 1152, drawBackLabel);
+  const lateRedraw = [labelTex, backTex];
+  // as texturas usam Inter e JetBrains Mono: redesenha quando os pesos usados no canvas estiverem carregados
+  if (document.fonts) Promise.all([`200 400px Inter`, `500 42px Inter`, `600 26px Inter`, `700 48px Inter`, `400 22px "JetBrains Mono"`, `500 22px "JetBrains Mono"`, `600 30px "JetBrains Mono"`].map(f => document.fonts.load(f)))
+    .catch(() => {}).then(() => lateRedraw.forEach(t => t.userData.redraw()));
   const gradientTex = (w, h, draw) => canvasTex(w, h, draw);
 
   /* ---------- renderer ---------- */
@@ -278,17 +305,17 @@
   renderer.shadowMap.enabled = true;
   renderer.shadowMap.type = THREE.VSMShadowMap;
   const maxAniso = renderer.capabilities.getMaxAnisotropy();
-  labelTex.anisotropy = maxAniso;
+  labelTex.anisotropy = maxAniso; backTex.anisotropy = maxAniso;
 
   const scene = new THREE.Scene();
-  scene.background = new THREE.Color(0xe4e1da);
+  scene.background = new THREE.Color(0xe9ecf1);
   const camera = new THREE.PerspectiveCamera(30, 1, 0.1, 80);
 
   /* environment: a bright studio with big softboxes and black flags at the sides, baked to PMREM.
      The flags are what give clear glass its dark edges. */
   {
     const env = new THREE.Scene();
-    env.add(new THREE.Mesh(new THREE.BoxGeometry(24, 24, 24), new THREE.MeshBasicMaterial({ color: new THREE.Color(0xd9d5cd).multiplyScalar(0.9), side: THREE.BackSide })));
+    env.add(new THREE.Mesh(new THREE.BoxGeometry(24, 24, 24), new THREE.MeshBasicMaterial({ color: new THREE.Color(0xd8dce4).multiplyScalar(0.9), side: THREE.BackSide })));
     const panel = (w, h, hex, k, x, y, z) => {
       const m = new THREE.Mesh(new THREE.PlaneGeometry(w, h), new THREE.MeshBasicMaterial({ color: new THREE.Color(hex).multiplyScalar(k), side: THREE.DoubleSide }));
       m.position.set(x, y, z); m.lookAt(0, 0, 0); env.add(m);
@@ -318,12 +345,12 @@
     new THREE.PlaneGeometry(60, 40),
     new THREE.MeshBasicMaterial({ map: gradientTex(64, 512, c => {
       const g = c.getContext('2d'), grd = g.createLinearGradient(0, 0, 0, 512);
-      grd.addColorStop(0, '#f4f2ec'); grd.addColorStop(0.55, '#ece9e2'); grd.addColorStop(1, '#cfcbc2');
+      grd.addColorStop(0, '#f7f8fa'); grd.addColorStop(0.55, '#eceff3'); grd.addColorStop(1, '#cdd3dc');
       g.fillStyle = grd; g.fillRect(0, 0, 64, 512);
     }), toneMapped: false })
   );
   backdrop.position.set(0, 4, -9); scene.add(backdrop);
-  const floor = new THREE.Mesh(new THREE.PlaneGeometry(16, 16), new THREE.ShadowMaterial({ color: 0x5a3a18, opacity: 0.3 }));
+  const floor = new THREE.Mesh(new THREE.PlaneGeometry(16, 16), new THREE.ShadowMaterial({ color: 0x2c2a2a, opacity: 0.3 }));
   floor.rotation.x = -PI / 2; floor.receiveShadow = true; scene.add(floor);
   // light that crosses the whisky is focused into a warm patch inside the shadow (the caustic every bottle casts)
   {
@@ -339,7 +366,7 @@
     pivot.add(patch); scene.add(pivot);
   }
   const contact = new THREE.Mesh(new THREE.PlaneGeometry(2.6, 2.6), new THREE.MeshBasicMaterial({
-    map: canvasTex(256, 256, c => { const g = c.getContext('2d'), grd = g.createRadialGradient(128, 128, 0, 128, 128, 128); grd.addColorStop(0, 'rgba(60,40,20,0.32)'); grd.addColorStop(0.5, 'rgba(60,40,20,0.1)'); grd.addColorStop(1, 'rgba(60,40,20,0)'); g.fillStyle = grd; g.fillRect(0, 0, 256, 256); }),
+    map: canvasTex(256, 256, c => { const g = c.getContext('2d'), grd = g.createRadialGradient(128, 128, 0, 128, 128, 128); grd.addColorStop(0, 'rgba(30,32,44,0.32)'); grd.addColorStop(0.5, 'rgba(30,32,44,0.1)'); grd.addColorStop(1, 'rgba(30,32,44,0)'); g.fillStyle = grd; g.fillRect(0, 0, 256, 256); }),
     transparent: true, depthWrite: false, toneMapped: false,
   }));
   contact.rotation.x = -PI / 2; contact.position.y = 0.003; scene.add(contact);
@@ -397,6 +424,10 @@
   const label = new THREE.Mesh(new THREE.PlaneGeometry(1.08, 1.27),
     new THREE.MeshPhysicalMaterial({ map: labelTex, roughness: 0.55, metalness: 0, envMapIntensity: 0.6, clearcoat: 0.3, clearcoatRoughness: 0.3, transmission: 0.001, thickness: 0 }));
   label.position.set(0, 1.82, HW + 0.004); bottle.add(label);
+  // contrarrótulo VeriSeal na face de trás: aparece quando a garrafa gira
+  const backLabel = new THREE.Mesh(new THREE.PlaneGeometry(0.86, 0.97),
+    new THREE.MeshPhysicalMaterial({ map: backTex, roughness: 0.5, metalness: 0, envMapIntensity: 0.6, clearcoat: 0.4, clearcoatRoughness: 0.25, transmission: 0.001, thickness: 0 }));
+  backLabel.position.set(0, 2.0, -(HW + 0.004)); backLabel.rotation.y = PI; bottle.add(backLabel);
 
   // a plain screw cap: short, black, finely ribbed, with a thin gold line above its skirt
   const capBody = new THREE.Mesh(new THREE.LatheGeometry([V2(0, 5.22), V2(0.35, 5.22), V2(0.35, 5.575), V2(0.335, 5.61), V2(0.30, 5.62), V2(0, 5.62)], 128),
@@ -453,52 +484,89 @@
     return { geometry: g, total, neck: neckLen };
   }
   const strip = buildStrip();
-  const stripTex = canvasTex(256, Math.round(256 * strip.total / STRIP_W), c => {
-    const g = c.getContext('2d'), W = c.width, H = c.height, yAt = len => len / strip.total * H;
-    const rrect = (x, y, w, h, r) => { g.beginPath(); if (g.roundRect) g.roundRect(x, y, w, h, r); else g.rect(x, y, w, h); };
+  // a arte do lacre: azul-marinho com guilhoché, logo VeriSeal no gargalo, holograma com o monograma no topo da tampa.
+  // A metade da frente é desenhada uma vez e girada 180° para a metade de trás (lê-se direito pelos dois lados).
+  const stripLen = len => len; // comprimentos em unidades da cena ao longo da tira
+  function drawStrip(c, orm) {
+    const g = c.getContext('2d'), W = c.width, H = c.height, k = W / 512, yAt = len => stripLen(len) / strip.total * H;
+    const rr = rrectOf(g), ls = lsOf(g);
+    const yN = yAt(strip.total - strip.neck);                 // junção tampa/gargalo na frente
+    const sidePx = yAt(5.574 - 5.22), topPx = yAt(0.6);      // lateral da tampa e topo
     g.clearRect(0, 0, W, H);
-    g.fillStyle = '#151211'; rrect(0, 0, W, H, 26); g.fill();
-    g.strokeStyle = '#c9a45c'; g.lineWidth = 3; rrect(10, 10, W - 20, H - 20, 18); g.stroke();
-    g.lineWidth = 1; rrect(18, 18, W - 36, H - 36, 12); g.stroke();
-    const ls = v => { if ('letterSpacing' in g) g.letterSpacing = v; };
+    if (orm) {                                               // R = iridescência, G = rugosidade, B = metal
+      g.fillStyle = 'rgb(0,115,0)'; rr(0, 0, W, H, 60 * k); g.fill();
+      const R = Math.min(W * 0.42, topPx * 0.45);
+      g.fillStyle = 'rgb(255,58,255)'; g.beginPath(); g.arc(W / 2, H / 2, R, 0, PI * 2); g.fill();
+      drawLogo(g, MK, W / 2 - R * 0.55, H / 2 - R * 0.55 * MK.h / MK.w, R * 1.1, 'rgb(40,110,0)', 'rgb(40,110,0)');
+      return;
+    }
+    const base = g.createLinearGradient(0, 0, W, 0); base.addColorStop(0, '#03204f'); base.addColorStop(0.5, '#0b3676'); base.addColorStop(1, '#03204f');
+    g.fillStyle = base; rr(0, 0, W, H, 60 * k); g.fill();
+    g.save(); rr(0, 0, W, H, 60 * k); g.clip();
+    g.strokeStyle = 'rgba(95,208,255,0.13)'; g.lineWidth = 1.6 * k;
+    for (let i = 0; i < 10; i++) { g.beginPath(); for (let y = 0; y <= H; y += 12 * k) { const x = W / 2 + W * 0.36 * Math.sin(y / k * 0.012 + i * 0.6) * (0.6 + 0.4 * Math.sin(y / k * 0.004 - i)); y ? g.lineTo(x, y) : g.moveTo(x, y); } g.stroke(); }
+    g.restore();
+    g.strokeStyle = 'rgba(3,173,249,.6)'; g.lineWidth = 4 * k; rr(18 * k, 18 * k, W - 36 * k, H - 36 * k, 44 * k); g.stroke();
+    g.strokeStyle = 'rgba(255,255,255,.18)'; g.lineWidth = 2 * k; rr(30 * k, 30 * k, W - 60 * k, H - 60 * k, 34 * k); g.stroke();
     g.textAlign = 'center'; g.textBaseline = 'middle';
-    // the neck part, drawn for the front; the canvas is symmetric about its centre, so the same drawing rotated
-    // by 180° lands on the back half reading upright from behind
     const half = () => {
-      const yN = yAt(strip.total - strip.neck);
-      g.fillStyle = '#e2cf9c'; ls('4px'); g.font = '500 20px "IBM Plex Mono", monospace';
-      g.fillText('LACRE', W / 2, yN + 44); g.fillText('INTELIGENTE', W / 2, yN + 70);
-      const cx = W / 2, cyc = yN + 176, R = 58;
-      g.strokeStyle = '#c9a45c'; g.lineWidth = 3; g.beginPath(); g.arc(cx, cyc, R, 0, PI * 2); g.stroke();
-      g.fillStyle = '#c9a45c'; g.beginPath(); g.arc(cx - 18, cyc - 12, 4.5, 0, PI * 2); g.fill();
-      g.lineWidth = 3.5; g.lineCap = 'round';
-      for (let k = 1; k <= 3; k++) { g.beginPath(); g.arc(cx - 18, cyc - 12, 4 + k * 9, -0.72, 0.72); g.stroke(); }
-      g.fillStyle = '#e2cf9c'; ls('3px'); g.font = '500 19px "IBM Plex Mono", monospace'; g.fillText('NFC', cx, cyc + 30);
-      ls('2px'); g.font = '400 13.5px "IBM Plex Mono", monospace'; g.fillText('VERIFIQUE', W / 2, cyc + R + 40); g.fillText('A AUTENTICIDADE', W / 2, cyc + R + 60);
-      ls('3px'); g.font = '500 20px "IBM Plex Mono", monospace'; g.fillText('A7F3K9B21', W / 2, H - 58);
+      // linha de ruptura (picote) exatamente na junção
+      g.save(); g.setLineDash([12 * k, 12 * k]); g.strokeStyle = 'rgba(255,255,255,.75)'; g.lineWidth = 3 * k;
+      g.beginPath(); g.moveTo(40 * k, yN + 14 * k); g.lineTo(W - 40 * k, yN + 14 * k); g.stroke(); g.restore();
+      drawLogo(g, WM, W / 2 - 200 * k, yN + 64 * k, 400 * k, '#ffffff', '#03adf9');
+      g.fillStyle = '#03adf9'; g.fillRect(W / 2 - 40 * k, yN + 166 * k, 80 * k, 4 * k);
+      drawContactless(g, W / 2 - 58 * k, yN + 300 * k, 210 * k, '#ffffff', 13 * k);
+      g.fillStyle = '#fff'; ls(`${4 * k}px`); g.font = `700 ${46 * k}px ${SANS}`;
+      g.fillText('APROXIME O', W / 2, yN + 468 * k); g.fillText('CELULAR', W / 2, yN + 522 * k);
+      g.fillStyle = 'rgba(255,255,255,.62)'; ls(`${6 * k}px`); g.font = `500 ${24 * k}px ${MONO}`; g.fillText('Nº DE SÉRIE', W / 2, yN + 618 * k);
+      g.fillStyle = '#fff'; ls(`${5 * k}px`); g.font = `600 ${52 * k}px ${MONO}`; g.fillText('A7F3K9B21', W / 2, yN + 676 * k);
+      // lateral da tampa
+      const ys = yN - sidePx / 2;
+      g.fillStyle = '#03adf9'; g.fillRect(W / 2 - 30 * k, ys - 98 * k, 60 * k, 4 * k); g.fillRect(W / 2 - 30 * k, ys + 94 * k, 60 * k, 4 * k);
+      g.fillStyle = '#fff'; ls(`${8 * k}px`); g.font = `700 ${44 * k}px ${SANS}`;
+      g.fillText('PRODUTO', W / 2, ys - 28 * k); g.fillText('ORIGINAL', W / 2, ys + 28 * k);
+      ls('0px');
     };
     half();
     g.save(); g.translate(W / 2, H / 2); g.rotate(PI); g.translate(-W / 2, -H / 2); half(); g.restore();
-    // over the cap, read from the front
-    const yMid = H / 2;
-    g.fillStyle = '#e2cf9c'; ls('4px'); g.font = '500 21px "IBM Plex Mono", monospace';
-    g.fillRect(W / 2 - 14, yMid - 46, 28, 1.5); g.fillText('ORIGINAL', W / 2, yMid - 14); g.fillText('PRODUTO', W / 2, yMid + 14); g.fillRect(W / 2 - 14, yMid + 46, 28, 1.5);
-    ls('0px');
-  });
+    // holograma no topo da tampa
+    const R = Math.min(W * 0.42, topPx * 0.45), cx = W / 2, cy = H / 2;
+    let holo;
+    if (g.createConicGradient) {
+      holo = g.createConicGradient(0.4, cx, cy);
+      ['#cfe9ff', '#e6d8ff', '#ffe0f0', '#fff6d6', '#dcfff0', '#cfe9ff', '#e9ddff', '#ffe6d2', '#cfe9ff'].forEach((c2, i, a) => holo.addColorStop(i / (a.length - 1), c2));
+    } else { holo = g.createRadialGradient(cx, cy, 0, cx, cy, R); holo.addColorStop(0, '#f0f4ff'); holo.addColorStop(1, '#cfe0ff'); }
+    g.fillStyle = holo; g.beginPath(); g.arc(cx, cy, R, 0, PI * 2); g.fill();
+    g.strokeStyle = 'rgba(255,255,255,.55)'; g.lineWidth = 1.2 * k;
+    for (let i = 0; i < 8; i++) { g.beginPath(); for (let j = 0; j <= 160; j++) { const t = j / 160 * PI * 2, r = R * (0.5 + 0.2 * Math.sin(7 * t + i * 0.55)); j ? g.lineTo(cx + r * Math.cos(t), cy + r * Math.sin(t)) : g.moveTo(cx + r * Math.cos(t), cy + r * Math.sin(t)); } g.closePath(); g.stroke(); }
+    g.strokeStyle = 'rgba(6,42,99,.55)'; g.lineWidth = 3 * k; g.beginPath(); g.arc(cx, cy, R - 2 * k, 0, PI * 2); g.stroke();
+    drawLogo(g, MK, cx - R * 0.55, cy - R * 0.55 * MK.h / MK.w, R * 1.1, '#062a63', '#0a76c4');
+    // microtexto em volta
+    g.fillStyle = 'rgba(6,42,99,.8)'; g.font = `600 ${17 * k}px ${MONO}`;
+    const ring = 'VERISEAL • PRODUTO ORIGINAL • VERISEAL • PRODUTO ORIGINAL • ', rr2 = R * 0.84;
+    for (let i = 0; i < ring.length; i++) {
+      const a = -PI / 2 + i / ring.length * PI * 2;
+      g.save(); g.translate(cx + rr2 * Math.cos(a), cy + rr2 * Math.sin(a)); g.rotate(a + PI / 2); g.fillText(ring[i], 0, 0); g.restore();
+    }
+  }
+  const stripTex = canvasTex(512, Math.round(512 * strip.total / STRIP_W), c => drawStrip(c, false));
+  const stripOrm = canvasTex(256, Math.round(256 * strip.total / STRIP_W), c => drawStrip(c, true));
+  stripOrm.colorSpace = THREE.NoColorSpace;
   stripTex.anisotropy = maxAniso; lateRedraw.push(stripTex);
   const stripMesh = new THREE.Mesh(strip.geometry, new THREE.MeshPhysicalMaterial({
-    map: stripTex, roughness: 0.45, metalness: 0, clearcoat: 0.5, clearcoatRoughness: 0.25, envMapIntensity: 0.9, side: THREE.DoubleSide, alphaTest: 0.5,
+    map: stripTex, roughness: 1, metalness: 1, roughnessMap: stripOrm, metalnessMap: stripOrm,
+    iridescence: 1, iridescenceMap: stripOrm, iridescenceIOR: 1.8, iridescenceThicknessRange: [180, 640],
+    clearcoat: 0.5, clearcoatRoughness: 0.2, envMapIntensity: 1.1, side: THREE.DoubleSide, alphaTest: 0.5,
     polygonOffset: true, polygonOffsetFactor: -2, polygonOffsetUnits: -2, // the strip always wins the depth tie against the cap it sits on
   }));
   bottle.add(stripMesh);
 
   /* ---------- overlay: chapters and the callouts anchored to the seal ---------- */
-  const chapters = [...document.querySelectorAll('[data-from]')].map(el => ({ el, a: +el.dataset.from, b: +el.dataset.to }));
   const hudSvg = document.getElementById('hud-svg');
   const callouts = {
     tear: { pos: new THREE.Vector3(0.0, 5.22, 0.365) },
-    nfc:  { pos: new THREE.Vector3(0.0, 4.98, 0.345) },
-    code: { pos: new THREE.Vector3(0.0, 4.75, 0.34) },
+    nfc:  { pos: new THREE.Vector3(0.0, 5.05, 0.345) },
+    code: { pos: new THREE.Vector3(0.0, 4.85, 0.34) },
     top:  { pos: new THREE.Vector3(0.0, 5.63, -0.02), up: true },
   };
   for (const id in callouts) {
@@ -514,13 +582,28 @@
   let pS = 0, visible = true;
   let px = 0, py = 0, pxS = 0, pyS = 0; // pointer parallax
   const tmp = new THREE.Vector3(), tmp2 = new THREE.Vector3();
-  const forcedP = /[#&]p=([\d.]+)/.exec(location.hash); // index.html#p=0.9 jumps to a point of the choreography
+  const nav = document.getElementById('nav');
 
+  // progresso da animação = quanto o quadro fixo (sticky) já percorreu da sua trilha
   function progress() {
-    if (forcedP) return clamp(+forcedP[1], 0, 1);
-    const total = track.offsetHeight - innerHeight;
-    return total > 0 ? clamp(-track.getBoundingClientRect().top / total, 0, 1) : 0;
+    const total = track.offsetHeight - trackPin.offsetHeight;
+    return total > 0 ? clamp(((nav ? nav.offsetHeight : 0) - track.getBoundingClientRect().top) / total, 0, 1) : 0;
   }
+
+  /* arrastar para girar: a garrafa gira na mão (e o líquido responde); ao soltar, ela continua com inércia
+     e volta a se alinhar com a coreografia na volta inteira mais próxima */
+  let dragSpin = 0, dragV = 0, dragging = false, lastX = 0, lastMoveT = 0;
+  canvas.addEventListener('pointerdown', e => {
+    dragging = true; lastX = e.clientX; lastMoveT = performance.now(); dragV = 0;
+    canvas.setPointerCapture?.(e.pointerId); canvas.classList.add('is-grabbing');
+  });
+  canvas.addEventListener('pointermove', e => {
+    if (!dragging) return;
+    const now = performance.now(), d = (e.clientX - lastX) / Math.max(W, 1) * PI * 1.8;
+    dragSpin += d; dragV = d / Math.max((now - lastMoveT) / 1000, 1 / 120); lastX = e.clientX; lastMoveT = now;
+  });
+  const endDrag = () => { dragging = false; canvas.classList.remove('is-grabbing'); };
+  canvas.addEventListener('pointerup', endDrag); canvas.addEventListener('pointercancel', endDrag);
   function resize() {
     W = stage.clientWidth || 1; H = stage.clientHeight || 1; aspect = W / H;
     renderer.setPixelRatio(Math.min(devicePixelRatio || 1, W < 760 ? 1.75 : 2));
@@ -591,17 +674,6 @@
     bottle.rotation.x = d.lean;
   }
 
-  function chapterVisibility(p) {
-    const f = 0.035;
-    for (const { el, a, b } of chapters) {
-      const fin = a <= 0 ? 1 : clamp((p - a) / f, 0, 1), fout = b >= 1 ? 1 : clamp((b - p) / f, 0, 1);
-      const v = smoothstep(0, 1, Math.min(fin, fout));
-      el.style.opacity = v.toFixed(3);
-      el.style.translate = `0 ${((1 - v) * 26).toFixed(1)}px`;
-      el.classList.toggle('is-on', v > 0.5);
-    }
-  }
-
   function updateHud(p) {
     const v = K.hud(p);
     hud.style.opacity = v.toFixed(3);
@@ -631,11 +703,13 @@
     const p = progress(), pPrev = pS;
     pS += (p - pS) * (1 - Math.exp(-dt * 4.5));
     const vP = (pS - pPrev) / dt;
-    hint.style.opacity = K.hint(pS).toFixed(3);
-    chapterVisibility(pS);
     if (!visible) return;
 
-    const spinTarget = K.rot(pS) + (reduceMotion ? 0 : 0.02 * Math.sin(t * 0.45));
+    if (!dragging) {
+      dragSpin += dragV * dt; dragV *= Math.exp(-dt * 2.5);
+      if (Math.abs(dragV) < 0.4) dragSpin += (Math.round(dragSpin / (2 * PI)) * 2 * PI - dragSpin) * (1 - Math.exp(-dt * 1.4));
+    }
+    const spinTarget = K.rot(pS) + dragSpin + (reduceMotion ? 0 : 0.02 * Math.sin(t * 0.45));
     updatePhysics(dt, t, spinTarget, vP, 1 - 0.6 * K.hud(pS));
 
     // camera: a dolly toward the cap. The bottle is moved across the frame with a lens shift (no keystone), and on
@@ -664,6 +738,5 @@
   if ('ResizeObserver' in window) new ResizeObserver(resize).observe(stage);
   new IntersectionObserver(entries => { visible = entries[0].isIntersecting; }, { threshold: 0 }).observe(stage);
   addEventListener('pointermove', e => { px = (e.clientX / innerWidth) * 2 - 1; py = (e.clientY / innerHeight) * 2 - 1; }, { passive: true });
-  chapterVisibility(pS);
   renderer.setAnimationLoop(frame);
 })();
