@@ -654,7 +654,7 @@
     if (m === mode) return;
     mode = m; host = m === 'how' ? howHost : stage;
     host.prepend(canvas); resize();
-    scene.background.set(m === 'how' ? 0xf5f6f8 : 0xe9ecf1);
+    scene.background.set(m === 'how' ? 0xffffff : 0xe9ecf1);
     backdrop.visible = m !== 'how';
     if (m === 'how') turnBase = Math.round(dyn.spin / (2 * PI)) * 2 * PI;
     hud.style.opacity = 0;
@@ -886,10 +886,11 @@
   addEventListener('resize', resize);
   if ('ResizeObserver' in window) { const ro = new ResizeObserver(resize); ro.observe(stage); ro.observe(howHost); }
   const io = new IntersectionObserver(entries => {
-    entries.forEach(e => { vis[e.target === howHost ? 'how' : 'frame'] = e.isIntersecting; });
-    visible = vis.frame || vis.how;
-    if (vis.how && !vis.frame) setMode('how'); else if (vis.frame) setMode('frame');
-  }, { threshold: 0 });
+    // as duas cenas agora são vizinhas: a garrafa vai para a que estiver mais visível
+    entries.forEach(e => { vis[e.target === howHost ? 'how' : 'frame'] = e.isIntersecting ? e.intersectionRect.height : 0; });
+    visible = vis.frame > 0 || vis.how > 0;
+    if (visible) setMode(vis.how > vis.frame ? 'how' : 'frame');
+  }, { threshold: [0, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1] });
   io.observe(stage); io.observe(howHost);
   window.VeriSeal3D = { renderBottle };
   const ready = () => dispatchEvent(new Event('veriseal:3d'));

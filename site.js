@@ -393,7 +393,7 @@
       playing = true; play.classList.add('is-playing'); play.setAttribute('aria-label', 'Pausar animação');
     });
     ['wheel', 'touchstart', 'keydown'].forEach(ev => addEventListener(ev, e => { if (playing && !(ev === 'keydown' && e.target === play)) stopPlay(); }, { passive: true }));
-    $('#skipAnim').addEventListener('click', e => { e.preventDefault(); stopPlay(); const t = $('#problema'); scrollTo({ top: t.getBoundingClientRect().top + scrollY, behavior: 'auto' }); t.setAttribute('tabindex', '-1'); t.focus({ preventScroll: true }); });
+    $('#skipAnim').addEventListener('click', e => { e.preventDefault(); stopPlay(); const t = $('#como-funciona'); scrollTo({ top: t.getBoundingClientRect().top + scrollY, behavior: 'auto' }); t.setAttribute('tabindex', '-1'); t.focus({ preventScroll: true }); });
 
     function update(p, dt) {
       if (playing) {
@@ -758,7 +758,8 @@
     const heroEnd = $('#lacre').offsetHeight - vh * 0.5;
     const tr = frameSeq, inTrack = y + vh > tr.top && y < tr.top + tr.h;
     const ct = $('#contato'), nearForm = y + vh > ct.offsetTop + 120;
-    mcta.classList.toggle('is-on', y > heroEnd && !inTrack && !nearForm);
+    const hs = $('#howScene').getBoundingClientRect(), overDemo = hs.top < vh && hs.bottom > 0;   // não cobrir o celular da demonstração
+    mcta.classList.toggle('is-on', y > heroEnd && !inTrack && !nearForm && !overDemo);
   }
 
   /* ============================================================
