@@ -449,8 +449,15 @@
       btns.forEach(b => { $('.gb-a', b).src = ok; $('.gb-b', b).src = bad; });
       hasImg = true;
     }
-    addEventListener('veriseal:3d', setImages);
-    setTimeout(() => { if (!hasImg) setImages(); }, 7000);
+    // as fotos 3D só são geradas quando o jogo se aproxima da tela (evita travar o carregamento)
+    let near = false, ready3d = false;
+    const tryImages = () => { if (near && ready3d && !hasImg) setImages(); };
+    addEventListener('veriseal:3d', () => { ready3d = true; tryImages(); });
+    new IntersectionObserver((es, o) => es.forEach(e => {
+      if (!e.isIntersecting) return;
+      near = true; o.disconnect(); tryImages();
+      setTimeout(() => { if (!hasImg) setImages(); }, 2500);   // sem 3D: desenho em SVG
+    }), { rootMargin: '120% 0px' }).observe(root);
     function reset() {
       fake = Math.random() < 0.5 ? 0 : 1; state = 'idle'; clock = 0;
       root.classList.remove('is-done', 'is-scanning');

@@ -730,3 +730,10 @@ h1,h2,h3,p{margin:0}
 .scr.is-on .res-ic circle{transition:stroke-dashoffset .4s var(--ease-io) .05s}
 .scr.is-on .res-ic path{transition:stroke-dashoffset .3s var(--ease-io) .35s}
 .spinner svg{animation-duration:.6s}
+/* história: desenho e preenchimento mais rápidos */
+.js .story-mark.is-in path{transition:stroke-dashoffset 1.2s var(--ease-io),fill-opacity .6s ease .8s}
+.js .story-mark.is-in .sm-acc{transition-delay:.3s,1s}
+.story-mark.is-in .sm-rig>svg.back{transition-delay:.9s}
+@media (max-width:719px){
+  .cta-box .btn-lg{padding:14px 18px;font-size:17px}
+}
