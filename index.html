@@ -112,6 +112,8 @@
       </ol>
     </div>
 
+    <p class="hero-next" id="heroNext" aria-hidden="true">Agora, veja o lacre na garrafa <svg><use href="#i-arrow-down"/></svg></p>
+
     <div class="hero-foot" id="heroFoot">
       <p class="hero-hint"><span class="hint-dot" aria-hidden="true"></span><span class="hint-fine">Passe o cursor sobre o lacre para ver por dentro.</span><span class="hint-coarse">Arraste a lente sobre o lacre para ver por dentro.</span></p>
       <div class="ctas">
@@ -234,17 +236,26 @@
             <clipPath id="cbClip"><path d="M-7 -30h14v8c6 3 9 8 9 14v32a6 6 0 0 1-6 6h-20a6 6 0 0 1-6-6V-8c0-6 3-11 9-14z"/></clipPath>
             <rect class="cb-liquid" id="cbLiquid" x="-18" y="-6" width="36" height="40" clip-path="url(#cbClip)"/>
             <rect class="cb-cap" x="-8.5" y="-36" width="17" height="8" rx="2"/>
+            <g class="cb-seal-g" id="cbSeal">
+              <rect class="cb-seal" id="cbSealBot" x="-3.5" y="-29" width="7" height="15" rx="1.5"/>
+              <rect class="cb-seal" id="cbSealTop" x="-3.5" y="-39" width="7" height="10" rx="1.5"/>
+            </g>
           </g>
         </svg>
-        <ol class="cyc-nodes">
-          <li style="--a:-90deg"><span class="n">1</span><b>Consumida</b><span class="d">A garrafa original é aberta e esvaziada.</span></li>
-          <li style="--a:0deg"><span class="n">2</span><b>Recolhida</b><span class="d">O vasilhame vazio é recolhido e revendido.</span></li>
-          <li style="--a:90deg"><span class="n">3</span><b>Reenchida</b><span class="d">Recebe bebida adulterada ou de origem desconhecida.</span></li>
-          <li style="--a:180deg"><span class="n">4</span><b>Revendida</b><span class="d">Volta à prateleira com cara de original.</span></li>
+        <ol class="cyc-nodes" aria-hidden="true">
+          <li style="--a:-90deg"><span class="n">1</span><b>Consumida</b></li>
+          <li style="--a:0deg"><span class="n">2</span><b>Recolhida</b></li>
+          <li style="--a:90deg"><span class="n">3</span><b>Reenchida</b></li>
+          <li style="--a:180deg"><span class="n">4</span><b>Revendida</b></li>
         </ol>
-        <div class="cyc-center">
-          <p class="cc" data-cc="0">Por fora, <br>nada muda.</p>
-          <p class="cc" data-cc="1"><svg viewBox="0 0 668 359" aria-hidden="true"><use href="#vs-mark"/></svg><span>Com VeriSeal, abrir a garrafa <b>rompe o lacre</b>. A reutilização deixa de ser invisível.</span></p>
+        <div class="cyc-center" aria-hidden="true">
+          <p class="cc" data-cc="1"><span class="big">Consumida</span>A garrafa original é aberta e esvaziada.</p>
+          <p class="cc" data-cc="2"><span class="big">Recolhida</span>O vasilhame vazio é recolhido e revendido.</p>
+          <p class="cc" data-cc="3"><span class="big">Reenchida</span>Recebe bebida adulterada ou de origem desconhecida.</p>
+          <p class="cc" data-cc="4"><span class="big">Revendida</span>Volta à prateleira com cara de original.</p>
+          <p class="cc" data-cc="loop"><span class="big">Por fora, nada muda.</span>Sem proteção, o ciclo se fecha e ninguém percebe.</p>
+          <p class="cc" data-cc="vs"><svg viewBox="0 0 668 359"><use href="#vs-mark"/></svg><span class="big">Agora, com VeriSeal.</span>A mesma garrafa, com o lacre inteligente.</p>
+          <p class="cc bad-t" data-cc="end"><span class="big">Ciclo interrompido.</span>Abrir a garrafa <b>rompe o lacre</b>. A reutilização deixa de ser invisível.</p>
         </div>
       </figure>
     </div>
@@ -400,7 +411,7 @@
       <i class="tabs-thumb" aria-hidden="true"></i>
     </div>
 
-    <div class="panels">
+    <div class="panels" data-reveal style="--d:.16s">
       <div class="panel is-on" role="tabpanel" id="pan-c" aria-labelledby="tab-c">
         <p class="lead narrow">Mais confiança no momento da compra e do consumo. <strong>Uma ferramenta a mais para decidir com segurança.</strong></p>
         <div class="bento ben-grid">
@@ -430,7 +441,7 @@
     <h2 class="h-sec" data-reveal style="--d:.06s">Cada leitura vira informação para a marca.</h2>
     <p class="lead narrow" data-reveal style="--d:.12s">Cada garrafa pode ter uma <strong>identidade digital única</strong>. Fabricantes acompanham as autenticações dos seus produtos e enxergam padrões, regiões com mais verificações e comportamentos suspeitos na cadeia de distribuição.</p>
 
-    <div class="dash" id="dash" data-reveal style="--d:.18s">
+    <div class="dash" id="dash">
       <div class="dash-head">
         <div class="dash-title"><svg viewBox="0 0 668 359" aria-hidden="true"><use href="#vs-mark"/></svg><div><b>Painel da marca</b><span>Single Malt 12 anos · dados ilustrativos</span></div></div>
         <div class="dash-range" role="radiogroup" aria-label="Período">
@@ -498,6 +509,7 @@
     <p class="eyebrow" data-reveal>Nossa proposta</p>
     <p class="cta-statement" data-reveal style="--d:.06s">Dar identidade digital a cada garrafa e <span class="grad">confiança a cada consumo.</span></p>
     <p class="cta-sub" data-reveal style="--d:.12s">A VeriSeal conecta tecnologia, segurança e rastreabilidade para criar uma nova camada de proteção para o mercado de bebidas destiladas.</p>
+    <div class="cta-seal" id="ctaSeal" aria-hidden="true"><div class="cs-rig"><div class="cs-face cs-front"></div><div class="cs-face cs-back"></div></div><div class="cs-shadow"></div></div>
     <div class="cta-box" data-reveal style="--d:.18s">
       <h2>Proteja sua marca com a VeriSeal.</h2>
       <p>Leve mais segurança, rastreabilidade e confiança para seus produtos.</p>

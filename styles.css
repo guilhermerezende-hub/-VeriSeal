@@ -618,3 +618,43 @@ h1,h2,h3,p{margin:0}
 @media (forced-colors:active){
   .btn{border:1px solid ButtonText}
 }
+
+/* ---------------- camadas 3D extras ---------------- */
+.hero-next{position:absolute;left:0;right:0;bottom:calc(30px + env(safe-area-inset-bottom,0px));display:flex;justify-content:center;align-items:center;gap:8px;font-size:17px;font-weight:600;color:var(--on-night-2);opacity:0;z-index:3;pointer-events:none}
+.hero-next svg{width:18px;height:18px;color:var(--cyan)}
+.cb-seal-g{opacity:0;transition:opacity .4s}
+.cb-seal-g.is-on{opacity:1}
+#cbSealTop{transform-box:fill-box;transform-origin:50% 100%;transition:transform .5s var(--spring)}
+.cb-seal-g.is-broken #cbSealTop{transform:translate(5px,-7px) rotate(28deg)}
+.cyc-bottle.shake{animation:shake .5s ease 1}
+@keyframes shake{20%{translate:-4px 0}40%{translate:4px 0}60%{translate:-3px 0}80%{translate:2px 0}}
+.cyc-center .cc svg{--lg-ink:#fff}
+
+/* lacre 3D flutuante na chamada final */
+.cta-seal{position:relative;width:min(620px,86vw);aspect-ratio:1000/280;margin:clamp(40px,7vh,72px) auto 0;perspective:1400px}
+.cs-rig{position:absolute;inset:0;transform-style:preserve-3d;transform:rotateX(var(--crx,16deg)) rotateY(var(--cry,-24deg)) rotateZ(-4deg);will-change:transform}
+.cs-face{position:absolute;inset:0;backface-visibility:hidden;-webkit-backface-visibility:hidden}
+.cs-face svg{width:100%;height:100%;overflow:visible}
+.cs-back{transform:rotateY(180deg) translateZ(1px)}
+.cs-shadow{position:absolute;left:8%;right:8%;bottom:-38%;height:30%;border-radius:50%;background:radial-gradient(closest-side,rgba(3,173,249,.28),transparent);filter:blur(12px);transform:scaleX(var(--css,1))}
+
+/* monograma extrudado (história) */
+.story-mark{perspective:1200px}
+.sm-rig{position:relative;width:100%;height:100%;transform-style:preserve-3d;transform:rotateX(var(--srx,8deg)) rotateY(var(--sry,-24deg));will-change:transform}
+.sm-rig>svg{position:absolute;inset:0;width:100%;height:100%}
+.sm-rig>svg.back{opacity:0;transition:opacity .8s ease}
+.story-mark.is-in .sm-rig>svg.back{opacity:1;transition-delay:1.4s}
+.js .story-mark{opacity:1;transform:none}
+
+/* celular girando em 3D ao se aproximar do lacre */
+.phone{transform:translate(var(--px,40%),-50%) perspective(1300px) rotateY(var(--ry,-28deg)) rotate(var(--pr,8deg))}
+
+/* painel de dados erguendo-se */
+.dash{transform-origin:50% 0;transform:perspective(1600px) rotateX(var(--dx,0deg)) scale(var(--ds,1));opacity:var(--do,1)}
+
+/* botões magnéticos e cartões com inclinação 3D */
+.btn{transition:background-color .25s,color .25s,border-color .25s,box-shadow .25s,transform .35s var(--spring),translate .4s var(--spring)}
+.tile.tilt-ready{transition:transform .35s var(--ease),box-shadow .35s}
+.tile.tilt-ready:hover{box-shadow:0 30px 60px -30px rgba(8,30,80,.35),0 0 0 1px rgba(3,173,249,.25)}
+.dark .tile.tilt-ready:hover{box-shadow:0 30px 60px -30px rgba(0,0,0,.6),0 0 0 1px rgba(3,173,249,.3)}
+@media (max-width:719px){.cta-seal{width:92vw}}
