@@ -240,31 +240,42 @@
   const lsOf = g => v => { if ('letterSpacing' in g) g.letterSpacing = v; };
   const rrectOf = g => (x, y, w, h, r) => { g.beginPath(); if (g.roundRect) g.roundRect(x, y, w, h, r); else g.rect(x, y, w, h); };
   function drawLabel(c) {
-    // rótulo preto da face frontal (o whisky), desenhado num espaço de 1000 x 1180; o selo VeriSeal fica embaixo
+    // rótulo frontal 100% VeriSeal, num espaço de 1000 x 1545 (plano de 1,1 x 1,7)
     const g = c.getContext('2d'), s = c.width / 1000, ls = lsOf(g), rr = rrectOf(g);
     g.setTransform(s, 0, 0, s, 0, 0);
-    g.fillStyle = '#121010'; g.fillRect(0, 0, 1000, 1180);
-    for (let i = 0; i < 6000; i++) { g.fillStyle = `rgba(255,240,210,${Math.random() * 0.05})`; g.fillRect(Math.random() * 1000, Math.random() * 1180, 1.5, 1.5); }
-    g.strokeStyle = '#c9a45c'; g.lineWidth = 4; g.strokeRect(34, 34, 932, 1112);
-    g.lineWidth = 1.2; g.strokeRect(50, 50, 900, 1080);
-    g.fillStyle = '#eadfc6'; g.textAlign = 'center'; g.textBaseline = 'alphabetic';
-    ls('12px'); g.font = `600 26px ${SANS}`; g.fillText('SINGLE MALT', 506, 150);
-    g.fillStyle = '#c9a45c'; g.fillRect(430, 178, 140, 1.5); g.fillStyle = '#eadfc6';
-    ls('-12px'); g.font = `200 400px ${SANS}`; g.fillText('12', 494, 560);
-    ls('20px'); g.font = `500 42px ${SANS}`; g.fillText('ANOS', 510, 640);
-    ls('16px'); g.font = `700 48px ${SANS}`; g.fillText('WHISKY', 508, 770);
-    g.fillStyle = '#c9a45c'; g.fillRect(430, 806, 140, 1.5); g.fillStyle = '#eadfc6';
-    ls('5px'); g.font = `400 22px ${MONO}`; g.fillText('ENVELHECIDO EM CARVALHO', 500, 868);
-    g.fillText('40% vol  ·  700 ml', 500, 912);
+    const bg = g.createLinearGradient(0, 0, 1000, 1545); bg.addColorStop(0, '#0f3d84'); bg.addColorStop(0.5, '#062a63'); bg.addColorStop(1, '#021838');
+    g.fillStyle = bg; g.fillRect(0, 0, 1000, 1545);
+    // guilhoché de segurança
+    g.lineWidth = 1.6;
+    for (let i = 0; i < 16; i++) {
+      g.strokeStyle = i % 2 ? 'rgba(95,208,255,.09)' : 'rgba(159,181,255,.07)';
+      g.beginPath();
+      for (let y = 0; y <= 1545; y += 10) { const x = 500 + 430 * Math.sin(y * 0.0085 + i * 0.4) * (0.6 + 0.4 * Math.sin(y * 0.003 - i * 0.7)); y ? g.lineTo(x, y) : g.moveTo(x, y); }
+      g.stroke();
+    }
+    // brilho atrás do monograma
+    const glow = g.createRadialGradient(500, 600, 0, 500, 600, 420); glow.addColorStop(0, 'rgba(3,173,249,.28)'); glow.addColorStop(1, 'rgba(3,173,249,0)');
+    g.fillStyle = glow; g.fillRect(0, 150, 1000, 900);
+    // molduras
+    g.strokeStyle = 'rgba(3,173,249,.85)'; g.lineWidth = 6; rr(34, 34, 932, 1477, 26); g.stroke();
+    g.strokeStyle = 'rgba(255,255,255,.28)'; g.lineWidth = 1.6; rr(52, 52, 896, 1441, 18); g.stroke();
+    g.textAlign = 'center'; g.textBaseline = 'alphabetic';
+    // topo
+    g.fillStyle = 'rgba(255,255,255,.75)'; ls('14px'); g.font = `600 26px ${MONO}`; g.fillText('LACRE INTELIGENTE', 507, 170);
+    g.fillStyle = '#03adf9'; g.fillRect(450, 198, 100, 4);
+    // monograma grande
+    drawLogo(g, MK, 170, 330, 660, '#ffffff', '#03adf9');
+    // logo completa
+    drawLogo(g, WM, 120, 790, 760, '#ffffff', '#03adf9');
+    g.fillStyle = 'rgba(255,255,255,.22)'; g.fillRect(120, 990, 760, 2);
+    // chamada
+    drawContactless(g, 288, 1140, 170, '#ffffff', 12);
+    g.textAlign = 'left'; g.fillStyle = '#ffffff'; ls('2px'); g.font = `700 50px ${SANS}`;
+    g.fillText('APROXIME', 420, 1120); g.fillText('O CELULAR', 420, 1180);
+    g.textAlign = 'center'; g.fillStyle = 'rgba(255,255,255,.7)'; ls('6px'); g.font = `500 22px ${MONO}`;
+    g.fillText('PRODUTO ORIGINAL · IDENTIDADE DIGITAL', 505, 1310);
+    g.fillStyle = '#ffffff'; ls('8px'); g.font = `600 40px ${MONO}`; g.fillText('Nº A7F3K9B21', 504, 1410);
     ls('0px');
-    // selo "protegido por VeriSeal"
-    const bx = 290, by = 960, bw = 420, bh = 112;
-    const bg = g.createLinearGradient(bx, by, bx + bw, by + bh); bg.addColorStop(0, '#0b3474'); bg.addColorStop(1, '#03204f');
-    g.fillStyle = bg; rr(bx, by, bw, bh, 22); g.fill();
-    g.strokeStyle = 'rgba(3,173,249,.7)'; g.lineWidth = 2; rr(bx + 6, by + 6, bw - 12, bh - 12, 17); g.stroke();
-    drawLogo(g, MK, bx + 26, by + bh / 2 - 26, 97, '#ffffff', '#03adf9');
-    g.textAlign = 'left'; g.fillStyle = 'rgba(255,255,255,.72)'; ls('5px'); g.font = `500 17px ${MONO}`; g.fillText('PROTEGIDO POR', bx + 144, by + 46); ls('0px');
-    drawLogo(g, WM, bx + 144, by + 58, 236, '#ffffff', '#03adf9');
   }
   function drawBackLabel(c) {
     // contrarrótulo VeriSeal na face de trás, 800 x 900
@@ -286,11 +297,11 @@
     ls('6px'); g.font = `600 30px ${MONO}`; g.fillStyle = '#fff'; g.fillText('Nº A7F3K9B21', 403, 815);
     ls('0px');
   }
-  const labelTex = canvasTex(1600, 1888, drawLabel);
+  const labelTex = canvasTex(1400, 2163, drawLabel);
   const backTex = canvasTex(1024, 1152, drawBackLabel);
   const lateRedraw = [labelTex, backTex];
   // as texturas usam Inter e JetBrains Mono: redesenha quando os pesos usados no canvas estiverem carregados
-  if (document.fonts) Promise.all([`200 400px Inter`, `500 42px Inter`, `600 26px Inter`, `700 48px Inter`, `400 22px "JetBrains Mono"`, `500 22px "JetBrains Mono"`, `600 30px "JetBrains Mono"`].map(f => document.fonts.load(f)))
+  if (document.fonts) Promise.all([`200 400px Inter`, `500 42px Inter`, `600 26px Inter`, `700 48px Inter`, `700 50px Inter`, `600 26px "JetBrains Mono"`, `600 40px "JetBrains Mono"`, `400 22px "JetBrains Mono"`, `500 22px "JetBrains Mono"`, `600 30px "JetBrains Mono"`].map(f => document.fonts.load(f)))
     .catch(() => {}).then(() => lateRedraw.forEach(t => t.userData.redraw()));
   const gradientTex = (w, h, draw) => canvasTex(w, h, draw);
 
@@ -352,6 +363,7 @@
   backdrop.position.set(0, 4, -9); scene.add(backdrop);
   const floor = new THREE.Mesh(new THREE.PlaneGeometry(16, 16), new THREE.ShadowMaterial({ color: 0x2c2a2a, opacity: 0.3 }));
   floor.rotation.x = -PI / 2; floor.receiveShadow = true; scene.add(floor);
+  let causticPivot = null;
   // light that crosses the whisky is focused into a warm patch inside the shadow (the caustic every bottle casts)
   {
     const toLight = key.position.clone().sub(key.target.position).normalize();
@@ -363,7 +375,7 @@
       transparent: true, depthWrite: false, toneMapped: false,
     }));
     patch.rotation.x = -PI / 2; patch.position.z = -(len / 2 - 0.35); patch.renderOrder = 1;
-    pivot.add(patch); scene.add(pivot);
+    pivot.add(patch); scene.add(pivot); causticPivot = pivot;
   }
   const contact = new THREE.Mesh(new THREE.PlaneGeometry(2.6, 2.6), new THREE.MeshBasicMaterial({
     map: canvasTex(256, 256, c => { const g = c.getContext('2d'), grd = g.createRadialGradient(128, 128, 0, 128, 128, 128); grd.addColorStop(0, 'rgba(30,32,44,0.32)'); grd.addColorStop(0.5, 'rgba(30,32,44,0.1)'); grd.addColorStop(1, 'rgba(30,32,44,0)'); g.fillStyle = grd; g.fillRect(0, 0, 256, 256); }),
@@ -420,29 +432,31 @@
   surface.frustumCulled = false; surface.renderOrder = 1;
   bottle.add(surface);
 
-  // black label on the flat front face; a trace of transmission keeps it out of the refraction buffer so it never ghosts
-  const label = new THREE.Mesh(new THREE.PlaneGeometry(1.08, 1.27),
-    new THREE.MeshPhysicalMaterial({ map: labelTex, roughness: 0.55, metalness: 0, envMapIntensity: 0.6, clearcoat: 0.3, clearcoatRoughness: 0.3, transmission: 0.001, thickness: 0 }));
-  label.position.set(0, 1.82, HW + 0.004); bottle.add(label);
+  // rótulo VeriSeal na face frontal (grande); um traço de transmissão o mantém fora do buffer de refração, sem fantasma
+  const label = new THREE.Mesh(new THREE.PlaneGeometry(1.1, 1.7),
+    new THREE.MeshPhysicalMaterial({ map: labelTex, roughness: 0.5, metalness: 0, envMapIntensity: 0.7, clearcoat: 0.45, clearcoatRoughness: 0.22, transmission: 0.001, thickness: 0 }));
+  label.position.set(0, 1.86, HW + 0.004); bottle.add(label);
   // contrarrótulo VeriSeal na face de trás: aparece quando a garrafa gira
   const backLabel = new THREE.Mesh(new THREE.PlaneGeometry(0.86, 0.97),
     new THREE.MeshPhysicalMaterial({ map: backTex, roughness: 0.5, metalness: 0, envMapIntensity: 0.6, clearcoat: 0.4, clearcoatRoughness: 0.25, transmission: 0.001, thickness: 0 }));
   backLabel.position.set(0, 2.0, -(HW + 0.004)); backLabel.rotation.y = PI; bottle.add(backLabel);
 
-  // a plain screw cap: short, black, finely ribbed, with a thin gold line above its skirt
+  // tampa de rosca curta, azul-marinho quase preto, com frisos e um filete ciano acima da saia.
+  // Fica num grupo próprio: no modo "lacre violado" ela gira e sobe, levando junto a parte de cima do lacre.
+  const capGroup = new THREE.Group(); bottle.add(capGroup);
   const capBody = new THREE.Mesh(new THREE.LatheGeometry([V2(0, 5.22), V2(0.35, 5.22), V2(0.35, 5.575), V2(0.335, 5.61), V2(0.30, 5.62), V2(0, 5.62)], 128),
-    new THREE.MeshPhysicalMaterial({ color: 0x0f0d0b, roughness: 0.38, metalness: 0, clearcoat: 0.5, clearcoatRoughness: 0.25, envMapIntensity: 0.9 }));
-  bottle.add(capBody);
+    new THREE.MeshPhysicalMaterial({ color: 0x07142e, roughness: 0.34, metalness: 0.1, clearcoat: 0.6, clearcoatRoughness: 0.2, envMapIntensity: 1.0 }));
+  capGroup.add(capBody);
   const capSkinTex = canvasTex(64, 512, c => {
-    const g = c.getContext('2d'); g.fillStyle = '#16120f'; g.fillRect(0, 0, 64, 512);
-    for (let y = 2; y < 440; y += 4) { g.fillStyle = (y >> 2) % 2 ? '#0b0907' : '#2b241f'; g.fillRect(0, y, 64, 1.5); }
-    g.fillStyle = '#c9a45c'; g.fillRect(0, 446, 64, 9);
-    g.fillStyle = '#0c0a08'; g.fillRect(0, 462, 64, 50);
+    const g = c.getContext('2d'); g.fillStyle = '#0a1a3a'; g.fillRect(0, 0, 64, 512);
+    for (let y = 2; y < 440; y += 4) { g.fillStyle = (y >> 2) % 2 ? '#050d20' : '#163066'; g.fillRect(0, y, 64, 1.5); }
+    g.fillStyle = '#03adf9'; g.fillRect(0, 446, 64, 9);
+    g.fillStyle = '#061128'; g.fillRect(0, 462, 64, 50);
   });
   capSkinTex.anisotropy = maxAniso;
   const capSkin = new THREE.Mesh(new THREE.CylinderGeometry(0.352, 0.352, 0.35, 128, 1, true),
-    new THREE.MeshPhysicalMaterial({ map: capSkinTex, roughness: 0.42, metalness: 0.15, clearcoat: 0.4, clearcoatRoughness: 0.3, envMapIntensity: 0.9 }));
-  capSkin.position.y = 5.395; bottle.add(capSkin); // 5.22 → 5.57, below the rounded rim
+    new THREE.MeshPhysicalMaterial({ map: capSkinTex, roughness: 0.4, metalness: 0.2, clearcoat: 0.5, clearcoatRoughness: 0.25, envMapIntensity: 1.0 }));
+  capSkin.position.y = 5.395; capGroup.add(capSkin); // 5.22 → 5.57, below the rounded rim
 
   /* the smart seal, as on the reference: a tamper strip that crosses the cap, runs down its side and bonds to the neck.
      Opening the cap tears it; the NFC inlay is laminated inside the strip. */
@@ -553,13 +567,30 @@
   const stripOrm = canvasTex(256, Math.round(256 * strip.total / STRIP_W), c => drawStrip(c, true));
   stripOrm.colorSpace = THREE.NoColorSpace;
   stripTex.anisotropy = maxAniso; lateRedraw.push(stripTex);
-  const stripMesh = new THREE.Mesh(strip.geometry, new THREE.MeshPhysicalMaterial({
+  const stripMat = new THREE.MeshPhysicalMaterial({
     map: stripTex, roughness: 1, metalness: 1, roughnessMap: stripOrm, metalnessMap: stripOrm,
     iridescence: 1, iridescenceMap: stripOrm, iridescenceIOR: 1.8, iridescenceThicknessRange: [180, 640],
     clearcoat: 0.5, clearcoatRoughness: 0.2, envMapIntensity: 1.1, side: THREE.DoubleSide, alphaTest: 0.5,
     polygonOffset: true, polygonOffsetFactor: -2, polygonOffsetUnits: -2, // the strip always wins the depth tie against the cap it sits on
-  }));
-  bottle.add(stripMesh);
+  });
+  // o lacre é uma peça só, desenhada duas vezes com planos de corte na junção: a metade de cima vai com a tampa.
+  // Girar a tampa ("lacre violado") separa as metades na linha de ruptura.
+  const SPLIT_Y = 5.222;
+  const clipTop = new THREE.Plane(), clipBot = new THREE.Plane();
+  const localUp = new THREE.Plane(new THREE.Vector3(0, 1, 0), -SPLIT_Y), localDown = new THREE.Plane(new THREE.Vector3(0, -1, 0), SPLIT_Y);
+  const stripTopMat = stripMat.clone(); stripTopMat.clippingPlanes = [clipTop];
+  stripMat.clippingPlanes = [clipBot];
+  renderer.localClippingEnabled = true;
+  bottle.add(new THREE.Mesh(strip.geometry, stripMat));
+  capGroup.add(new THREE.Mesh(strip.geometry, stripTopMat));
+  let tear = 0, tearT = 0;
+  function updateTear(dt) {
+    tear += (tearT - tear) * (1 - Math.exp(-dt * (tearT > tear ? 3.2 : 4)));
+    capGroup.rotation.y = 0.62 * tear; capGroup.position.y = 0.04 * tear;
+    bottle.updateMatrixWorld(true);
+    clipTop.copy(localUp).applyMatrix4(capGroup.matrixWorld);
+    clipBot.copy(localDown).applyMatrix4(bottle.matrixWorld);
+  }
 
   /* ---------- overlay: chapters and the callouts anchored to the seal ---------- */
   const hudSvg = document.getElementById('hud-svg');
@@ -583,6 +614,18 @@
   let px = 0, py = 0, pxS = 0, pyS = 0; // pointer parallax
   const tmp = new THREE.Vector3(), tmp2 = new THREE.Vector3();
   const nav = document.getElementById('nav');
+  const howHost = document.getElementById('howGL'), howScene = document.getElementById('howScene');
+  let mode = 'frame', host = stage, turnBase = 0;
+  const vis = { frame: false, how: false };
+  function setMode(m) {
+    if (m === mode) return;
+    mode = m; host = m === 'how' ? howHost : stage;
+    host.prepend(canvas); resize();
+    scene.background.set(m === 'how' ? 0xf5f6f8 : 0xe9ecf1);
+    backdrop.visible = m !== 'how';
+    if (m === 'how') turnBase = Math.round(dyn.spin / (2 * PI)) * 2 * PI;
+    hud.style.opacity = 0;
+  }
 
   // progresso da animação = quanto o quadro fixo (sticky) já percorreu da sua trilha
   function progress() {
@@ -605,7 +648,7 @@
   const endDrag = () => { dragging = false; canvas.classList.remove('is-grabbing'); };
   canvas.addEventListener('pointerup', endDrag); canvas.addEventListener('pointercancel', endDrag);
   function resize() {
-    W = stage.clientWidth || 1; H = stage.clientHeight || 1; aspect = W / H;
+    W = host.clientWidth || 1; H = host.clientHeight || 1; aspect = W / H;
     renderer.setPixelRatio(Math.min(devicePixelRatio || 1, W < 760 ? 1.75 : 2));
     renderer.setSize(W, H, false);
     camera.aspect = aspect; camera.updateProjectionMatrix();
@@ -704,6 +747,8 @@
     pS += (p - pS) * (1 - Math.exp(-dt * 4.5));
     const vP = (pS - pPrev) / dt;
     if (!visible) return;
+    if (mode === 'how') { howFrame(dt, t); return; }
+    tearT = 0;
 
     if (!dragging) {
       dragSpin += dragV * dt; dragV *= Math.exp(-dt * 2.5);
@@ -726,8 +771,77 @@
     camera.setViewOffset(W, H, (ox / visW) * W, lift, W, H);
     backdrop.position.y = ty;
 
+    updateTear(dt);
     renderer.render(scene, camera);
     updateHud(pS);
+  }
+
+  /* "Como funciona": close no gargalo, o lacre vira para o celular; site.js informa a etapa e o modo violado */
+  function howFrame(dt, t) {
+    const st = (window.VeriSeal && window.VeriSeal.how) || { step: 0, bad: false };
+    tearT = st.bad ? 1 : 0;
+    if (!dragging) {
+      dragSpin += dragV * dt; dragV *= Math.exp(-dt * 2.5);
+      if (Math.abs(dragV) < 0.4) dragSpin += (Math.round(dragSpin / (2 * PI)) * 2 * PI - dragSpin) * (1 - Math.exp(-dt * 1.4));
+    }
+    const look = st.step === 0 ? 0.3 : st.step === 1 ? 0.5 : 0.2;   // gira o lacre na direção do celular
+    const spinTarget = turnBase + look + dragSpin + (reduceMotion ? 0 : 0.07 * Math.sin(t * 0.6));
+    updatePhysics(dt, t, spinTarget, 0, 1);
+    const narrow = aspect < 0.9;
+    const dist = narrow ? 7.6 : 6.3, ty = narrow ? 4.3 : 4.5, el = 0.12, ox = narrow ? 0.35 : 1.1;
+    pxS += (px - pxS) * (1 - Math.exp(-dt * 3)); pyS += (py - pyS) * (1 - Math.exp(-dt * 3));
+    const par = reduceMotion ? 0 : 0.18;
+    camera.position.set(pxS * par, ty + dist * Math.sin(el) - pyS * 0.1, dist * Math.cos(el));
+    camera.lookAt(0, ty, 0);
+    const visW = 2 * dist * Math.tan(camera.fov * PI / 360) * aspect;
+    camera.setViewOffset(W, H, (ox / visW) * W, narrow ? 0.14 * H : 0, W, H);
+    updateTear(dt);
+    renderer.render(scene, camera);
+    // onde o símbolo de aproximação do lacre está na tela (as ondas saem dali)
+    bottle.localToWorld(tmp.set(0, 5.05, 0.345)); tmp.project(camera);
+    howScene.style.setProperty('--nfc-x', ((tmp.x * 0.5 + 0.5) * W).toFixed(1) + 'px');
+    howScene.style.setProperty('--nfc-y', ((-tmp.y * 0.5 + 0.5) * H).toFixed(1) + 'px');
+  }
+
+  /* fotos da garrafa renderizadas pela própria cena (usadas no jogo "qual delas é original?"):
+     bad = true troca o whisky por uma bebida turva e gira a tampa, rompendo o lacre */
+  let glowPlane = null;
+  function renderBottle({ bad = false, w = 380, h = 760, bg = 0x030b1c } = {}) {
+    const prev = {
+      pr: renderer.getPixelRatio(), size: renderer.getSize(new THREE.Vector2()), bg: scene.background.clone(), bd: backdrop.visible,
+      rot: bottle.rotation.clone(), cap: capGroup.rotation.y, capY: capGroup.position.y, aspect: camera.aspect,
+      att: liquid.material.attenuationColor.clone(), rough: liquid.material.roughness, surf: surface.material.color.clone(),
+      tilt: liquidUniforms.uTilt.value.clone(), sym: liquidUniforms.uSym.value, rip: liquidUniforms.uRip.value, swirl: liquidUniforms.uSwirl.value,
+    };
+    renderer.setPixelRatio(2); renderer.setSize(w, h, false);
+    scene.background.set(bg); backdrop.visible = false; causticPivot.visible = false;
+    // uma luz de fundo atrás da garrafa: o líquido a refrata (e a cor da bebida aparece) e a borda some no fundo da seção
+    if (!glowPlane) {
+      const hex = '#' + new THREE.Color(bg).getHexString();
+      glowPlane = new THREE.Mesh(new THREE.PlaneGeometry(4.8, 8), new THREE.MeshBasicMaterial({ toneMapped: false, map: canvasTex(256, 256, c => {
+        const g = c.getContext('2d'), grd = g.createRadialGradient(128, 128, 0, 128, 128, 128);
+        grd.addColorStop(0, '#8fb0e6'); grd.addColorStop(0.3, '#3a64a8'); grd.addColorStop(0.62, '#0e2349'); grd.addColorStop(0.86, hex); grd.addColorStop(1, hex);
+        g.fillStyle = grd; g.fillRect(0, 0, 256, 256);
+      }) }));
+      glowPlane.position.set(0, 3.5, -6); scene.add(glowPlane);
+    }
+    glowPlane.visible = true;
+    bottle.rotation.set(0, 0.42, 0); capGroup.rotation.y = bad ? 0.8 : 0; capGroup.position.y = bad ? 0.05 : 0;
+    if (bad) { liquid.material.attenuationColor.set(0xbdb57c); liquid.material.roughness = 0.4; surface.material.color.set(0xc4b98a); }
+    liquidUniforms.uTilt.value.set(0, 0); liquidUniforms.uSym.value = 0; liquidUniforms.uRip.value = 0.0004; liquidUniforms.uSwirl.value = 0;
+    camera.clearViewOffset(); camera.aspect = w / h; camera.updateProjectionMatrix();
+    const d = 13.4; camera.position.set(0, 2.98 + d * Math.sin(0.05), d * Math.cos(0.05)); camera.lookAt(0, 2.98, 0);
+    bottle.updateMatrixWorld(true);
+    clipTop.copy(localUp).applyMatrix4(capGroup.matrixWorld); clipBot.copy(localDown).applyMatrix4(bottle.matrixWorld);
+    renderer.render(scene, camera);
+    const url = renderer.domElement.toDataURL('image/png');
+    renderer.setPixelRatio(prev.pr); renderer.setSize(prev.size.x, prev.size.y, false);
+    scene.background.copy(prev.bg); backdrop.visible = prev.bd; causticPivot.visible = true; glowPlane.visible = false;
+    bottle.rotation.copy(prev.rot); capGroup.rotation.y = prev.cap; capGroup.position.y = prev.capY;
+    liquid.material.attenuationColor.copy(prev.att); liquid.material.roughness = prev.rough; surface.material.color.copy(prev.surf);
+    liquidUniforms.uTilt.value.copy(prev.tilt); liquidUniforms.uSym.value = prev.sym; liquidUniforms.uRip.value = prev.rip; liquidUniforms.uSwirl.value = prev.swirl;
+    camera.aspect = prev.aspect; camera.updateProjectionMatrix();
+    return url;
   }
 
   /* ---------- boot ---------- */
@@ -735,8 +849,16 @@
   dyn.spin = K.rot(pS) - 0.3; // a small settle on load
   resize();
   addEventListener('resize', resize);
-  if ('ResizeObserver' in window) new ResizeObserver(resize).observe(stage);
-  new IntersectionObserver(entries => { visible = entries[0].isIntersecting; }, { threshold: 0 }).observe(stage);
+  if ('ResizeObserver' in window) { const ro = new ResizeObserver(resize); ro.observe(stage); ro.observe(howHost); }
+  const io = new IntersectionObserver(entries => {
+    entries.forEach(e => { vis[e.target === howHost ? 'how' : 'frame'] = e.isIntersecting; });
+    visible = vis.frame || vis.how;
+    if (vis.how && !vis.frame) setMode('how'); else if (vis.frame) setMode('frame');
+  }, { threshold: 0 });
+  io.observe(stage); io.observe(howHost);
+  window.VeriSeal3D = { renderBottle };
+  const ready = () => dispatchEvent(new Event('veriseal:3d'));
+  (document.fonts ? document.fonts.ready : Promise.resolve()).then(() => setTimeout(ready, 300));
   addEventListener('pointermove', e => { px = (e.clientX / innerWidth) * 2 - 1; py = (e.clientY / innerHeight) * 2 - 1; }, { passive: true });
   renderer.setAnimationLoop(frame);
 })();

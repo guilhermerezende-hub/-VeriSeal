@@ -183,7 +183,7 @@
       if (s.el.id === 'track') s.pinOffset = navH;   // o quadro gruda logo abaixo da nav
     }
     sections.forEach(o => { const r = o.el.getBoundingClientRect(); o.top = r.top + scrollY; o.bottom = o.top + o.el.offsetHeight; });
-    hero.layout(); how.layout(); dash.layout();
+    hero.layout();
   }
   const sections = $$('[data-theme]').filter(el => el.matches('section, footer, .track')).map(el => ({ el, theme: el.dataset.theme, top: 0, bottom: 0 }));
 
@@ -317,7 +317,7 @@
       const targY = (fine ? pX * 11 : 0) + idle * Math.sin(t * 0.37 + 1) * 3.5;
       tiltX = damp(tiltX, reduce ? 0 : targX, 5, dt); tiltY = damp(tiltY, reduce ? 0 : targY, 5, dt);
       const ex = narrow ? 58 : 57, ez = narrow ? 0 : -24, es = narrow ? 0.94 : 0.64;
-      const ox = narrow ? 0 : sw * 0.16, oy = narrow ? sh * 0.62 : sh * 0.55;
+      const ox = narrow ? 0 : sw * 0.03, oy = narrow ? sh * 0.62 : sh * 0.55;
       tx = ox * k; ty = oy * k;
       const s = lerp(1, es, k) * (1 - 0.06 * settle);
       seal.style.transform = `translate3d(${tx.toFixed(1)}px,${ty.toFixed(1)}px,0) rotateX(${lerp(tiltX, ex, k).toFixed(2)}deg) rotateY(${lerp(tiltY, 0, k).toFixed(2)}deg) rotateZ(${(ez * k).toFixed(2)}deg) scale(${s.toFixed(4)})`;
@@ -363,7 +363,7 @@
         } else {
           const m = lay.querySelector('.mk').getBoundingClientRect();
           const mx = m.left - stageR.left, my = m.top - stageR.top;
-          const lx = mx + 56, ly = my - 18 - (3 - i) * 6;
+          const lx = Math.min(mx + 56, vw - stageR.left - li.offsetWidth - 20), ly = my - 18 - (3 - i) * 6;
           li.style.transform = `translate(${lx.toFixed(1)}px,${(ly - 10).toFixed(1)}px)`;
           linePaths[i].firstChild.setAttribute('d', `M${mx.toFixed(1)} ${my.toFixed(1)}L${(mx + 22).toFixed(1)} ${ly.toFixed(1)}H${(lx - 6).toFixed(1)}`);
           linePaths[i].lastChild.setAttribute('cx', mx.toFixed(1)); linePaths[i].lastChild.setAttribute('cy', my.toFixed(1));
@@ -422,143 +422,132 @@
   frame.bind(frameSeq);
 
   /* ============================================================
-     3 · O PROBLEMA — o ciclo da garrafa reaproveitada, duas voltas: sem e com VeriSeal
+     3 · O PROBLEMA — "qual delas é original?": duas garrafas idênticas (renderizadas pela cena 3D);
+     começa sozinho quando aparece, revela em alguns segundos ou quando a pessoa escolhe
      ============================================================ */
-  const cycle = (() => {
-    const fig = $('#cycle'), prog = $('#cycProg'), bottle = $('#cycBottle'), liquid = $('#cbLiquid'), brk = $('#cycBreak');
-    const sealG = $('#cbSeal'), nodes = $$('.cyc-nodes li', fig), ccs = {};
-    $$('.cc', fig).forEach(c => { ccs[c.dataset.cc] = c; });
-    brk.setAttribute('d', 'M128 409l24 24M152 409l-24 24'); brk.style.transformOrigin = '140px 421px';
-    const AMBER = '#e6a247', MURKY = '#7d7046';
-    let curCC = null, shook = false;
-    const ro = new ResizeObserver(() => fig.style.setProperty('--cs', fig.offsetWidth + 'px')); ro.observe(fig);
-    function placeBottle(s) {
-      const a = (-90 + 360 * s) * Math.PI / 180;
-      bottle.setAttribute('transform', `translate(${(280 + 200 * Math.cos(a)).toFixed(1)} ${(280 + 200 * Math.sin(a)).toFixed(1)})`);
+  const game = (() => {
+    const root = $('#game'), btns = $$('.gb', root), msg = $('#gameMsg'), again = $('#gameAgain'), timer = $('#gameTimer');
+    const AUTO = 6;
+    let fake = Math.random() < 0.5 ? 0 : 1, state = 'idle', clock = 0, inView = false, hasImg = false;
+    function fallback(bad) {
+      const liq = bad ? '#c2b47a' : '#d98a2b';
+      const svg = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 190 380">'
+        + '<path d="M80 44h30v56c0 12 40 22 40 50v196a10 10 0 0 1-10 10H50a10 10 0 0 1-10-10V150c0-28 40-38 40-50z" fill="' + liq + '" fill-opacity=".85"/>'
+        + '<path d="M80 44h30v56c0 12 40 22 40 50v196a10 10 0 0 1-10 10H50a10 10 0 0 1-10-10V150c0-28 40-38 40-50z" fill="none" stroke="#fff" stroke-opacity=".6" stroke-width="2"/>'
+        + '<rect x="56" y="186" width="78" height="120" rx="6" fill="#062a63" stroke="#03adf9" stroke-width="2"/>'
+        + '<rect x="74" y="16" width="42" height="30" rx="5" fill="#0a1a3a"' + (bad ? ' transform="rotate(-14 95 31)"' : '') + '/></svg>';
+      return 'data:image/svg+xml;charset=utf-8,' + encodeURIComponent(svg);
     }
-    function setLiquid(level, color) {
-      const h = 40 * clamp(level, 0, 1);
-      liquid.setAttribute('y', (34 - h).toFixed(1)); liquid.setAttribute('height', h.toFixed(1)); liquid.style.fill = color;
+    function setImages() {
+      let ok = null, bad = null;
+      try { if (window.VeriSeal3D) { ok = window.VeriSeal3D.renderBottle({ bad: false }); bad = window.VeriSeal3D.renderBottle({ bad: true }); } } catch (e) { ok = null; }
+      if (!ok) { ok = fallback(false); bad = fallback(true); }
+      btns.forEach(b => { $('.gb-a', b).src = ok; $('.gb-b', b).src = bad; });
+      hasImg = true;
     }
-    function liquidFor(s) {
-      if (s < 0.25) return [1 - sstep(0.02, 0.22, s), AMBER];
-      if (s < 0.5) return [sstep(0.36, 0.48, s), MURKY];
-      return [1, MURKY];
+    addEventListener('veriseal:3d', setImages);
+    setTimeout(() => { if (!hasImg) setImages(); }, 7000);
+    function reset() {
+      fake = Math.random() < 0.5 ? 0 : 1; state = 'idle'; clock = 0;
+      root.classList.remove('is-done', 'is-scanning');
+      btns.forEach(b => { b.className = 'gb'; b.disabled = false; $('.gb-badge', b).textContent = ''; });
+      msg.textContent = ''; again.hidden = true; timer.style.setProperty('--gt', 0);
     }
-    function show(id) {
-      if (curCC === id) return; curCC = id;
-      for (const k in ccs) ccs[k].classList.toggle('is-on', k === id);
+    function reveal(choice) {
+      if (state !== 'idle') return;
+      state = 'revealing';
+      root.classList.add('is-done'); btns.forEach(b => { b.disabled = true; });
+      if (choice != null) btns[choice].classList.add('chosen');
+      root.classList.remove('is-scanning'); void root.offsetWidth; root.classList.add('is-scanning');
+      [0, 1].forEach((i, k) => setTimeout(() => {
+        const b = btns[i], isFake = i === fake;
+        b.classList.add(isFake ? 'is-fake' : 'is-real', 'revealed');
+        $('.gb-badge', b).textContent = isFake ? '✕ Lacre rompido' : '✓ Original';
+      }, reduce ? 0 : 420 + k * 640));
+      setTimeout(() => {
+        state = 'done';
+        const tail = ' Por fora, são idênticas. Só o lacre VeriSeal conta a verdade.';
+        msg.innerHTML = choice == null ? '<b>Impossível saber só de olhar.</b> Só o lacre VeriSeal conta a verdade.'
+          : choice === fake ? '<b>Errou.</b>' + tail : '<b>Acertou, mas foi sorte.</b>' + tail;
+        again.hidden = false;
+      }, reduce ? 0 : 1700);
     }
-    function update(p) {
-      fig.style.opacity = sstep(0, 0.05, p).toFixed(3);
-      let s, lap2 = p >= 0.56;
-      if (!lap2) {
-        s = clamp((p - 0.05) / 0.45, 0, 1);
-        prog.style.strokeDashoffset = (1 - s).toFixed(4);
-        prog.classList.remove('is-bad');
-        const stage = Math.min(3, Math.floor(s * 4 + 0.02));
-        nodes.forEach((n, i) => { n.classList.toggle('is-on', i === stage && s < 0.995); n.classList.remove('is-bad'); });
-        const [lv, col] = liquidFor(s); setLiquid(lv, col);
-        sealG.classList.remove('is-on', 'is-broken');
-        show(p > 0.5 ? 'loop' : String(stage + 1));
-        brk.style.opacity = 0; shook = false;
-      } else {
-        s = 0.625 * clamp((p - 0.62) / 0.22, 0, 1);
-        prog.style.strokeDashoffset = (1 - s).toFixed(4);
-        prog.classList.toggle('is-bad', s > 0.5);
-        const [lv, col] = liquidFor(s); setLiquid(lv, col);
-        sealG.classList.add('is-on'); sealG.classList.toggle('is-broken', s > 0.04);
-        const stage = Math.min(3, Math.floor(s * 4 + 0.02));
-        const blocked = p > 0.84;
-        nodes.forEach((n, i) => { n.classList.toggle('is-on', i === stage && !blocked); n.classList.toggle('is-bad', blocked && i === 3); });
-        const b = sstep(0.83, 0.88, p);
-        brk.style.opacity = b.toFixed(3);
-        brk.style.transform = `scale(${lerp(0.4, 1, b).toFixed(3)})`;
-        if (blocked && !shook && !reduce) { shook = true; bottle.classList.remove('shake'); void bottle.getBBox(); bottle.classList.add('shake'); }
-        if (!blocked) shook = false;
-        show(blocked ? 'end' : 'vs');
-      }
-      placeBottle(s);
+    btns.forEach((b, i) => b.addEventListener('click', () => reveal(i)));
+    again.addEventListener('click', () => { reset(); btns[0].focus(); });
+    new IntersectionObserver(es => es.forEach(e => { inView = e.isIntersecting; }), { threshold: 0.5 }).observe(root);
+    function update(dt) {
+      if (!inView || state !== 'idle' || !hasImg) return;
+      clock += dt;
+      timer.style.setProperty('--gt', clamp(clock / AUTO, 0, 1).toFixed(3));
+      if (clock >= AUTO) reveal(null);
     }
     return { update };
   })();
-  addSeq($('#problema'), p => cycle.update(p), '.pin');
 
   /* ============================================================
-     5 · A IDEIA — a frase acende palavra por palavra
+     5 · A IDEIA — a frase acende palavra por palavra sozinha quando aparece (a rolagem fica livre)
      ============================================================ */
-  const idea = (() => {
-    const text = $('#ideaText'), sub = $('#ideaSub'), mark = $('.idea-mark');
+  (() => {
+    const sec = $('#ideia'), text = $('#ideaText'), sub = $('#ideaSub');
     const words = text.textContent.trim().split(/\s+/);
     text.setAttribute('aria-label', text.textContent.trim());
-    text.innerHTML = words.map((w, i) => `<span class="iw${i >= words.length - 2 ? ' hl' : ''}" aria-hidden="true">${w}</span>`).join(' ');
-    const spans = $$('.iw', text);
-    function update(p) {
-      const n = spans.length;
-      spans.forEach((s, i) => {
-        const a = 0.08 + 0.55 * (i / n);
-        s.style.opacity = (0.16 + 0.84 * sstep(a, a + 0.07, p)).toFixed(3);
-      });
-      sub.classList.toggle('is-on', p > 0.66);
-      mark.style.setProperty('--im', (0.86 + 0.3 * p).toFixed(3));
-      mark.style.opacity = (0.03 + 0.05 * sstep(0.1, 0.8, p)).toFixed(3);
-    }
-    return { update };
+    text.innerHTML = words.map((w, i) => '<span class="iw' + (i >= words.length - 2 ? ' hl' : '') + '" aria-hidden="true" style="--i:' + i + '">' + w + '</span>').join(' ');
+    sub.style.setProperty('--sd', (words.length * 0.085 + 0.5).toFixed(2) + 's');
+    new IntersectionObserver((es, o) => es.forEach(e => { if (e.isIntersecting) { sec.classList.add('is-on'); o.disconnect(); } }), { threshold: 0.4 }).observe(sec);
   })();
-  addSeq($('#ideia'), p => idea.update(p), '.pin');
 
   /* ============================================================
-     6 · COMO FUNCIONA — o celular se aproxima, lê o lacre e confirma
+     6 · COMO FUNCIONA — demonstração que roda sozinha quando aparece; etapas clicáveis, pausa e modo violado.
+     A garrafa é a cena 3D real (main.js lê window.VeriSeal.how para girar o lacre e romper a tampa).
      ============================================================ */
+  const howState = { step: 0, bad: false };
   const how = (() => {
-    const scene = $('#howScene'), phone = $('#phone'), neck = $('.neck', scene), waves = $('#howWaves');
-    const steps = $$('#steps li'), checks = $$('.checks li', phone);
-    const scr1 = $('.scr-1', phone), scr2 = $('.scr-2', phone), scrOk = $('.scr-ok', phone), scrBad = $('.scr-bad', phone);
-    const seg = $('.seg', scene), segBtns = $$('button', seg);
-    let bad = false;
-    function layout() {
-      const r = neck.getBoundingClientRect(), sr = scene.getBoundingClientRect();
-      if (!r.width) return;
-      scene.style.setProperty('--neck-x', (r.left - sr.left + r.width * (130 / 260)) + 'px');
-      scene.style.setProperty('--neck-y', (r.top - sr.top + r.height * (214 / 560)) + 'px');
+    const scene = $('#howScene'), steps = $$('#steps li'), stepBtns = $$('#steps button'), checks = $$('.checks li', scene);
+    const scr1 = $('.scr-1', scene), scr2 = $('.scr-2', scene), scrOk = $('.scr-ok', scene), scrBad = $('.scr-bad', scene);
+    const seg = $('#como-funciona .seg'), segBtns = $$('button', seg), playBtn = $('#howPlay');
+    const DUR = [3.4, 3.8, 5.2];
+    let local = 0, playing = !reduce, inView = false, started = false;
+    function render() {
+      const st = howState.step;
+      ['st-0', 'st-1', 'st-2'].forEach((c, i) => scene.classList.toggle(c, started && st === i));
+      steps.forEach((li, i) => {
+        li.classList.toggle('is-on', i === st); li.classList.toggle('is-done', i < st);
+        li.style.setProperty('--sp', i < st ? 1 : i === st ? clamp(local, 0, 1).toFixed(3) : 0);
+        stepBtns[i].setAttribute('aria-current', i === st ? 'step' : 'false');
+      });
+      scr1.classList.toggle('is-on', st === 0); scr2.classList.toggle('is-on', st === 1);
+      scrOk.classList.toggle('is-on', st === 2 && !howState.bad); scrBad.classList.toggle('is-on', st === 2 && howState.bad);
+      checks.forEach(c => c.classList.toggle('is-on', st > 1 || (st === 1 && local >= +c.dataset.at)));
+      scene.classList.toggle('is-reading', started && ((st === 0 && local > 0.6) || st === 1));
     }
+    function go(i) { howState.step = i; local = 0; render(); }
+    stepBtns.forEach((b, i) => b.addEventListener('click', () => { started = true; go(i); }));
+    function setPlaying(v) { playing = v; playBtn.classList.toggle('is-playing', v); playBtn.setAttribute('aria-label', v ? 'Pausar demonstração' : 'Reproduzir demonstração'); }
+    setPlaying(playing);
+    playBtn.addEventListener('click', () => setPlaying(!playing));
     segBtns.forEach(b => b.addEventListener('click', () => {
-      bad = b.dataset.mode === 'bad';
+      howState.bad = b.dataset.mode === 'bad';
       segBtns.forEach(x => x.setAttribute('aria-checked', x === b));
-      seg.classList.toggle('is-bad', bad); scene.classList.toggle('is-bad', bad);
-      if (last >= 0) update(last);
+      seg.classList.toggle('is-bad', howState.bad); scene.classList.toggle('is-bad', howState.bad);
+      started = true; go(2);
     }));
     seg.addEventListener('keydown', e => {
       if (e.key !== 'ArrowLeft' && e.key !== 'ArrowRight') return;
       const i = segBtns.findIndex(x => x.getAttribute('aria-checked') === 'true'), j = (i + 1) % 2;
       segBtns[j].click(); segBtns[j].focus(); e.preventDefault();
     });
-    let last = -1;
-    function update(p) {
-      last = p;
-      const st = p < 0.34 ? 0 : p < 0.67 ? 1 : 2;
-      const local = st === 0 ? p / 0.34 : st === 1 ? (p - 0.34) / 0.33 : (p - 0.67) / 0.33;
-      steps.forEach((li, i) => {
-        li.classList.toggle('is-on', i === st); li.classList.toggle('is-done', i < st);
-        li.style.setProperty('--sp', i < st ? 1 : i === st ? clamp(local, 0, 1).toFixed(3) : 0);
-      });
-      // trajetória do celular: chega girado, encosta perto do lacre, depois se vira para quem lê
-      const a = sstep(0.02, 0.28, p), back = sstep(0.68, 0.8, p);
-      const px = lerp(lerp(55, -26, a), 0, back), pr = lerp(lerp(14, -7, a), 0, back), ry = lerp(lerp(-42, -16, a), 0, back);
-      phone.style.setProperty('--px', px.toFixed(2) + '%');
-      phone.style.setProperty('--pr', pr.toFixed(2) + 'deg');
-      phone.style.setProperty('--ry', ry.toFixed(2) + 'deg');
-      phone.style.opacity = sstep(0, 0.06, p).toFixed(3);
-      scene.classList.toggle('is-reading', (st === 0 && local > 0.75) || st === 1);
-      scr1.classList.toggle('is-on', st === 0);
-      scr2.classList.toggle('is-on', st === 1);
-      scrOk.classList.toggle('is-on', st === 2 && !bad);
-      scrBad.classList.toggle('is-on', st === 2 && bad);
-      checks.forEach(c => c.classList.toggle('is-on', st > 1 || (st === 1 && local >= +c.dataset.at)));
+    new IntersectionObserver(es => es.forEach(e => { inView = e.isIntersecting; if (inView && !started) { started = true; go(0); } }), { threshold: 0.35 }).observe(scene);
+    function update(dt) {
+      if (!started || !inView) return;
+      if (playing) {
+        local += dt / DUR[howState.step];
+        if (local >= 1) { go((howState.step + 1) % 3); return; }
+      }
+      render();
     }
-    return { update, layout };
+    render();
+    return { update };
   })();
-  addSeq($('#como-funciona'), p => how.update(p), '.pin');
 
   /* ============================================================
      7 · BENEFÍCIOS — abas com controle segmentado
@@ -588,140 +577,35 @@
   })();
 
   /* ============================================================
-     8 · PAINEL DE DADOS (ilustrativo) — KPIs, linha diária, regiões; entra erguendo-se em perspectiva
+     8 · IDENTIDADE DIGITAL — cartão 3D que entra em perspectiva, vira sozinho uma vez para mostrar a jornada,
+     e depois vira com um toque; inclina com o ponteiro
      ============================================================ */
-  const dash = (() => {
-    const el = $('#dash');
-    // série determinística: tendência leve, sazonalidade semanal, um pico recente
-    let seed = 7;
-    const rnd = () => (seed = (seed * 16807) % 2147483647) / 2147483647;
-    const today = new Date(); today.setHours(12, 0, 0, 0);
-    const DAYS = 180, series = [];
-    for (let i = DAYS - 1; i >= 0; i--) {
-      const d = new Date(today); d.setDate(today.getDate() - i);
-      const dow = d.getDay(), weekly = dow === 5 ? 1.32 : dow === 6 ? 1.42 : dow === 0 ? 1.12 : 1;
-      const trend = 1 + (DAYS - i) * 0.0042, spike = i >= 8 && i <= 10 ? 1.55 : 1;
-      series.push({ d, v: Math.round(1180 * weekly * trend * spike * (0.92 + rnd() * 0.16)) });
+  const passport = (() => {
+    const box = $('#pass'), card = $('#passCard'), flipBtn = $('#passFlip'), holo = $('.pc-holo', card), sec = $('#identidade');
+    $$('.journey li', card).forEach((li, k) => li.style.setProperty('--k', k));
+    let shown = false, enter = 0, flip = 0, flipT = 0, rx = 0, ry = 0, mx = 0, my = 0, autoT = 0, auto = reduce ? 2 : 0;
+    function setFlip(back) { flipT = back ? 180 : 0; card.classList.toggle('is-back', back); flipBtn.textContent = back ? 'Ver a identidade' : 'Ver a jornada'; }
+    const toggle = () => { auto = 2; setFlip(flipT === 0); };
+    flipBtn.addEventListener('click', toggle);
+    card.addEventListener('click', toggle);
+    if (fine) box.addEventListener('pointermove', e => { const r = card.getBoundingClientRect(); mx = clamp(((e.clientX - r.left) / r.width) * 2 - 1, -1, 1); my = clamp(((e.clientY - r.top) / r.height) * 2 - 1, -1, 1); });
+    box.addEventListener('pointerleave', () => { mx = my = 0; });
+    new IntersectionObserver(es => es.forEach(e => { if (e.isIntersecting) shown = true; }), { threshold: 0.35 }).observe(box);
+    card.style.opacity = 0;
+    function update(dt, t) {
+      if (!shown) return;
+      enter = reduce ? 1 : damp(enter, 1, 2.4, dt);
+      if (auto === 0) { autoT += dt; if (autoT > 2.6) { setFlip(true); auto = 1; autoT = 0; } }
+      else if (auto === 1) { autoT += dt; if (autoT > 6.5) { setFlip(false); auto = 2; } }
+      flip = reduce ? flipT : damp(flip, flipT, 4, dt);
+      const idle = reduce ? 0 : 1;
+      rx = damp(rx, -my * 8 + idle * Math.sin(t * 0.7) * 2, 5, dt); ry = damp(ry, mx * 12 + idle * Math.sin(t * 0.5) * 4, 5, dt);
+      card.style.opacity = Math.min(1, enter * 1.4).toFixed(3);
+      card.style.transform = 'translateY(' + ((1 - enter) * 70).toFixed(1) + 'px) rotateX(' + (rx + (1 - enter) * 40).toFixed(2) + 'deg) rotateY(' + (ry + flip).toFixed(2) + 'deg)';
+      holo.style.setProperty('--ha', (ry * 6 + t * 18).toFixed(1) + 'deg');
+      card.style.setProperty('--gx', (50 + ry * 3).toFixed(1) + '%'); card.style.setProperty('--gy', (25 - rx * 3).toFixed(1) + '%');
     }
-    const REG = [['Sudeste', .46], ['Nordeste', .19], ['Sul', .18], ['Centro-Oeste', .1], ['Norte', .07]];
-    const kVer = $('#kVer'), kBot = $('#kBot'), kReg = $('#kReg'), kAl = $('#kAl'), kVerD = $('#kVerD'), kBotD = $('#kBotD');
-    const svg = $('#chartSvg'), chart = $('#chart'), tip = $('#chartTip'), regions = $('#regions');
-    const table = $('#chartTable'), tblBtn = $('#tblToggle');
-    const rangeBtns = $$('.dash-range button');
-    let days = 30, shown = false, data = [], top0 = 0, hoverI = -1;
-    const counters = new Map();
-    function countTo(node, to, ms = 900) {
-      const from = counters.get(node) || 0, t0 = performance.now();
-      counters.set(node, to);
-      if (reduce) { node.textContent = fmt(to); return; }
-      const step = now => { const k = clamp((now - t0) / ms, 0, 1), e = 1 - Math.pow(1 - k, 3); node.textContent = fmt(lerp(from, to, e)); if (k < 1) requestAnimationFrame(step); };
-      requestAnimationFrame(step);
-    }
-    const ddmm = d => d.toLocaleDateString('pt-BR', { day: '2-digit', month: '2-digit' });
-    function compute() {
-      data = series.slice(-days);
-      const prev = series.slice(-2 * days, -days);
-      const sum = data.reduce((s, x) => s + x.v, 0), psum = prev.reduce((s, x) => s + x.v, 0);
-      return { sum, delta: psum ? (sum - psum) / psum : 0 };
-    }
-    function render(animate) {
-      const { sum, delta } = compute();
-      countTo(kVer, sum); countTo(kBot, sum * 0.71); countTo(kReg, days >= 30 ? 5 : 4); countTo(kAl, Math.max(2, Math.round(sum * 0.00042)));
-      const pct = (delta * 100).toLocaleString('pt-BR', { maximumFractionDigits: 1, minimumFractionDigits: 1 });
-      kVerD.textContent = `${delta >= 0 ? '+' : ''}${pct}% vs. ${days} dias anteriores`;
-      kBotD.textContent = `${delta >= 0 ? '+' : ''}${(delta * 92).toLocaleString('pt-BR', { maximumFractionDigits: 1, minimumFractionDigits: 1 })}% no período`;
-      drawChart(animate);
-      const max = REG[0][1];
-      regions.innerHTML = '';
-      REG.forEach(([name, share]) => {
-        const li = document.createElement('li');
-        const n = document.createElement('span'); n.textContent = name;
-        const bar = document.createElement('span'); bar.className = 'bar';
-        const i = document.createElement('i'); const em = document.createElement('em'); em.textContent = fmt(sum * share);
-        bar.append(i, em); li.append(n, bar); regions.appendChild(li);
-        requestAnimationFrame(() => requestAnimationFrame(() => i.style.setProperty('--w', (share / max * 78).toFixed(1) + '%')));
-      });
-      // tabela equivalente ao gráfico
-      const tbl = document.createElement('table');
-      const cap = document.createElement('caption'); cap.className = 'sprite'; cap.textContent = `Verificações por dia, últimos ${days} dias (dados ilustrativos)`;
-      const th = document.createElement('thead'); th.innerHTML = '<tr><th scope="col">Dia</th><th scope="col">Verificações</th></tr>';
-      const tb = document.createElement('tbody');
-      data.slice().reverse().forEach(x => { const tr = document.createElement('tr'); const a = document.createElement('td'); a.textContent = ddmm(x.d); const b = document.createElement('td'); b.textContent = fmt(x.v); tr.append(a, b); tb.appendChild(tr); });
-      tbl.append(cap, th, tb); table.replaceChildren(tbl);
-    }
-    let geo = null;
-    function drawChart(animate) {
-      const W = chart.clientWidth, H = chart.clientHeight;
-      if (!W) return;
-      const m = { l: 46, r: 58, t: 14, b: 28 };
-      const max = Math.max(...data.map(x => x.v));
-      const stepY = max > 2500 ? 1000 : 500, top = Math.ceil(max * 1.08 / stepY) * stepY;
-      const x = i => m.l + (W - m.l - m.r) * (data.length === 1 ? 0 : i / (data.length - 1));
-      const y = v => m.t + (H - m.t - m.b) * (1 - v / top);
-      geo = { x, y, m, W, H };
-      let grid = '', axis = '';
-      for (let v = 0; v <= top; v += stepY) { grid += `<line x1="${m.l}" x2="${W - m.r}" y1="${y(v).toFixed(1)}" y2="${y(v).toFixed(1)}"/>`; axis += `<text x="${m.l - 10}" y="${(y(v) + 4).toFixed(1)}" text-anchor="end">${fmt(v)}</text>`; }
-      const nt = Math.min(6, data.length), idx = [...new Set(Array.from({ length: nt }, (_, k) => Math.round(k * (data.length - 1) / (nt - 1))))];
-      idx.forEach(i => { axis += `<text x="${x(i).toFixed(1)}" y="${H - 6}" text-anchor="middle">${ddmm(data[i].d)}</text>`; });
-      const pts = data.map((d, i) => `${x(i).toFixed(1)} ${y(d.v).toFixed(1)}`);
-      const line = 'M' + pts.join('L'), area = line + `L${x(data.length - 1).toFixed(1)} ${y(0)}L${x(0).toFixed(1)} ${y(0)}Z`;
-      const last = data[data.length - 1];
-      svg.innerHTML = `<g class="grid">${grid}</g><g class="axis">${axis}</g>
-        <path class="area" d="${area}"/><path class="line" pathLength="1" d="${line}"/>
-        <circle class="end" r="4.5" cx="${x(data.length - 1).toFixed(1)}" cy="${y(last.v).toFixed(1)}"/>
-        <text class="end-label" x="${(x(data.length - 1) + 10).toFixed(1)}" y="${(y(last.v) + 4).toFixed(1)}">${fmt(last.v)}</text>
-        <line class="cross" y1="${m.t}" y2="${H - m.b}" x1="-10" x2="-10"/><circle class="hover-dot" r="5" cx="-20" cy="-20"/>`;
-      if (animate && !reduce) {
-        const ln = $('.line', svg), ar = $('.area', svg), en = $$('.end, .end-label', svg);
-        ln.style.strokeDasharray = 1; ln.style.strokeDashoffset = 1; ar.style.opacity = 0; en.forEach(e => e.style.opacity = 0);
-        requestAnimationFrame(() => requestAnimationFrame(() => {
-          ln.style.transition = 'stroke-dashoffset 1.4s cubic-bezier(.65,0,.35,1)'; ln.style.strokeDashoffset = 0;
-          ar.style.transition = 'opacity 1s ease .6s'; ar.style.opacity = 1;
-          en.forEach(e => { e.style.transition = 'opacity .5s ease 1.3s'; e.style.opacity = 1; });
-        }));
-      }
-      hoverI = -1; tip.hidden = true;
-    }
-    function showTip(i) {
-      if (!geo || i < 0) { tip.hidden = true; return; }
-      hoverI = i;
-      const d = data[i], cx = geo.x(i), cy = geo.y(d.v);
-      const cross = $('.cross', svg), dot = $('.hover-dot', svg);
-      cross.setAttribute('x1', cx); cross.setAttribute('x2', cx); dot.setAttribute('cx', cx); dot.setAttribute('cy', cy);
-      tip.replaceChildren();
-      const b = document.createElement('b'); b.textContent = fmt(d.v) + ' verificações';
-      const s = document.createElement('span'); s.textContent = d.d.toLocaleDateString('pt-BR', { weekday: 'short', day: '2-digit', month: 'short' });
-      tip.append(b, s); tip.hidden = false;
-      tip.style.left = clamp(cx, 70, geo.W - 70) + 'px'; tip.style.top = cy + 'px';
-    }
-    chart.addEventListener('pointermove', e => {
-      if (!geo) return;
-      const r = chart.getBoundingClientRect(), px = e.clientX - r.left;
-      const i = Math.round(clamp((px - geo.m.l) / (geo.W - geo.m.l - geo.m.r), 0, 1) * (data.length - 1));
-      showTip(i);
-    });
-    chart.addEventListener('pointerleave', () => { tip.hidden = true; $('.cross', svg)?.setAttribute('x1', -10); $('.cross', svg)?.setAttribute('x2', -10); $('.hover-dot', svg)?.setAttribute('cx', -20); });
-    chart.tabIndex = 0;
-    chart.addEventListener('keydown', e => {
-      if (e.key === 'ArrowRight' || e.key === 'ArrowLeft') { e.preventDefault(); showTip(clamp((hoverI < 0 ? data.length - 1 : hoverI) + (e.key === 'ArrowRight' ? 1 : -1), 0, data.length - 1)); }
-    });
-    chart.addEventListener('blur', () => { tip.hidden = true; });
-    tblBtn.addEventListener('click', () => { const open = table.hidden; table.hidden = !open; tblBtn.setAttribute('aria-expanded', open); tblBtn.textContent = open ? 'Ocultar tabela' : 'Ver tabela'; });
-    rangeBtns.forEach(b => b.addEventListener('click', () => {
-      days = +b.dataset.days; rangeBtns.forEach(x => x.setAttribute('aria-checked', x === b));
-      render(true);
-    }));
-    new ResizeObserver(() => { if (shown) drawChart(false); }).observe(chart);
-    function layout() { top0 = el.getBoundingClientRect().top + scrollY; }
-    function update(y) {
-      // de 24° deitado para de pé, conforme o painel sobe pela tela
-      const k = reduce ? 1 : sstep(top0 - vh * 0.95, top0 - vh * 0.35, y);
-      el.style.setProperty('--dx', ((1 - k) * 26).toFixed(2) + 'deg');
-      el.style.setProperty('--ds', (0.9 + 0.1 * k).toFixed(4));
-      el.style.setProperty('--do', (0.25 + 0.75 * k).toFixed(3));
-      if (!shown && k > 0.55) { shown = true; el.classList.add('is-in'); render(true); }
-    }
-    return { layout, update };
+    return { update, sec };
   })();
 
   /* ============================================================
@@ -863,7 +747,10 @@
     }
     updateNav(y);
     updateMcta(y);
-    dash.update(y);
+    game.update(dt);
+    how.update(dt);
+    const ps = passport.sec;
+    if (y + vh > ps.offsetTop && y < ps.offsetTop + ps.offsetHeight) passport.update(dt, t);
     const st = $('#historia');
     if (y + vh > st.offsetTop && y < st.offsetTop + st.offsetHeight) story.update(y, dt);
     const ct = $('#contato');
@@ -883,5 +770,5 @@
   if (forcedP) addEventListener('load', () => { measure(); scrollTo({ top: frameSeq.top + clamp(+forcedP[1], 0, 1) * frameSeq.len, behavior: 'auto' }); });
 
   requestAnimationFrame(tick);
-  window.VeriSeal = { frameProgress: () => Math.max(0, frameSeq.p), measure };
+  window.VeriSeal = Object.assign(window.VeriSeal || {}, { frameProgress: () => Math.max(0, frameSeq.p), measure, how: howState });
 })();
