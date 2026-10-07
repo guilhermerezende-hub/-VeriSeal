@@ -35,6 +35,8 @@
   <symbol id="i-close" viewBox="0 0 24 24"><path fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" d="M6 6l12 12M18 6L6 18"/></symbol>
   <symbol id="i-check" viewBox="0 0 24 24"><path fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" d="M5 12.5l4.5 4.5L19 7.5"/></symbol>
   <symbol id="i-alert" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"><path d="M12 3.5 2.8 19.5h18.4z"/><path stroke-linecap="round" d="M12 10v4.5M12 17.2v.1"/></g></symbol>
+  <symbol id="i-verified" viewBox="-2 -2 60 60"><path fill="currentColor" d="M28.00 4.80Q35.82 -1.17 39.60 7.91Q49.35 6.65 48.09 16.40Q57.17 20.18 51.20 28.00Q57.17 35.82 48.09 39.60Q49.35 49.35 39.60 48.09Q35.82 57.17 28.00 51.20Q20.18 57.17 16.40 48.09Q6.65 49.35 7.91 39.60Q-1.17 35.82 4.80 28.00Q-1.17 20.18 7.91 16.40Q6.65 6.65 16.40 7.91Q20.18 -1.17 28.00 4.80Z"/><path class="vb-check" fill="none" stroke="#fff" stroke-width="5" stroke-linecap="round" stroke-linejoin="round" d="M18 28.5l7 7 13.5-14"/></symbol>
+  <symbol id="i-alert-badge" viewBox="-2 -2 60 60"><path fill="currentColor" d="M28.00 4.80Q35.82 -1.17 39.60 7.91Q49.35 6.65 48.09 16.40Q57.17 20.18 51.20 28.00Q57.17 35.82 48.09 39.60Q49.35 49.35 39.60 48.09Q35.82 57.17 28.00 51.20Q20.18 57.17 16.40 48.09Q6.65 49.35 7.91 39.60Q-1.17 35.82 4.80 28.00Q-1.17 20.18 7.91 16.40Q6.65 6.65 16.40 7.91Q20.18 -1.17 28.00 4.80Z"/><path fill="none" stroke="#fff" stroke-width="5" stroke-linecap="round" d="M28 16v15M28 39.5v.5"/></symbol>
   <symbol id="i-pulse" viewBox="0 0 24 24"><path fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" d="M3 12h4l2.5-6 5 12 2.5-6H21"/></symbol>
   <!-- ameaças -->
   <symbol id="i-drop" viewBox="0 0 48 48"><g fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path class="draw" pathLength="1" d="M24 6c6 8 12 14.5 12 22a12 12 0 0 1-24 0c0-7.5 6-14 12-22z"/><path class="draw" pathLength="1" d="M19.5 25.5l9 9M28.5 25.5l-9 9"/></g></symbol>
@@ -309,51 +311,57 @@
       <div class="phone" id="phone" aria-hidden="true">
         <div class="phone-screen">
           <div class="ph-status"><span>9:41</span><i class="ph-island"></i><span class="ph-icons"><i></i><i></i><i></i></span></div>
+
+          <div class="ph-home">
+            <div class="ph-widget"><b>9:41</b><span>Boa noite</span></div>
+            <div class="ph-grid">
+              <i class="ic g1"></i><i class="ic g2"></i><i class="ic g3"></i><i class="ic g4"></i>
+              <i class="ic g5"></i><i class="ic g6"></i><span class="ic vs-app"><svg viewBox="0 0 668 359"><use href="#vs-mark"/></svg><em>VeriSeal</em></span><i class="ic g7"></i>
+              <i class="ic g8"></i><i class="ic g9"></i><i class="ic g10"></i><i class="ic g11"></i>
+            </div>
+            <div class="ph-dock"><i class="ic d1"></i><i class="ic d2"></i><i class="ic d3"></i><i class="ic d4"></i></div>
+          </div>
+
+          <div class="ph-banner"><span class="ic vs-app"><svg viewBox="0 0 668 359"><use href="#vs-mark"/></svg></span><div><b>VeriSeal</b><span>Lacre detectado. Abrindo verificação…</span></div></div>
+
           <div class="ph-app">
-            <div class="ph-brand"><svg viewBox="0 0 977 161"><use href="#vs-wordmark"/></svg></div>
+            <div class="ap-top"><svg viewBox="0 0 977 161"><use href="#vs-wordmark"/></svg></div>
 
-            <div class="scr scr-1">
-              <div class="scan-ring"><svg><use href="#i-contactless"/></svg><i></i><i></i></div>
-              <p class="scr-t">Pronto para verificar</p>
-              <p class="scr-s">Aproxime o celular do lacre na garrafa.</p>
-            </div>
-
-            <div class="scr scr-2">
-              <div class="spinner"><svg viewBox="0 0 48 48"><circle cx="24" cy="24" r="20" pathLength="1"/></svg></div>
-              <p class="scr-t">Verificando…</p>
-              <ul class="checks">
-                <li data-at=".15"><svg><use href="#i-check"/></svg>Lacre detectado</li>
-                <li data-at=".45"><svg><use href="#i-check"/></svg>Identidade digital consultada</li>
-                <li data-at=".75"><svg><use href="#i-check"/></svg>Integridade conferida</li>
+            <div class="ap-scr ap-read">
+              <div class="ap-hero"><img class="ap-bottle" alt=""><i class="ap-ring"></i><i class="ap-ring"></i><i class="ap-scan"></i></div>
+              <p class="ap-title">Lendo o lacre…</p>
+              <ul class="ap-checks">
+                <li data-at=".12"><svg><use href="#i-check"/></svg>Lacre detectado</li>
+                <li data-at=".42"><svg><use href="#i-check"/></svg>Identidade digital</li>
+                <li data-at=".72"><svg><use href="#i-check"/></svg>Integridade conferida</li>
               </ul>
-              <p class="scr-code">ID <span>A7F3K9B21</span></p>
             </div>
 
-            <div class="scr scr-3 scr-ok">
-              <div class="res-ic ok"><svg viewBox="0 0 52 52"><circle cx="26" cy="26" r="24" pathLength="1"/><path d="M15 27l7 7 15-16" pathLength="1"/></svg></div>
-              <p class="scr-t">Produto autêntico</p>
-              <p class="scr-s ok-t">Lacre íntegro · nunca aberto</p>
-              <dl class="res-card">
-                <dt>Produto</dt><dd>Whisky 12 anos</dd>
-                <dt>Garrafa</dt><dd class="mono">A7F3K9B21</dd>
-                <dt>Lote</dt><dd>2026-09 · produção 14/09</dd>
-                <dt>Verificações</dt><dd>3 · última há 2 min</dd>
+            <div class="ap-scr ap-ok">
+              <div class="ap-hero"><img class="ap-bottle" alt=""><svg class="ap-badge ok"><use href="#i-verified"/></svg></div>
+              <p class="ap-title ok">Autêntico</p>
+              <p class="ap-sub">Lacre íntegro · nunca aberto</p>
+              <dl class="ap-card">
+                <div><dt>Produto</dt><dd>Whisky 12 anos</dd></div>
+                <div><dt>Garrafa</dt><dd class="mono">A7F3K9B21</dd></div>
+                <div><dt>Produção</dt><dd>14/09/2026</dd></div>
               </dl>
+              <ol class="ap-journey"><li>Produção</li><li>Distribuidor</li><li>Loja</li><li class="me">Você</li></ol>
+              <span class="ap-btn">Ver jornada completa</span>
             </div>
 
-            <div class="scr scr-3 scr-bad">
-              <div class="res-ic bad"><svg viewBox="0 0 52 52"><circle cx="26" cy="26" r="24" pathLength="1"/><path d="M26 14v15M26 36v1" pathLength="1"/></svg></div>
-              <p class="scr-t">Atenção: lacre violado</p>
-              <p class="scr-s bad-t">Esta garrafa já foi aberta.</p>
-              <dl class="res-card">
-                <dt>Garrafa</dt><dd class="mono">A7F3K9B21</dd>
-                <dt>Primeira abertura</dt><dd>02/10 · 21:42</dd>
-                <dt>Situação</dt><dd>circuito rompido</dd>
+            <div class="ap-scr ap-bad">
+              <div class="ap-hero"><img class="ap-bottle bad" alt=""><svg class="ap-badge bad"><use href="#i-alert-badge"/></svg></div>
+              <p class="ap-title bad">Lacre violado</p>
+              <p class="ap-sub">Esta garrafa já foi aberta</p>
+              <dl class="ap-card">
+                <div><dt>Garrafa</dt><dd class="mono">A7F3K9B21</dd></div>
+                <div><dt>1ª abertura</dt><dd>02/10 · 21:42</dd></div>
+                <div><dt>Situação</dt><dd class="bad-t">circuito rompido</dd></div>
               </dl>
-              <p class="scr-note">Desconfie da procedência e fale com o vendedor.</p>
+              <p class="ap-note">Desconfie da procedência e fale com o vendedor.</p>
+              <span class="ap-btn bad">Avisar a marca</span>
             </div>
-
-            <p class="ph-foot">Verificado por VeriSeal</p>
           </div>
         </div>
       </div>
@@ -420,7 +428,7 @@
       <div class="pass-card" id="passCard">
         <div class="pc-face pc-front">
           <div class="pc-head"><svg viewBox="0 0 668 359" aria-hidden="true"><use href="#vs-mark"/></svg><span>Identidade digital</span></div>
-          <div class="pc-auth"><span class="pc-auth-ic"><svg aria-hidden="true"><use href="#i-check"/></svg></span><div><b>Autêntico</b><span>Lacre íntegro · nunca aberto</span></div></div>
+          <div class="pc-auth"><svg class="pc-auth-ic" aria-hidden="true"><use href="#i-verified"/></svg><div><b>Autêntico</b><span>Lacre íntegro · nunca aberto</span></div></div>
           <p class="pc-prod">Whisky 12 anos</p>
           <p class="pc-sub">700 ml · 40% vol</p>
           <dl class="pc-grid">

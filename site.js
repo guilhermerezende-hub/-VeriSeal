@@ -300,13 +300,13 @@
 
     function update(p, dt, t) {
       // explosão: as camadas se separam entre 10% e 42% da rolagem e voltam entre 74% e 90%
-      const k = reduce ? 0 : sstep(0.1, 0.42, p) * (1 - sstep(0.74, 0.9, p));
-      const settle = sstep(0.86, 0.96, p);
+      const k = reduce ? 0 : sstep(0.1, 0.42, p);   // termina aberto: as camadas não voltam
+      const settle = 0;
       heroCopy.style.opacity = (1 - sstep(0.03, 0.14, p)).toFixed(3);
       heroCopy.style.transform = `translateY(${(-sstep(0, 0.2, p) * 60).toFixed(1)}px)`;
       foot.style.opacity = (1 - sstep(0.02, 0.09, p)).toFixed(3);
       foot.style.pointerEvents = p > 0.06 ? 'none' : '';
-      const an = sstep(0.22, 0.34, p) * (1 - sstep(0.72, 0.8, p));
+      const an = sstep(0.22, 0.34, p);
       anatomy.style.opacity = an.toFixed(3);
       anatomy.style.transform = `translateY(${((1 - an) * 24).toFixed(1)}px)`;
       next.style.opacity = settle.toFixed(3);
@@ -352,7 +352,7 @@
       // rótulos das camadas, presos às pontas projetadas de cada camada
       const stageR = stage.getBoundingClientRect();
       labels.forEach((li, i) => {
-        const a = sstep(0.2 + i * 0.035, 0.3 + i * 0.035, p) * (1 - sstep(0.7, 0.78, p));
+        const a = sstep(0.2 + i * 0.035, 0.3 + i * 0.035, p);
         li.style.opacity = a.toFixed(3);
         linePaths[i].style.opacity = narrow ? 0 : a.toFixed(3);
         if (a <= 0.001) return;
@@ -493,7 +493,7 @@
       timer.style.setProperty('--gt', clamp(clock / AUTO, 0, 1).toFixed(3));
       if (clock >= AUTO) reveal(null);
     }
-    return { update };
+    return { update, fallback };
   })();
 
   /* ============================================================
@@ -514,10 +514,10 @@
      ============================================================ */
   const howState = { step: 0, bad: false };
   const how = (() => {
-    const scene = $('#howScene'), steps = $$('#steps li'), stepBtns = $$('#steps button'), checks = $$('.checks li', scene);
-    const scr1 = $('.scr-1', scene), scr2 = $('.scr-2', scene), scrOk = $('.scr-ok', scene), scrBad = $('.scr-bad', scene);
+    const scene = $('#howScene'), steps = $$('#steps li'), stepBtns = $$('#steps button');
+    const scrRead = $('.ap-read', scene), scrOk = $('.ap-ok', scene), scrBad = $('.ap-bad', scene), apChecks = $('.ap-checks li', scene);
     const seg = $('#como-funciona .seg'), segBtns = $$('button', seg), playBtn = $('#howPlay');
-    const DUR = [1.2, 0.9, 3];   // verificação rápida: aproxima, lê em menos de um segundo, mostra o resultado
+    const DUR = [1.8, 1.1, 3.2];   // aproxima (o app abre sozinho), lê em ~1 s, mostra o resultado
     let local = 0, playing = !reduce, inView = false, started = false;
     function render() {
       const st = howState.step;
@@ -527,10 +527,12 @@
         li.style.setProperty('--sp', i < st ? 1 : i === st ? clamp(local, 0, 1).toFixed(3) : 0);
         stepBtns[i].setAttribute('aria-current', i === st ? 'step' : 'false');
       });
-      scr1.classList.toggle('is-on', st === 0); scr2.classList.toggle('is-on', st === 1);
+      scene.classList.toggle('ph-detect', started && st === 0 && local > 0.62);
+      scene.classList.toggle('ph-open', started && st >= 1);
+      scrRead.classList.toggle('is-on', st === 1);
       scrOk.classList.toggle('is-on', st === 2 && !howState.bad); scrBad.classList.toggle('is-on', st === 2 && howState.bad);
-      checks.forEach(c => c.classList.toggle('is-on', st > 1 || (st === 1 && local >= +c.dataset.at)));
-      scene.classList.toggle('is-reading', started && ((st === 0 && local > 0.6) || st === 1));
+      apChecks.forEach(c => c.classList.toggle('is-on', st > 1 || (st === 1 && local >= +c.dataset.at)));
+      scene.classList.toggle('is-reading', started && ((st === 0 && local > 0.5) || st === 1));
     }
     function go(i) { howState.step = i; local = 0; render(); }
     stepBtns.forEach((b, i) => b.addEventListener('click', () => { started = true; go(i); }));
@@ -549,6 +551,17 @@
       segBtns[j].click(); segBtns[j].focus(); e.preventDefault();
     });
     new IntersectionObserver(es => es.forEach(e => { inView = e.isIntersecting; if (inView && !started) { started = true; go(0); } }), { threshold: 0.35 }).observe(scene);
+    let shots = false;
+    const takeShots = () => {
+      if (shots) return; shots = true;
+      let ok = null, bad = null;
+      try { if (window.VeriSeal3D) { ok = window.VeriSeal3D.renderBottle({ w: 260, h: 520, bg: 0xf1f5fb }); bad = window.VeriSeal3D.renderBottle({ bad: true, w: 260, h: 520, bg: 0xf1f5fb }); } } catch (e) { ok = null; }
+      if (!ok) { ok = game.fallback(false); bad = game.fallback(true); }
+      $('.ap-bottle', scene).forEach(img => { img.src = img.classList.contains('bad') ? bad : ok; });
+    };
+    let near3d = false, ready3d = !!window.VeriSeal3D;
+    addEventListener('veriseal:3d', () => { ready3d = true; if (near3d) takeShots(); });
+    new IntersectionObserver((es, o) => es.forEach(e => { if (!e.isIntersecting) return; near3d = true; o.disconnect(); if (ready3d) takeShots(); setTimeout(() => { if (!shots) takeShots(); }, 2500); }), { rootMargin: '120% 0px' }).observe(scene);
     function update(dt) {
       if (!started || !inView) return;
       if (playing) {

@@ -110,7 +110,7 @@
     el:   kf([[0, 0.08], [0.5, 0.12], [0.72, 0.24], [0.85, 0.36], [1, 0.42]]),
     // lateral lens shift in world units at the target depth (negative = bottle to the right of the text)
     offx: kf([[0, -1.6], [0.14, -1.6], [0.2, 1.8], [0.4, 1.8], [0.46, -1.3], [0.64, -1.1], [0.72, 0], [0.88, 0], [1, -0.3]]),
-    hud:  kf([[0, 0], [0.8, 0], [0.84, 1], [1, 1]]),
+    hud:  kf([[0, 0], [0.79, 0], [0.83, 1], [0.88, 1], [0.905, 0], [1, 0]]),   // balões só no capítulo "Lacre"
   };
 
   /* ---------- liquid model: one height field shared by the volume, its surface, the glass and the shadow ----------
@@ -800,7 +800,7 @@
     camera.position.set(pxS * 0.45 * par, ty + dist * Math.sin(el) - pyS * 0.25 * par, dist * Math.cos(el));
     camera.lookAt(0, ty, 0);
     const visW = 2 * dist * Math.tan(camera.fov * PI / 360) * aspect;
-    const lift = aspect < 1 ? 0.16 * H * clamp((0.7 - pS) / 0.15, 0, 1) : 0;
+    const lift = aspect < 1 ? 0.21 * H : 0;   // no celular a garrafa fica sempre acima dos textos
     camera.setViewOffset(W, H, (ox / visW) * W, lift, W, H);
     backdrop.position.y = ty;
 
@@ -849,14 +849,16 @@
     renderer.setPixelRatio(2); renderer.setSize(w, h, false);
     scene.background.set(bg); backdrop.visible = false; causticPivot.visible = false;
     // uma luz de fundo atrás da garrafa: o líquido a refrata (e a cor da bebida aparece) e a borda some no fundo da seção
+    if (glowPlane && glowPlane.userData.bg !== bg) { scene.remove(glowPlane); glowPlane = null; }
     if (!glowPlane) {
-      const hex = '#' + new THREE.Color(bg).getHexString();
+      const hex = '#' + new THREE.Color(bg).getHexString(), light = new THREE.Color(bg).getHSL({}).l > 0.5;
       glowPlane = new THREE.Mesh(new THREE.PlaneGeometry(4.8, 8), new THREE.MeshBasicMaterial({ toneMapped: false, map: canvasTex(256, 256, c => {
         const g = c.getContext('2d'), grd = g.createRadialGradient(128, 128, 0, 128, 128, 128);
-        grd.addColorStop(0, '#8fb0e6'); grd.addColorStop(0.3, '#3a64a8'); grd.addColorStop(0.62, '#0e2349'); grd.addColorStop(0.86, hex); grd.addColorStop(1, hex);
+        if (light) { grd.addColorStop(0, '#ffffff'); grd.addColorStop(0.5, '#ffffff'); grd.addColorStop(0.86, hex); grd.addColorStop(1, hex); }
+        else { grd.addColorStop(0, '#8fb0e6'); grd.addColorStop(0.3, '#3a64a8'); grd.addColorStop(0.62, '#0e2349'); grd.addColorStop(0.86, hex); grd.addColorStop(1, hex); }
         g.fillStyle = grd; g.fillRect(0, 0, 256, 256);
       }) }));
-      glowPlane.position.set(0, 3.5, -6); scene.add(glowPlane);
+      glowPlane.position.set(0, 3.5, -6); glowPlane.userData.bg = bg; scene.add(glowPlane);
     }
     glowPlane.visible = true;
     bottle.rotation.set(0, 0.42, 0); capGroup.rotation.y = bad ? 0.8 : 0; capGroup.position.y = bad ? 0.05 : 0;
