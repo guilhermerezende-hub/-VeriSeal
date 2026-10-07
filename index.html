@@ -60,7 +60,7 @@
       <a href="#garrafa">Na garrafa</a>
       <a href="#como-funciona">Como funciona</a>
       <a href="#beneficios">Benefícios</a>
-      <a href="#dados">Dados</a>
+      <a href="#identidade">Identidade</a>
     </nav>
     <a class="btn btn-primary btn-sm nav-cta" href="#contato">Proteger minha marca</a>
     <button class="nav-menu" id="navMenu" type="button" aria-expanded="false" aria-controls="navSheet" aria-label="Abrir menu"><svg aria-hidden="true"><use href="#i-menu"/></svg></button>
@@ -71,7 +71,7 @@
     <a href="#garrafa">Na garrafa</a>
     <a href="#como-funciona">Como funciona</a>
     <a href="#beneficios">Benefícios</a>
-    <a href="#dados">Dados</a>
+    <a href="#identidade">Identidade</a>
     <a class="btn btn-primary" href="#contato">Proteger minha marca</a>
   </div>
 </header>
@@ -212,50 +212,36 @@
   </div>
 </section>
 
-<!-- 3 · O PROBLEMA: o ciclo da fraude -->
-<section class="problem dark" id="problema" data-theme="dark" data-seq="cycle">
-  <div class="pin problem-pin">
-    <div class="wrap problem-grid">
-      <div class="problem-copy">
-        <p class="eyebrow">O problema</p>
-        <h2 class="h-sec">Por fora, original. Por dentro, ninguém sabe.</h2>
-        <p class="lead">Garrafas originais são reaproveitadas com bebida adulterada. <strong>A marca paga o prejuízo e a reputação.</strong></p>
+<!-- 3 · O PROBLEMA: "qual delas é original?" — começa sozinho quando aparece -->
+<section class="problem dark" id="problema" data-theme="dark">
+  <div class="wrap problem-grid">
+    <div class="problem-copy">
+      <p class="eyebrow" data-reveal>O problema</p>
+      <h2 class="h-sec" data-reveal style="--d:.06s">Por fora, original. Por dentro, ninguém sabe.</h2>
+      <p class="lead" data-reveal style="--d:.12s">Garrafas originais são reaproveitadas com bebida adulterada. <strong>A marca paga o prejuízo e a reputação.</strong></p>
+    </div>
+    <div class="game" id="game">
+      <p class="game-q" id="gameQ">Qual delas é original?</p>
+      <div class="game-timer" aria-hidden="true"><i id="gameTimer"></i></div>
+      <div class="game-stage">
+        <button class="gb" type="button" data-i="0" aria-label="Escolher a garrafa da esquerda">
+          <span class="gb-img"><img class="gb-a" alt=""><img class="gb-b" alt=""></span>
+          <span class="gb-ring" aria-hidden="true"></span>
+          <span class="gb-badge" aria-hidden="true"></span>
+          <span class="gb-pick">Esta</span>
+        </button>
+        <button class="gb" type="button" data-i="1" aria-label="Escolher a garrafa da direita">
+          <span class="gb-img"><img class="gb-a" alt=""><img class="gb-b" alt=""></span>
+          <span class="gb-ring" aria-hidden="true"></span>
+          <span class="gb-badge" aria-hidden="true"></span>
+          <span class="gb-pick">Esta</span>
+        </button>
+        <i class="game-scan" aria-hidden="true"></i>
       </div>
-      <figure class="cycle" id="cycle" aria-label="O ciclo da garrafa reaproveitada: 1, a garrafa original é consumida; 2, o vasilhame é recolhido; 3, é reenchido com bebida adulterada; 4, volta à prateleira como se fosse original. Com o lacre VeriSeal, abrir a garrafa rompe o lacre e a reutilização deixa de ser invisível.">
-        <svg class="cycle-svg" viewBox="0 0 560 560" aria-hidden="true">
-          <defs>
-            <linearGradient id="cycGrad" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#03adf9"/><stop offset="1" stop-color="#7c8cff"/></linearGradient>
-          </defs>
-          <circle class="cyc-track" cx="280" cy="280" r="200"/>
-          <circle class="cyc-prog" id="cycProg" cx="280" cy="280" r="200" pathLength="1"/>
-          <path class="cyc-break" id="cycBreak" d="M 452 380 l 26 26 M 478 380 l -26 26"/>
-          <g class="cyc-bottle" id="cycBottle">
-            <path class="cb-glass" d="M-7 -30h14v8c6 3 9 8 9 14v32a6 6 0 0 1-6 6h-20a6 6 0 0 1-6-6V-8c0-6 3-11 9-14z"/>
-            <clipPath id="cbClip"><path d="M-7 -30h14v8c6 3 9 8 9 14v32a6 6 0 0 1-6 6h-20a6 6 0 0 1-6-6V-8c0-6 3-11 9-14z"/></clipPath>
-            <rect class="cb-liquid" id="cbLiquid" x="-18" y="-6" width="36" height="40" clip-path="url(#cbClip)"/>
-            <rect class="cb-cap" x="-8.5" y="-36" width="17" height="8" rx="2"/>
-            <g class="cb-seal-g" id="cbSeal">
-              <rect class="cb-seal" id="cbSealBot" x="-3.5" y="-29" width="7" height="15" rx="1.5"/>
-              <rect class="cb-seal" id="cbSealTop" x="-3.5" y="-39" width="7" height="10" rx="1.5"/>
-            </g>
-          </g>
-        </svg>
-        <ol class="cyc-nodes" aria-hidden="true">
-          <li style="--a:-90deg"><span class="n">1</span><b>Consumida</b></li>
-          <li style="--a:0deg"><span class="n">2</span><b>Recolhida</b></li>
-          <li style="--a:90deg"><span class="n">3</span><b>Reenchida</b></li>
-          <li style="--a:180deg"><span class="n">4</span><b>Revendida</b></li>
-        </ol>
-        <div class="cyc-center" aria-hidden="true">
-          <p class="cc" data-cc="1"><span class="big">Consumida</span>A garrafa original é aberta e esvaziada.</p>
-          <p class="cc" data-cc="2"><span class="big">Recolhida</span>O vasilhame vazio é recolhido e revendido.</p>
-          <p class="cc" data-cc="3"><span class="big">Reenchida</span>Recebe bebida adulterada ou de origem desconhecida.</p>
-          <p class="cc" data-cc="4"><span class="big">Revendida</span>Volta à prateleira com cara de original.</p>
-          <p class="cc" data-cc="loop"><span class="big">Por fora, nada muda.</span>Sem proteção, o ciclo se fecha e ninguém percebe.</p>
-          <p class="cc" data-cc="vs"><svg viewBox="0 0 668 359"><use href="#vs-mark"/></svg><span class="big">Agora, com VeriSeal.</span>A mesma garrafa, com o lacre inteligente.</p>
-          <p class="cc bad-t" data-cc="end"><span class="big">Ciclo interrompido.</span>Abrir a garrafa <b>rompe o lacre</b>. A reutilização deixa de ser invisível.</p>
-        </div>
-      </figure>
+      <div class="game-foot">
+        <p class="game-msg" id="gameMsg" role="status" aria-live="polite"></p>
+        <button class="btn btn-ghost btn-sm" id="gameAgain" type="button" hidden>Jogar de novo</button>
+      </div>
     </div>
   </div>
 </section>
@@ -280,8 +266,8 @@
 </section>
 
 <!-- 5 · A IDEIA: frase revelada palavra por palavra -->
-<section class="idea dark" id="ideia" data-theme="dark" data-seq="idea">
-  <div class="pin idea-pin">
+<section class="idea dark" id="ideia" data-theme="dark">
+  <div class="idea-pin">
     <svg class="idea-mark" viewBox="0 0 668 359" aria-hidden="true"><use href="#vs-mark"/></svg>
     <div class="wrap idea-in">
       <p class="eyebrow">A ideia</p>
@@ -291,106 +277,81 @@
   </div>
 </section>
 
-<!-- 6 · COMO FUNCIONA: celular, lacre e as três etapas -->
-<section class="how light" id="como-funciona" data-theme="light" data-seq="how">
-  <div class="pin how-pin">
-    <div class="wrap how-grid">
-      <div class="how-copy">
-        <p class="eyebrow">Como funciona</p>
-        <h2 class="h-sec">Verificar é simples.</h2>
-        <p class="lead">Rápida e confiável, <strong>antes do primeiro gole.</strong></p>
-        <ol class="steps" id="steps">
-          <li><span class="s-n">1</span><div><b>Aproxime o celular</b><span>do lacre na garrafa.</span></div><i class="s-bar"><i></i></i></li>
-          <li><span class="s-n">2</span><div><b>Verifique o produto</b><span>A identidade digital é consultada.</span></div><i class="s-bar"><i></i></i></li>
-          <li><span class="s-n">3</span><div><b>Confirme a autenticidade</b><span>Original e íntegra, ou violada.</span></div><i class="s-bar"><i></i></i></li>
-        </ol>
-      </div>
-
-      <div class="how-scene" id="howScene">
-        <svg class="neck" viewBox="0 0 260 560" aria-hidden="true">
-          <defs>
-            <linearGradient id="nkGlass" x1="0" x2="1"><stop offset="0" stop-color="#c9d3e0"/><stop offset=".35" stop-color="#f4f7fb"/><stop offset=".7" stop-color="#dbe2ec"/><stop offset="1" stop-color="#aeb9c9"/></linearGradient>
-            <linearGradient id="nkWhisky" x1="0" x2="1"><stop offset="0" stop-color="#9a5512"/><stop offset=".4" stop-color="#e7a24a"/><stop offset="1" stop-color="#8a4a10"/></linearGradient>
-            <linearGradient id="nkCap" x1="0" x2="1"><stop offset="0" stop-color="#05070b"/><stop offset=".4" stop-color="#2a2f38"/><stop offset="1" stop-color="#05070b"/></linearGradient>
-            <linearGradient id="nkStrip" x1="0" x2="1"><stop offset="0" stop-color="#021a40"/><stop offset=".45" stop-color="#0b3474"/><stop offset="1" stop-color="#021a40"/></linearGradient>
-            <clipPath id="nkBody"><path d="M96 150h68v120c0 30 70 60 70 130v160H26V400c0-70 70-100 70-130z"/></clipPath>
-          </defs>
-          <path class="nk-glass" d="M96 150h68v120c0 30 70 60 70 130v160H26V400c0-70 70-100 70-130z"/>
-          <rect x="0" y="300" width="260" height="260" fill="url(#nkWhisky)" clip-path="url(#nkBody)" opacity=".92"/>
-          <rect x="90" y="40" width="80" height="118" rx="8" fill="url(#nkCap)"/>
-          <g class="nk-ribs" stroke="#000" stroke-opacity=".35">
-            <path d="M98 52v94M106 52v94M114 52v94M122 52v94M130 52v94M138 52v94M146 52v94M154 52v94M162 52v94"/>
-          </g>
-          <g id="nkSeal">
-            <g class="nk-top"><rect x="111" y="30" width="38" height="132" rx="5" fill="url(#nkStrip)"/></g>
-            <g class="nk-bottom"><rect x="111" y="166" width="38" height="104" rx="5" fill="url(#nkStrip)"/>
-              <svg x="114" y="176" width="32" height="17" viewBox="0 0 668 359" style="--lg-ink:#fff"><use href="#vs-mark"/></svg>
-              <g fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" transform="translate(122 210)"><path d="M2 4a4 4 0 0 1 0 6"/><path d="M6 1.5a8 8 0 0 1 0 11"/><path d="M10 -1a12 12 0 0 1 0 16"/></g>
-              <rect x="117" y="240" width="26" height="2" rx="1" fill="#03adf9"/>
-            </g>
-            <path class="nk-tear" d="M108 164h44" stroke="#fff" stroke-width="1.5" stroke-dasharray="3 3" opacity=".7"/>
-          </g>
-          <circle class="nk-glow" cx="130" cy="214" r="34"/>
-        </svg>
-
-        <div class="waves" id="howWaves" aria-hidden="true"><i></i><i></i><i></i></div>
-
-        <div class="phone" id="phone" aria-hidden="true">
-          <div class="phone-screen">
-            <div class="ph-status"><span>9:41</span><i class="ph-island"></i><span class="ph-icons"><i></i><i></i><i></i></span></div>
-            <div class="ph-app">
-              <div class="ph-brand"><svg viewBox="0 0 977 161"><use href="#vs-wordmark"/></svg></div>
-
-              <div class="scr scr-1">
-                <div class="scan-ring"><svg><use href="#i-contactless"/></svg><i></i><i></i></div>
-                <p class="scr-t">Pronto para verificar</p>
-                <p class="scr-s">Aproxime o celular do lacre na garrafa.</p>
-              </div>
-
-              <div class="scr scr-2">
-                <div class="spinner"><svg viewBox="0 0 48 48"><circle cx="24" cy="24" r="20" pathLength="1"/></svg></div>
-                <p class="scr-t">Verificando…</p>
-                <ul class="checks">
-                  <li data-at=".15"><svg><use href="#i-check"/></svg>Lacre detectado</li>
-                  <li data-at=".45"><svg><use href="#i-check"/></svg>Identidade digital consultada</li>
-                  <li data-at=".75"><svg><use href="#i-check"/></svg>Integridade conferida</li>
-                </ul>
-                <p class="scr-code">ID <span id="phId">A7F3K9B21</span></p>
-              </div>
-
-              <div class="scr scr-3 scr-ok">
-                <div class="res-ic ok"><svg viewBox="0 0 52 52"><circle cx="26" cy="26" r="24" pathLength="1"/><path d="M15 27l7 7 15-16" pathLength="1"/></svg></div>
-                <p class="scr-t">Produto autêntico</p>
-                <p class="scr-s ok-t">Lacre íntegro · nunca aberto</p>
-                <dl class="res-card">
-                  <dt>Produto</dt><dd>Single Malt 12 anos</dd>
-                  <dt>Garrafa</dt><dd class="mono">A7F3K9B21</dd>
-                  <dt>Lote</dt><dd>2026-09 · envase 14/09</dd>
-                  <dt>Verificações</dt><dd>3 · última há 2 min</dd>
-                </dl>
-              </div>
-
-              <div class="scr scr-3 scr-bad">
-                <div class="res-ic bad"><svg viewBox="0 0 52 52"><circle cx="26" cy="26" r="24" pathLength="1"/><path d="M26 14v15M26 36v1" pathLength="1"/></svg></div>
-                <p class="scr-t">Atenção: lacre violado</p>
-                <p class="scr-s bad-t">Esta garrafa já foi aberta.</p>
-                <dl class="res-card">
-                  <dt>Garrafa</dt><dd class="mono">A7F3K9B21</dd>
-                  <dt>Primeira abertura</dt><dd>02/10 · 21:42</dd>
-                  <dt>Situação</dt><dd>circuito de ruptura aberto</dd>
-                </dl>
-                <p class="scr-note">Desconfie da procedência e fale com o vendedor.</p>
-              </div>
-
-              <p class="ph-foot">Verificado por VeriSeal</p>
-            </div>
-          </div>
-        </div>
-
+<!-- 6 · COMO FUNCIONA: demonstração automática, com a garrafa 3D real ao lado do celular -->
+<section class="how light" id="como-funciona" data-theme="light">
+  <div class="wrap how-grid">
+    <div class="how-copy">
+      <p class="eyebrow" data-reveal>Como funciona</p>
+      <h2 class="h-sec" data-reveal style="--d:.06s">Verificar é simples.</h2>
+      <p class="lead" data-reveal style="--d:.12s">Rápida e confiável, <strong>antes do primeiro gole.</strong></p>
+      <ol class="steps" id="steps" data-reveal style="--d:.18s">
+        <li><button type="button" data-step="0"><span class="s-n">1</span><span class="s-t"><b>Aproxime o celular</b><span>do lacre na garrafa.</span></span><i class="s-bar"><i></i></i></button></li>
+        <li><button type="button" data-step="1"><span class="s-n">2</span><span class="s-t"><b>Verifique o produto</b><span>A identidade digital é consultada.</span></span><i class="s-bar"><i></i></i></button></li>
+        <li><button type="button" data-step="2"><span class="s-n">3</span><span class="s-t"><b>Confirme a autenticidade</b><span>Original e íntegra, ou violada.</span></span><i class="s-bar"><i></i></i></button></li>
+      </ol>
+      <div class="how-ctrl" data-reveal style="--d:.24s">
+        <button class="how-play is-playing" id="howPlay" type="button" aria-label="Pausar demonstração"><svg class="ic-play" aria-hidden="true"><use href="#i-play"/></svg><svg class="ic-pause" aria-hidden="true"><use href="#i-pause"/></svg></button>
         <div class="seg" role="radiogroup" aria-label="Simular resultado">
           <button type="button" role="radio" aria-checked="true" data-mode="ok">Lacre íntegro</button>
           <button type="button" role="radio" aria-checked="false" data-mode="bad">Lacre violado</button>
           <i class="seg-thumb" aria-hidden="true"></i>
+        </div>
+      </div>
+    </div>
+
+    <div class="how-scene" id="howScene">
+      <div class="how-gl" id="howGL" aria-hidden="true"></div>
+      <div class="waves" id="howWaves" aria-hidden="true"><i></i><i></i><i></i></div>
+
+      <div class="phone" id="phone" aria-hidden="true">
+        <div class="phone-screen">
+          <div class="ph-status"><span>9:41</span><i class="ph-island"></i><span class="ph-icons"><i></i><i></i><i></i></span></div>
+          <div class="ph-app">
+            <div class="ph-brand"><svg viewBox="0 0 977 161"><use href="#vs-wordmark"/></svg></div>
+
+            <div class="scr scr-1">
+              <div class="scan-ring"><svg><use href="#i-contactless"/></svg><i></i><i></i></div>
+              <p class="scr-t">Pronto para verificar</p>
+              <p class="scr-s">Aproxime o celular do lacre na garrafa.</p>
+            </div>
+
+            <div class="scr scr-2">
+              <div class="spinner"><svg viewBox="0 0 48 48"><circle cx="24" cy="24" r="20" pathLength="1"/></svg></div>
+              <p class="scr-t">Verificando…</p>
+              <ul class="checks">
+                <li data-at=".15"><svg><use href="#i-check"/></svg>Lacre detectado</li>
+                <li data-at=".45"><svg><use href="#i-check"/></svg>Identidade digital consultada</li>
+                <li data-at=".75"><svg><use href="#i-check"/></svg>Integridade conferida</li>
+              </ul>
+              <p class="scr-code">ID <span>A7F3K9B21</span></p>
+            </div>
+
+            <div class="scr scr-3 scr-ok">
+              <div class="res-ic ok"><svg viewBox="0 0 52 52"><circle cx="26" cy="26" r="24" pathLength="1"/><path d="M15 27l7 7 15-16" pathLength="1"/></svg></div>
+              <p class="scr-t">Produto autêntico</p>
+              <p class="scr-s ok-t">Lacre íntegro · nunca aberto</p>
+              <dl class="res-card">
+                <dt>Produto</dt><dd>Single Malt 12 anos</dd>
+                <dt>Garrafa</dt><dd class="mono">A7F3K9B21</dd>
+                <dt>Lote</dt><dd>2026-09 · envase 14/09</dd>
+                <dt>Verificações</dt><dd>3 · última há 2 min</dd>
+              </dl>
+            </div>
+
+            <div class="scr scr-3 scr-bad">
+              <div class="res-ic bad"><svg viewBox="0 0 52 52"><circle cx="26" cy="26" r="24" pathLength="1"/><path d="M26 14v15M26 36v1" pathLength="1"/></svg></div>
+              <p class="scr-t">Atenção: lacre violado</p>
+              <p class="scr-s bad-t">Esta garrafa já foi aberta.</p>
+              <dl class="res-card">
+                <dt>Garrafa</dt><dd class="mono">A7F3K9B21</dd>
+                <dt>Primeira abertura</dt><dd>02/10 · 21:42</dd>
+                <dt>Situação</dt><dd>circuito rompido</dd>
+              </dl>
+              <p class="scr-note">Desconfie da procedência e fale com o vendedor.</p>
+            </div>
+
+            <p class="ph-foot">Verificado por VeriSeal</p>
+          </div>
         </div>
       </div>
     </div>
@@ -439,52 +400,46 @@
   </div>
 </section>
 
-<!-- 8 · RASTREABILIDADE E DADOS -->
-<section class="data dark" id="dados" data-theme="dark">
-  <div class="wrap">
-    <p class="eyebrow" data-reveal>Rastreabilidade e dados</p>
-    <h2 class="h-sec" data-reveal style="--d:.06s">Cada leitura vira dado para a sua marca.</h2>
-    <p class="lead narrow" data-reveal style="--d:.12s">Padrões, regiões e <strong>comportamentos suspeitos</strong> na sua cadeia de distribuição.</p>
+<!-- 8 · IDENTIDADE DIGITAL: o que o consumidor vê ao verificar -->
+<section class="passport dark" id="identidade" data-theme="dark">
+  <div class="wrap pass-grid">
+    <div class="pass-copy">
+      <p class="eyebrow" data-reveal>Identidade digital</p>
+      <h2 class="h-sec" data-reveal style="--d:.06s">Cada garrafa conta a própria história.</h2>
+      <p class="lead" data-reveal style="--d:.12s">Ao verificar, você vê <strong>de onde ela veio e por onde passou.</strong></p>
+      <ul class="results" data-reveal style="--d:.18s">
+        <li class="r-ok"><svg aria-hidden="true"><use href="#i-check"/></svg><div><b>Original e íntegra</b><span>Pode abrir com tranquilidade.</span></div></li>
+        <li class="r-warn"><svg aria-hidden="true"><use href="#i-alert"/></svg><div><b>Já foi aberta</b><span>Comprou lacrada? Desconfie e fale com o vendedor.</span></div></li>
+        <li class="r-bad"><svg aria-hidden="true"><use href="#i-close"/></svg><div><b>Não reconhecida</b><span>Pode ser falsificada. Avise a marca.</span></div></li>
+      </ul>
+    </div>
 
-    <div class="dash" id="dash">
-      <div class="dash-head">
-        <div class="dash-title"><svg viewBox="0 0 668 359" aria-hidden="true"><use href="#vs-mark"/></svg><div><b>Painel da marca</b><span>Single Malt 12 anos · dados ilustrativos</span></div></div>
-        <div class="dash-range" role="radiogroup" aria-label="Período">
-          <button type="button" role="radio" aria-checked="false" data-days="7">7 dias</button>
-          <button type="button" role="radio" aria-checked="true" data-days="30">30 dias</button>
-          <button type="button" role="radio" aria-checked="false" data-days="90">90 dias</button>
+    <div class="pass-3d" id="pass">
+      <div class="pass-card" id="passCard">
+        <div class="pc-face pc-front">
+          <div class="pc-head"><svg viewBox="0 0 668 359" aria-hidden="true"><use href="#vs-mark"/></svg><span>Identidade digital</span><em class="pc-ok"><svg aria-hidden="true"><use href="#i-check"/></svg>Autêntica</em></div>
+          <p class="pc-prod">Single Malt<br>12 anos</p>
+          <p class="pc-sub">Whisky · 700 ml · 40% vol</p>
+          <dl class="pc-grid">
+            <div><dt>Garrafa</dt><dd class="mono">A7F3K9B21</dd></div>
+            <div><dt>Lote</dt><dd>2026-09</dd></div>
+            <div><dt>Envase</dt><dd>14/09/2026</dd></div>
+            <div><dt>Lacre</dt><dd class="pc-green">íntegro</dd></div>
+          </dl>
+          <div class="pc-holo" aria-hidden="true"></div>
+        </div>
+        <div class="pc-face pc-back">
+          <p class="pc-title">Jornada da garrafa</p>
+          <ol class="journey">
+            <li><b>Envase</b><span>14/09 · linha de produção</span></li>
+            <li><b>Distribuidor</b><span>20/09 · Campinas, SP</span></li>
+            <li><b>Loja</b><span>28/09 · São Paulo, SP</span></li>
+            <li class="now"><b>Sua verificação</b><span>agora · lacre íntegro</span></li>
+          </ol>
         </div>
       </div>
-
-      <div class="kpis">
-        <div class="kpi"><span class="k-l">Verificações</span><b class="k-v" id="kVer">0</b><span class="k-d up" id="kVerD"></span></div>
-        <div class="kpi"><span class="k-l">Garrafas verificadas</span><b class="k-v" id="kBot">0</b><span class="k-d up" id="kBotD"></span></div>
-        <div class="kpi"><span class="k-l">Regiões com leitura</span><b class="k-v" id="kReg">0</b><span class="k-d neutral" id="kRegD">de 5 regiões</span></div>
-        <div class="kpi kpi-alert"><span class="k-l">Alertas de violação</span><b class="k-v" id="kAl">0</b><span class="k-d crit" id="kAlD"><svg aria-hidden="true"><use href="#i-alert"/></svg>exigem atenção</span></div>
-      </div>
-
-      <div class="dash-body">
-        <figure class="chart-card">
-          <figcaption><b>Verificações por dia</b><button type="button" class="link-btn" id="tblToggle" aria-expanded="false" aria-controls="chartTable">Ver tabela</button></figcaption>
-          <div class="chart" id="chart">
-            <svg id="chartSvg" role="img" aria-label="Gráfico de linha com o número de verificações por dia no período selecionado."></svg>
-            <div class="tip" id="chartTip" hidden></div>
-          </div>
-          <div class="chart-table" id="chartTable" hidden></div>
-        </figure>
-        <figure class="regions-card">
-          <figcaption><b>Verificações por região</b></figcaption>
-          <ul class="regions" id="regions"></ul>
-        </figure>
-        <figure class="alerts-card">
-          <figcaption><b>Alertas recentes</b></figcaption>
-          <ul class="alerts">
-            <li class="al crit"><svg aria-hidden="true"><use href="#i-alert"/></svg><div><b>Lacre violado antes da venda</b><span>Garrafa C2M8Q4T70 · Recife, PE · há 18 min</span></div><em>Crítico</em></li>
-            <li class="al warn"><svg aria-hidden="true"><use href="#i-pulse"/></svg><div><b>Leitura em duas cidades em 2 h</b><span>Garrafa H5K1W9R33 · São Paulo → Rio de Janeiro</span></div><em>Atenção</em></li>
-            <li class="al info"><svg aria-hidden="true"><use href="#i-chart"/></svg><div><b>Pico de verificações</b><span>Porto Alegre, RS · +62% na semana</span></div><em>Info</em></li>
-          </ul>
-        </figure>
-      </div>
+      <button class="btn btn-ghost btn-sm pass-flip" id="passFlip" type="button">Ver a jornada</button>
+      <p class="pass-note">Exemplo ilustrativo.</p>
     </div>
   </div>
 </section>
@@ -550,7 +505,7 @@
     <a class="foot-logo" href="#lacre" aria-label="VeriSeal, voltar ao início"><svg viewBox="0 0 977 161" aria-hidden="true"><use href="#vs-wordmark"/></svg></a>
     <p class="foot-tag">Identidade digital para cada garrafa.</p>
     <nav class="foot-links" aria-label="Rodapé">
-      <a href="#lacre">O lacre</a><a href="#garrafa">Na garrafa</a><a href="#como-funciona">Como funciona</a><a href="#beneficios">Benefícios</a><a href="#dados">Dados</a><a href="#contato">Contato</a>
+      <a href="#lacre">O lacre</a><a href="#garrafa">Na garrafa</a><a href="#como-funciona">Como funciona</a><a href="#beneficios">Benefícios</a><a href="#identidade">Identidade</a><a href="#contato">Contato</a>
     </nav>
     <p class="foot-legal">© 2026 VeriSeal. Todos os direitos reservados.</p>
   </div>
