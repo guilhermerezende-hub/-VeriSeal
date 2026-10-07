@@ -164,7 +164,7 @@ h1,h2,h3,p{margin:0}
 .closer{padding-top:clamp(96px,15vh,170px)}
 .closer-head{text-align:center;margin-bottom:clamp(28px,5vh,56px)}
 .closer-head .lead{margin-inline:auto}
-.track{position:relative;height:560vh}
+.track{position:relative;height:340vh}
 .track-pin{position:sticky;top:var(--nav-h);height:calc(100vh - var(--nav-h));height:calc(100svh - var(--nav-h));padding:12px max(12px,calc((100vw - 1440px) / 2)) 16px;display:flex}
 .frame{position:relative;flex:1;min-width:0;border-radius:30px;overflow:hidden;isolation:isolate;background:#e9ecf1;box-shadow:0 0 0 1px rgba(15,26,46,.08),0 40px 90px -40px rgba(8,30,80,.45),0 10px 30px -20px rgba(8,30,80,.3)}
 .frame canvas{position:absolute;inset:0;z-index:1;width:100%;height:100%;display:block;touch-action:pan-y;cursor:grab}
@@ -531,7 +531,7 @@ h1,h2,h3,p{margin:0}
   .layer-labels b::before{width:20px;height:20px;font-size:11px}
   .hero-foot{bottom:calc(16px + env(safe-area-inset-bottom,0px))}
   .hero-foot .btn-ghost{display:none}
-  .track{height:520vh}
+  .track{height:320vh}
   .track-pin{padding:8px 8px 10px}
   .frame{border-radius:24px}
   .frame::after{content:"";position:absolute;inset:auto 0 0 0;height:56%;z-index:4;pointer-events:none;background:linear-gradient(to bottom,rgba(233,236,241,0),rgba(233,236,241,.86) 40%,rgba(233,236,241,.97))}
@@ -696,3 +696,8 @@ h1,h2,h3,p{margin:0}
 .game-stage{max-width:520px}
 .gb-img{aspect-ratio:.56}
 .how-gl{-webkit-mask-image:linear-gradient(to bottom,#000 78%,transparent);mask-image:linear-gradient(to bottom,#000 78%,transparent)}
+.story,.threats,.benefits,.band{overflow:hidden}
+@media (max-width:719px){
+  .seal-stage{top:50%}
+  .hero-foot{gap:14px}
+}

@@ -397,7 +397,7 @@
 
     function update(p, dt) {
       if (playing) {
-        scrollBy(0, (seq.len / 26) * dt);
+        scrollBy(0, (seq.len / 15) * dt);
         if (p >= 0.999) stopPlay();
       }
       pS = damp(pS, p, 4.5, dt);
