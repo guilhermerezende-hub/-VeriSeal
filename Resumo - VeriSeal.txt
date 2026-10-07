@@ -1,0 +1,84 @@
+## Funcionamento
+
+A VeriSeal utiliza um **lacre inteligente integrado à garrafa**, desenvolvido para indicar se a embalagem foi aberta ou violada. A tecnologia permite que o consumidor verifique a autenticidade do produto pelo celular, criando uma conexão entre a garrafa física e uma identificação digital única.
+
+O objetivo é tornar a verificação **rápida, simples e confiável**, antes do consumo da bebida.
+
+## O problema
+
+O mercado de bebidas destiladas enfrenta riscos relacionados à **adulteração, falsificação e reutilização de garrafas originais**.
+
+Muitas vezes, o consumidor não consegue identificar visualmente se uma bebida foi violada ou se realmente possui procedência confiável. Isso gera riscos para quem consome e também pode causar prejuízos financeiros e danos à reputação das marcas.
+
+## Para que serve
+
+A VeriSeal foi criada para aumentar a segurança no mercado de bebidas destiladas, ajudando a combater:
+
+- Adulteração de bebidas;
+- Falsificação de produtos;
+- Reutilização de garrafas originais;
+- Venda de bebidas de procedência desconhecida;
+- Perda de confiança entre consumidor e marca.
+
+Além de proteger o consumidor, a solução ajuda fabricantes e distribuidores a **proteger sua marca, seus produtos e sua reputação**.
+
+## A ideia
+
+Transformar cada garrafa em um produto que possa comprovar sua própria autenticidade.
+
+Em vez de o consumidor depender apenas da embalagem, selo ou aparência da bebida, a VeriSeal adiciona uma **camada tecnológica de segurança**, permitindo verificar se aquele produto é realmente original e se sua embalagem permanece íntegra.
+
+## Como funciona
+
+A experiência foi pensada para ser simples:
+
+**1. Aproxime o celular**  
+O consumidor aproxima o smartphone do lacre inteligente presente na garrafa.
+
+**2. Verifique o produto**  
+O sistema identifica aquela garrafa e consulta sua identidade digital.
+
+**3. Confirme a autenticidade**  
+O consumidor recebe a confirmação sobre a autenticidade e a integridade do produto antes do consumo.
+
+## Benefícios para o consumidor
+
+A VeriSeal proporciona mais confiança no momento da compra e do consumo, permitindo verificar de forma simples se a bebida possui uma identificação legítima e se a embalagem apresenta sinais de violação.
+
+O consumidor passa a ter uma ferramenta adicional para tomar uma decisão mais segura.
+
+## Benefícios para fabricantes e marcas
+
+Para as empresas, a VeriSeal cria uma nova camada de proteção contra falsificação e adulteração.
+
+A solução também pode ajudar a:
+
+- Proteger a reputação da marca;
+- Aumentar a confiança do consumidor;
+- Identificar tentativas de reutilização de embalagens;
+- Melhorar a rastreabilidade dos produtos;
+- Obter informações sobre verificações realizadas no mercado.
+
+## Rastreabilidade e dados
+
+Cada garrafa pode possuir uma **identidade digital única**, permitindo que fabricantes acompanhem informações relacionadas à autenticação de seus produtos.
+
+Esses dados podem ajudar a identificar padrões, regiões com maior número de verificações e possíveis comportamentos suspeitos, criando uma ferramenta adicional para proteção da cadeia de distribuição.
+
+## Criação da empresa
+
+A VeriSeal nasceu a partir de um problema real: a dificuldade que consumidores e fabricantes possuem para identificar bebidas adulteradas ou falsificadas.
+
+A empresa foi criada com o propósito de utilizar tecnologia para aumentar a rastreabilidade e a segurança das bebidas destiladas, oferecendo uma solução simples para o consumidor e uma nova ferramenta de proteção para fabricantes e marcas.
+
+## Nossa proposta
+
+**Dar identidade digital a cada garrafa e confiança a cada consumo.**
+
+A VeriSeal conecta tecnologia, segurança e rastreabilidade para criar uma nova camada de proteção para o mercado de bebidas destiladas.
+
+## Proteja sua marca com a VeriSeal
+
+Leve mais segurança, rastreabilidade e confiança para seus produtos.
+
+**Quero proteger minha marca com a VeriSeal**

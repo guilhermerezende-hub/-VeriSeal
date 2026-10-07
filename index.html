@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>VeriSeal</title>
+<meta name="description" content="VeriSeal: lacre inteligente com NFC para garrafas de whisky. Role para girar a garrafa e revelar o lacre na tampa.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght,SOFT@0,9..144,300..700,50;1,9..144,300..700,50&family=IBM+Plex+Sans:wght@400;500&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<link rel="stylesheet" href="styles.css">
+</head>
+<body>
+<a class="wordmark" href="#top"><i aria-hidden="true"></i>VeriSeal</a>
+
+<div class="track" id="track">
+  <div class="stage" id="stage">
+    <canvas id="scene" role="img" aria-label="Garrafa de whisky girando. Ao rolar a página, a câmera aproxima da tampa e revela o lacre inteligente VeriSeal."></canvas>
+    <div class="vignette" aria-hidden="true"></div>
+    <div class="nogl"><p>Seu navegador não conseguiu iniciar a cena 3D.</p></div>
+
+    <section class="chapter ch-left ch-hero" data-from="0" data-to="0.14">
+      <span class="eyebrow">Lacre inteligente para destilados</span>
+      <h1>A garrafa sabe <em>se foi aberta.</em></h1>
+      <p class="lede">VeriSeal é um lacre com chip NFC que cruza a tampa e cola no gargalo. Ele registra a primeira abertura, denuncia o reenchimento e prova a origem do whisky em um toque do celular.</p>
+    </section>
+
+    <section class="chapter ch-right" data-from="0.2" data-to="0.4">
+      <span class="eyebrow">O problema</span>
+      <h2>A fraude não imita o rótulo. <em>Ela reaproveita a garrafa.</em></h2>
+      <p class="lede">Garrafas originais são recolhidas vazias, reenchidas com destilado barato e fechadas de novo. Nada disso aparece no vidro.</p>
+      <div class="facts">
+        <div><b>Vidro</b><span>o mesmo, recolhido vazio</span></div>
+        <div><b>Rótulo</b><span>o mesmo, sem retoque</span></div>
+        <div><b>Líquido</b><span>trocado por um mais barato</span></div>
+        <div><b>Tampa</b><span>o único ponto que precisa ser violado</span></div>
+      </div>
+    </section>
+
+    <section class="chapter ch-left" data-from="0.46" data-to="0.64">
+      <span class="eyebrow">A resposta</span>
+      <h2>Cada garrafa, <em>uma identidade.</em></h2>
+      <p class="lede">Um lacre com chip NFC cruza a tampa e cola no gargalo. Abrir rompe o lacre. Encostar o celular prova a origem e mostra se a garrafa já foi aberta.</p>
+      <div class="facts">
+        <div><b>NFC</b><span>leitura direta no celular, sem aplicativo</span></div>
+        <div><b>Código único</b><span>gravado no envase, assinado a cada leitura</span></div>
+      </div>
+    </section>
+
+    <div class="hint" id="hint" aria-hidden="true"><i></i>Role para explorar</div>
+
+    <div class="hud" id="hud" aria-hidden="true">
+      <svg id="hud-svg"></svg>
+      <div class="callout left" data-cal="tear" style="top:44%"><b>Linha de ruptura</b><span>O lacre cruza a junção entre tampa e gargalo. Girar a tampa rompe a tira e o circuito.</span></div>
+      <div class="callout left" data-cal="nfc" style="top:62%"><b>Antena NFC</b><span>Laminada dentro da tira. O celular alimenta o chip e recebe uma resposta assinada.</span></div>
+      <div class="callout right" data-cal="top" style="top:36%"><b>Selo de origem</b><span>Cobre a tampa inteira. Não existe como abrir sem violar o lacre.</span></div>
+      <div class="callout right" data-cal="code" style="top:66%"><b>Código único</b><span>Identidade da garrafa, gravada na linha de envase.</span></div>
+      <i class="dot" data-dot="tear"></i><i class="dot" data-dot="nfc"></i><i class="dot" data-dot="top"></i><i class="dot" data-dot="code"></i>
+    </div>
+
+    <section class="chapter ch-final" data-from="0.9" data-to="1.2">
+      <span class="eyebrow">Verificação</span>
+      <h2>Violado? <em>Você sabe antes do primeiro gole.</em></h2>
+      <div class="ctas"><a class="btn btn-ink" href="mailto:contato@veriseal.example">Quero um piloto</a><a class="btn btn-ghost" href="#top">Ver de novo</a></div>
+    </section>
+
+    <aside class="status" data-from="0.9" data-to="1.2" aria-label="Exemplo de tela de verificação">
+      <div class="row"><i aria-hidden="true"></i>Lacre íntegro</div>
+      <dl>
+        <dt>Garrafa</dt><dd>A7F3K9B21</dd>
+        <dt>Primeira abertura</dt><dd>não registrada</dd>
+        <dt>Lote</dt><dd>2026-09 · envase 14/09</dd>
+        <dt>Leituras</dt><dd>3 · última há 2 min</dd>
+      </dl>
+    </aside>
+  </div>
+</div>
+
+<script src="main.js"></script>
+</body>
+</html>
