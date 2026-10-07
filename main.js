@@ -239,69 +239,102 @@
   }
   const lsOf = g => v => { if ('letterSpacing' in g) g.letterSpacing = v; };
   const rrectOf = g => (x, y, w, h, r) => { g.beginPath(); if (g.roundRect) g.roundRect(x, y, w, h, r); else g.rect(x, y, w, h); };
-  function drawLabel(c) {
-    // rótulo frontal 100% VeriSeal, num espaço de 1000 x 1545 (plano de 1,1 x 1,7)
-    const g = c.getContext('2d'), s = c.width / 1000, ls = lsOf(g), rr = rrectOf(g);
-    g.setTransform(s, 0, 0, s, 0, 0);
-    const bg = g.createLinearGradient(0, 0, 1000, 1545); bg.addColorStop(0, '#0f3d84'); bg.addColorStop(0.5, '#062a63'); bg.addColorStop(1, '#021838');
-    g.fillStyle = bg; g.fillRect(0, 0, 1000, 1545);
-    // guilhoché de segurança
-    g.lineWidth = 1.6;
-    for (let i = 0; i < 16; i++) {
-      g.strokeStyle = i % 2 ? 'rgba(95,208,255,.09)' : 'rgba(159,181,255,.07)';
-      g.beginPath();
-      for (let y = 0; y <= 1545; y += 10) { const x = 500 + 430 * Math.sin(y * 0.0085 + i * 0.4) * (0.6 + 0.4 * Math.sin(y * 0.003 - i * 0.7)); y ? g.lineTo(x, y) : g.moveTo(x, y); }
+  // medalhão holográfico com o monograma: o mesmo holograma do lacre na tampa, para os dois conversarem
+  function drawHolo(g, cx, cy, R, ring) {
+    g.save();
+    g.shadowColor = 'rgba(3,173,249,.45)'; g.shadowBlur = R * 0.22;
+    let holo;
+    if (g.createConicGradient) {
+      holo = g.createConicGradient(0.5, cx, cy);
+      ['#cfe9ff', '#e6d8ff', '#ffe0f0', '#fff6d6', '#dcfff0', '#cfe9ff', '#e9ddff', '#ffe6d2', '#cfe9ff'].forEach((c2, i, arr) => holo.addColorStop(i / (arr.length - 1), c2));
+    } else { holo = g.createRadialGradient(cx, cy, 0, cx, cy, R); holo.addColorStop(0, '#f2f6ff'); holo.addColorStop(1, '#cfe0ff'); }
+    g.fillStyle = holo; g.beginPath(); g.arc(cx, cy, R, 0, PI * 2); g.fill();
+    g.restore();
+    // brilho especular
+    const sh = g.createRadialGradient(cx - R * 0.35, cy - R * 0.4, 0, cx - R * 0.35, cy - R * 0.4, R * 1.1);
+    sh.addColorStop(0, 'rgba(255,255,255,.75)'); sh.addColorStop(0.35, 'rgba(255,255,255,.08)'); sh.addColorStop(1, 'rgba(255,255,255,0)');
+    g.fillStyle = sh; g.beginPath(); g.arc(cx, cy, R, 0, PI * 2); g.fill();
+    // roseta de segurança
+    g.strokeStyle = 'rgba(255,255,255,.6)'; g.lineWidth = R * 0.006;
+    for (let i = 0; i < 9; i++) { g.beginPath(); for (let j = 0; j <= 200; j++) { const t = j / 200 * PI * 2, r = R * (0.52 + 0.17 * Math.sin(8 * t + i * 0.5)); const x = cx + r * Math.cos(t), y = cy + r * Math.sin(t); j ? g.lineTo(x, y) : g.moveTo(x, y); } g.closePath(); g.stroke(); }
+    // aros
+    g.strokeStyle = 'rgba(6,42,99,.5)'; g.lineWidth = R * 0.012; g.beginPath(); g.arc(cx, cy, R * 0.97, 0, PI * 2); g.stroke();
+    g.strokeStyle = 'rgba(6,42,99,.35)'; g.lineWidth = R * 0.006; g.beginPath(); g.arc(cx, cy, R * 0.72, 0, PI * 2); g.stroke();
+    // microtexto em volta
+    if (ring) {
+      g.fillStyle = 'rgba(6,42,99,.8)'; g.font = `600 ${Math.round(R * 0.075)}px ${MONO}`; g.textAlign = 'center'; g.textBaseline = 'middle';
+      const txt = ring, rr = R * 0.845;
+      for (let i = 0; i < txt.length; i++) { const ang = -PI / 2 + i / txt.length * PI * 2; g.save(); g.translate(cx + rr * Math.cos(ang), cy + rr * Math.sin(ang)); g.rotate(ang + PI / 2); g.fillText(txt[i], 0, 0); g.restore(); }
+    }
+    const mw = R * 1.08;
+    drawLogo(g, MK, cx - mw / 2, cy - mw * MK.h / MK.w / 2, mw, '#062a63', '#0a76c4');
+  }
+  // moldura e fundo comuns aos rótulos VeriSeal
+  function labelBase(g, Wd, Hd) {
+    const rr = rrectOf(g);
+    const bg = g.createLinearGradient(0, 0, Wd * 0.6, Hd); bg.addColorStop(0, '#0f3d84'); bg.addColorStop(0.5, '#072c66'); bg.addColorStop(1, '#021838');
+    g.fillStyle = bg; g.fillRect(0, 0, Wd, Hd);
+    g.lineWidth = 1.4;
+    for (let i = 0; i < 12; i++) {
+      g.strokeStyle = 'rgba(120,200,255,.055)'; g.beginPath();
+      for (let y = 0; y <= Hd; y += 10) { const x = Wd / 2 + Wd * 0.42 * Math.sin(y * 0.0075 + i * 0.45) * (0.6 + 0.4 * Math.sin(y * 0.0028 - i * 0.6)); y ? g.lineTo(x, y) : g.moveTo(x, y); }
       g.stroke();
     }
-    // brilho atrás do monograma
-    const glow = g.createRadialGradient(500, 600, 0, 500, 600, 420); glow.addColorStop(0, 'rgba(3,173,249,.28)'); glow.addColorStop(1, 'rgba(3,173,249,0)');
-    g.fillStyle = glow; g.fillRect(0, 150, 1000, 900);
-    // molduras
-    g.strokeStyle = 'rgba(3,173,249,.85)'; g.lineWidth = 6; rr(34, 34, 932, 1477, 26); g.stroke();
-    g.strokeStyle = 'rgba(255,255,255,.28)'; g.lineWidth = 1.6; rr(52, 52, 896, 1441, 18); g.stroke();
-    g.textAlign = 'center'; g.textBaseline = 'alphabetic';
-    // topo
-    g.fillStyle = 'rgba(255,255,255,.75)'; ls('14px'); g.font = `600 26px ${MONO}`; g.fillText('LACRE INTELIGENTE', 507, 170);
-    g.fillStyle = '#03adf9'; g.fillRect(450, 198, 100, 4);
-    // monograma grande
-    drawLogo(g, MK, 170, 330, 660, '#ffffff', '#03adf9');
-    // logo completa
-    drawLogo(g, WM, 120, 790, 760, '#ffffff', '#03adf9');
-    g.fillStyle = 'rgba(255,255,255,.22)'; g.fillRect(120, 990, 760, 2);
-    // chamada
-    drawContactless(g, 288, 1140, 170, '#ffffff', 12);
-    g.textAlign = 'left'; g.fillStyle = '#ffffff'; ls('2px'); g.font = `700 50px ${SANS}`;
-    g.fillText('APROXIME', 420, 1120); g.fillText('O CELULAR', 420, 1180);
-    g.textAlign = 'center'; g.fillStyle = 'rgba(255,255,255,.7)'; ls('6px'); g.font = `500 22px ${MONO}`;
-    g.fillText('PRODUTO ORIGINAL · IDENTIDADE DIGITAL', 505, 1310);
-    g.fillStyle = '#ffffff'; ls('8px'); g.font = `600 40px ${MONO}`; g.fillText('Nº A7F3K9B21', 504, 1410);
+    const vg = g.createRadialGradient(Wd / 2, Hd * 0.4, 0, Wd / 2, Hd * 0.4, Wd * 0.75); vg.addColorStop(0, 'rgba(3,173,249,.16)'); vg.addColorStop(1, 'rgba(3,173,249,0)');
+    g.fillStyle = vg; g.fillRect(0, 0, Wd, Hd);
+    g.strokeStyle = 'rgba(3,173,249,.85)'; g.lineWidth = 5; rr(30, 30, Wd - 60, Hd - 60, 30); g.stroke();
+    g.strokeStyle = 'rgba(255,255,255,.22)'; g.lineWidth = 1.6; rr(48, 48, Wd - 96, Hd - 96, 20); g.stroke();
+  }
+  // título em versalete com fios ciano dos dois lados
+  function capsTitle(g, text, cx, y, size, spacing, color) {
+    const ls = lsOf(g);
+    ls(spacing + 'px'); g.font = `600 ${size}px ${MONO}`; g.textAlign = 'center'; g.textBaseline = 'middle';
+    const w = g.measureText(text).width;
+    g.fillStyle = color; g.fillText(text, cx + spacing / 2, y);
+    g.fillStyle = '#03adf9'; g.fillRect(cx - w / 2 - 110, y - 1.5, 80, 3); g.fillRect(cx + w / 2 + 30, y - 1.5, 80, 3);
+    ls('0px');
+  }
+  function drawLabel(c) {
+    // rótulo frontal 100% VeriSeal, 1000 x 1545 (plano de 1,1 x 1,7): medalhão, logo, chamada
+    const g = c.getContext('2d'), s = c.width / 1000, ls = lsOf(g);
+    g.setTransform(s, 0, 0, s, 0, 0);
+    labelBase(g, 1000, 1545);
+    capsTitle(g, 'IDENTIDADE DIGITAL', 500, 150, 24, 10, 'rgba(255,255,255,.82)');
+    drawHolo(g, 500, 505, 245, 'VERISEAL • PRODUTO ORIGINAL • VERISEAL • PRODUTO ORIGINAL • ');
+    drawLogo(g, WM, 180, 820, 640, '#ffffff', '#03adf9');
+    g.fillStyle = '#03adf9'; g.fillRect(460, 975, 80, 4);
+    g.textAlign = 'center'; g.textBaseline = 'alphabetic'; g.fillStyle = '#ffffff';
+    ls('16px'); g.font = `700 34px ${SANS}`; g.fillText('PRODUTO ORIGINAL', 508, 1068);
+    // chamada: símbolo + frase numa linha só
+    ls('3px'); g.font = `500 26px ${SANS}`; g.fillStyle = 'rgba(255,255,255,.88)';
+    const t = 'Aproxime o celular do lacre', tw = g.measureText(t).width, gx = 500 - (tw + 74) / 2;
+    drawContactless(g, gx + 10, 1192, 96, '#ffffff', 7);
+    g.textAlign = 'left'; g.fillText(t, gx + 74, 1201);
+    g.textAlign = 'center'; g.fillStyle = 'rgba(255,255,255,.55)'; g.fillRect(380, 1290, 240, 1.5);
+    ls('8px'); g.font = `600 32px ${MONO}`; g.fillStyle = 'rgba(255,255,255,.9)'; g.fillText('Nº A7F3K9B21', 504, 1392);
     ls('0px');
   }
   function drawBackLabel(c) {
-    // contrarrótulo VeriSeal na face de trás, 800 x 900
+    // contrarrótulo VeriSeal, 800 x 900 — mesma linguagem do frontal
     const g = c.getContext('2d'), s = c.width / 800, ls = lsOf(g);
     g.setTransform(s, 0, 0, s, 0, 0);
-    const bg = g.createLinearGradient(0, 0, 800, 900); bg.addColorStop(0, '#0d3a80'); bg.addColorStop(.55, '#062a63'); bg.addColorStop(1, '#021a42');
-    g.fillStyle = bg; g.fillRect(0, 0, 800, 900);
-    g.strokeStyle = 'rgba(95,208,255,.1)'; g.lineWidth = 1.4;
-    for (let i = 0; i < 12; i++) { g.beginPath(); for (let x = 0; x <= 800; x += 10) { const y = 450 + 330 * Math.sin(x * 0.011 + i * 0.5) * (0.6 + 0.4 * Math.sin(x * 0.004 - i)); x ? g.lineTo(x, y) : g.moveTo(x, y); } g.stroke(); }
-    g.strokeStyle = 'rgba(3,173,249,.6)'; g.lineWidth = 3; g.strokeRect(26, 26, 748, 848);
-    drawLogo(g, WM, 190, 80, 420, '#ffffff', '#03adf9');
-    g.fillStyle = '#03adf9'; g.fillRect(360, 186, 80, 4);
-    g.textAlign = 'center'; g.fillStyle = '#ffffff'; ls('1px'); g.font = `700 46px ${SANS}`;
-    g.fillText('ESTA GARRAFA TEM', 400, 280); g.fillText('IDENTIDADE DIGITAL', 400, 336);
-    drawContactless(g, 352, 485, 190, '#ffffff', 13);
-    ls('0px'); g.font = `500 34px ${SANS}`; g.fillStyle = 'rgba(255,255,255,.88)';
-    g.fillText('Aproxime o celular do lacre', 400, 650); g.fillText('para confirmar a autenticidade.', 400, 696);
-    g.fillStyle = 'rgba(255,255,255,.2)'; g.fillRect(120, 750, 560, 1.5);
-    ls('6px'); g.font = `600 30px ${MONO}`; g.fillStyle = '#fff'; g.fillText('Nº A7F3K9B21', 403, 815);
+    labelBase(g, 800, 900);
+    drawLogo(g, WM, 200, 104, 400, '#ffffff', '#03adf9');
+    capsTitle(g, 'COMO VERIFICAR', 400, 262, 20, 8, 'rgba(255,255,255,.8)');
+    g.textAlign = 'center'; g.textBaseline = 'alphabetic'; g.fillStyle = '#ffffff'; ls('0px'); g.font = `700 42px ${SANS}`;
+    g.fillText('Esta garrafa tem', 400, 360); g.fillText('identidade digital.', 400, 410);
+    drawContactless(g, 372, 535, 160, '#03adf9', 11);
+    g.font = `500 30px ${SANS}`; g.fillStyle = 'rgba(255,255,255,.86)';
+    g.fillText('Aproxime o celular do lacre', 400, 670); g.fillText('para confirmar a autenticidade.', 400, 712);
+    g.fillStyle = 'rgba(255,255,255,.5)'; g.fillRect(300, 760, 200, 1.5);
+    ls('6px'); g.font = `600 26px ${MONO}`; g.fillStyle = 'rgba(255,255,255,.9)'; g.fillText('Nº A7F3K9B21', 403, 815);
     ls('0px');
   }
   const labelTex = canvasTex(1400, 2163, drawLabel);
   const backTex = canvasTex(1024, 1152, drawBackLabel);
   const lateRedraw = [labelTex, backTex];
   // as texturas usam Inter e JetBrains Mono: redesenha quando os pesos usados no canvas estiverem carregados
-  if (document.fonts) Promise.all([`200 400px Inter`, `500 42px Inter`, `600 26px Inter`, `700 48px Inter`, `700 50px Inter`, `600 26px "JetBrains Mono"`, `600 40px "JetBrains Mono"`, `400 22px "JetBrains Mono"`, `500 22px "JetBrains Mono"`, `600 30px "JetBrains Mono"`].map(f => document.fonts.load(f)))
+  if (document.fonts) Promise.all([`200 400px Inter`, `500 42px Inter`, `600 26px Inter`, `700 48px Inter`, `700 50px Inter`, `700 34px Inter`, `500 26px Inter`, `700 42px Inter`, `500 30px Inter`, `600 24px "JetBrains Mono"`, `600 32px "JetBrains Mono"`, `600 20px "JetBrains Mono"`, `600 26px "JetBrains Mono"`, `600 18px "JetBrains Mono"`, `400 22px "JetBrains Mono"`, `500 22px "JetBrains Mono"`, `600 30px "JetBrains Mono"`].map(f => document.fonts.load(f)))
     .catch(() => {}).then(() => lateRedraw.forEach(t => t.userData.redraw()));
   const gradientTex = (w, h, draw) => canvasTex(w, h, draw);
 
