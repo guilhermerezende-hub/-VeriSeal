@@ -1,530 +1,871 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
+
 <head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>VeriSeal — Lacre inteligente para destilados</title>
-<meta name="description" content="VeriSeal: lacre inteligente com chip NFC que dá identidade digital a cada garrafa e mostra no celular se ela já foi aberta.">
-<meta name="theme-color" content="#030b1c">
-<link rel="icon" href="favicon.svg" type="image/svg+xml">
-<link rel="icon" href="favicon-32.png" type="image/png" sizes="32x32">
-<link rel="apple-touch-icon" href="apple-touch-icon.png">
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@200..800&family=JetBrains+Mono:wght@400;500;600&display=swap">
-<link rel="stylesheet" href="styles.css">
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>VeriSeal — Lacre inteligente para destilados</title>
+  <meta name="description"
+    content="VeriSeal: lacre inteligente com chip NFC que dá identidade digital a cada garrafa e mostra no celular se ela já foi aberta.">
+  <meta name="theme-color" content="#030b1c">
+  <link rel="icon" href="favicon.svg" type="image/svg+xml">
+  <link rel="icon" href="favicon-32.png" type="image/png" sizes="32x32">
+  <link rel="apple-touch-icon" href="apple-touch-icon.png">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet"
+    href="https://fonts.googleapis.com/css2?family=Inter:wght@200..800&family=JetBrains+Mono:wght@400;500;600&display=swap">
+  <link rel="stylesheet" href="styles.css">
 </head>
+
 <body>
 
-<!-- logos (vetorizadas a partir dos arquivos da marca) e ícones -->
-<svg class="sprite" aria-hidden="true" focusable="false">
-  <symbol id="vs-wordmark" viewBox="0 0 977 161">
-    <path class="lg-ink" fill="var(--lg-ink, currentColor)" d="M0.7 0.7C-0.2 1.6-0.5 0.9 10.3 23.8L73.5 157.9C73.8 158.3 74.4 158.8 74.9 159C76.2 159.5 95.1 159.4 96.4 158.9L125.8 110L147.7 72.5C151.6 65.8 152 64.7 150.8 64.2C149.9 63.9 117.5 64 116.5 64.3L91.7 104.8C89 109.4 88.4 110.1 87.4 109.5L38.7 5C36.4-0.1 38.4 0.3 18.4 0.3C5.4 0.3 1 0.4 0.7 0.7M415 1.2C414.4 2.1 414.3 2.5 414.3 12.8C414.3 22.9 414.4 23.6 415 24.4C415.6 25.2 415.6 25.2 431.8 25.2C448.1 25.2 448.1 25.2 448.7 24.4C449.3 23.6 449.3 22.9 449.3 12.9C449.3 2.4 449.2 1.3 448.2 0.6C448 0.5 440.6 0.3 431.8 0.3C415.7 0.3 415.7 0.3 415 1.2M549.2 0.7C542.3 1.2 537.8 2.6 532.9 5.8C528.4 8.7 526.3 11.2 522 18.5L492.6 67.6C492.2 68.8 492.7 70.1 494.8 73.2C498.5 78.6 504.7 83.8 510.3 86.2L555 98.3C580.9 104.7 588.3 106.9 591 109.2C593.2 111.1 593.8 112.7 593.8 116C593.8 122.1 590.8 125.4 582.2 128.6C579.8 129.5 579.8 129.5 556 129.6C529.1 129.7 530.6 129.8 524.7 126.9C518.9 124.2 516.5 121.3 510.7 110.7C508.1 105.7 507.7 105.1 506.6 104.8C505.1 104.2 476.6 104.2 475 104.7C473 105.4 473.1 105.9 478.3 116.1C484.2 128 486.4 131.9 489 135.5C498.1 147.9 508.8 155 523.3 158.1C528.2 159.1 528.2 159.1 545.3 159.2C554.8 159.3 567.8 159.2 574.3 159.1C585.9 158.7 586.2 158.7 590.2 157.7C607.8 153.2 620.2 142.6 625.1 127.7C626.7 122.8 627.1 119.4 626.9 112C626.7 104.8 626.1 102.1 623.9 97.5C618.5 86.5 608.6 80.3 589 75.3L539.7 61.8C527.2 58.4 523.3 55.8 521.6 49.8C519.7 42.6 523.4 36.1 531.6 32.7C534.9 31.3 537.1 31.1 551 30.6C569 30.1 575.3 30.5 580.8 32.7C587.7 35.4 591.2 39.1 593.1 45.7C594.1 49.1 592.5 48.8 609.5 48.9C626.2 49 625.7 49.1 625.7 46.7C625.7 44.4 624.6 39.1 623.3 34.7C617.5 15.2 601.7 3 580 1C574.6 0.5 554.3 0.3 549.2 0.7M943.5 0.8C942.8 1.3 942.8 2.5 942.7 79.5C942.7 157.7 942.7 157.7 943.5 158.5C944.3 159.4 944.3 159.4 960 159.3C975.1 159.2 975.7 159.1 976.2 158.5C976.6 158 976.7 146.7 976.7 79.6C976.7 1.4 976.7 1.4 975.9 0.9C974.9 0.1 944.5 0.1 943.5 0.8M217.7 39.7C200.6 40.6 188.8 43.8 181.8 49.5C171.6 57.7 168.1 70.8 168.2 100.8C168.2 127.8 170.4 138.9 177 147.2C182.4 153.7 189.9 157.3 203 159.5C211.3 160.9 213.7 161 229.7 161C244.9 161 251.4 160.7 258.2 159.8C260.2 159.6 263.6 159.2 265.7 159C270.6 158.6 273.5 157.9 274.3 157.2C275 156.6 275 156.2 275 145.7C275 135.1 275 134.8 274.3 134.1C273.6 133.5 273.4 133.5 266.7 134.1C252 135.4 228.6 135.6 219 134.7C209.6 133.7 204.9 130.8 203 124.8C202.6 123.4 202.2 120.7 202 117.2C201.6 111.3 201.7 110.2 203.2 109.7C203.7 109.5 217.7 109.3 241.4 109.3C278.7 109.3 278.7 109.3 279.5 108.5C280.3 107.7 280.3 107.7 280.3 100.4C280.3 92.3 279.9 80.7 279.3 75.2C276.8 49.9 266.1 41.5 234.3 39.7C227.6 39.3 224.6 39.3 217.7 39.7M703.8 39.7C674.2 41.3 661.8 48.7 656.9 67.7C654.8 75.8 654 84.8 654 101C654 124.4 655.6 135.4 660.5 143.7C666.3 153.7 677.6 158.8 697.5 160.7C702.2 161.1 730.3 161.1 735.3 160.7C742.5 160.1 752.8 159 756 158.5C761.2 157.7 760.8 158.7 760.9 145.7C761 133.2 761.1 133.7 758.4 133.7C757.5 133.7 754.5 133.9 751.8 134.2C737.6 135.6 708.7 135.7 702 134.3C691.4 132.2 688.6 128.7 687.7 116.7C687.4 111.7 687.6 110.3 688.9 109.7L765.5 108.7C766 108.1 766.1 107.1 766 97.1C766 80.8 765.4 73.2 764 67C761.3 55.7 756.8 49.6 748.2 45.4C738.9 40.9 721.9 38.7 703.8 39.7M838.5 39.7C829 40 816.1 41.1 808.5 42.2C800.2 43.4 801 42 801 55.1C801 67.8 800.8 67.2 804.9 67.1C806.3 67 811.5 66.7 816.3 66.4C828.7 65.6 852.1 65.6 858 66.4C864.9 67.4 868.6 69.8 870 74.3C870.8 76.7 871.6 86.4 871.2 88.5C870.8 90.7 870.7 90.7 859.9 90.3C826.8 89.2 815.2 90 806.7 94.1C802 96.4 798.4 100.5 796.3 105.7C792.7 115 792.3 133.1 795.5 142.1C799 151.7 804.9 156.9 815.7 159.7C819.8 160.8 819.9 160.8 829.9 160.9C843.7 161.1 850.3 160.1 857.2 156.8C862.2 154.5 864.8 152.4 869.2 147.2C870.5 145.7 871.8 145.6 872.3 146.9C872.5 147.4 872.8 150 872.9 152.7C873.1 155.3 873.4 157.7 873.5 158C874 159.2 875.1 159.3 889.5 159.3C902.9 159.3 903.6 159.3 904.4 158.7C905.2 158.1 905.2 158.1 905.2 118.4C905.2 76.2 905.1 74.4 903.5 66.7C899.6 47.8 888.1 41.1 857 39.7C849.3 39.3 849.5 39.3 838.5 39.7M380 39.9C369.5 41.5 366 42.5 361.6 45.1C356.4 48.2 352.4 52.7 349.9 58.1C349.3 59.4 348.5 60.8 348.1 61.1C347.4 61.7 347.4 61.7 346.8 61.1C346.2 60.5 346.1 59.5 345.7 51.8C345.3 42.3 345.1 41.8 343.3 41.5C342.7 41.4 336 41.3 328.4 41.4C315.8 41.5 314.6 41.5 314.1 42.1L314.1 158.6C314.6 159.1 315.8 159.2 329.4 159.3C345.1 159.4 346.5 159.3 346.8 157.9C346.9 157.5 347 145.5 347.1 131.2C347.3 104.6 347.3 103.6 348.7 96.3C349.9 89.9 351.1 86.6 353.5 83C358.7 75.2 367.5 71.5 382.6 70.7C386.7 70.5 387.5 70.4 387.9 69.8C388.3 69.2 388.6 53.7 388.4 44.5C388.2 39.7 388.1 39.7 384.1 39.7C382.3 39.7 380.5 39.8 380 39.9M416.1 41.7C415.7 41.8 415.2 42.3 415 42.6C414.8 43.1 414.7 60.7 414.7 100.5C414.7 157.7 414.7 157.7 415.5 158.5C416.3 159.3 416.3 159.3 431.5 159.3C439.9 159.3 447 159.2 447.4 159C447.9 158.9 448.3 158.5 448.5 158.1L448.7 43.4C448.7 41.4 448.3 41.3 431.6 41.4C423.5 41.4 416.5 41.5 416.1 41.7M220.3 64.7C213 65.1 208.7 66.3 206.6 68.5C203.8 71.6 202.6 75 202 82.1C201.5 88.6 201.5 89.2 202.5 90.2C203.3 91 203.3 91 225.1 90.9C250.9 90.8 248.5 91.3 248.4 86.6C248.3 82.9 247.7 78.1 247 75.1C245.2 68.1 241.3 65.3 232.4 64.8C230.5 64.7 228 64.6 227 64.5C226 64.5 223 64.5 220.3 64.7M701.7 65C691.6 66.4 688.8 70.3 687.7 84.1C687.3 89.2 687.6 90.4 689.3 90.8C691.1 91.1 731.9 91 732.8 90.7C734.3 90.1 734.4 89.1 734 83.2C733.3 71.8 730.9 67.8 723.7 65.5C721.6 64.8 705.6 64.5 701.7 65M836.5 108.6C828.1 109.6 826.5 111.1 825.7 119.1C825.3 123.1 825.6 128.3 826.5 130.6C828.1 135.2 831.8 136.5 843.3 136.9C850.3 137.1 853.7 136.8 858.2 135.6C867.2 133.3 870.9 127.1 871.1 114.4C871.2 109.7 871.1 109.6 870.4 109C869.6 108.4 868.9 108.3 853.5 108.4C844.7 108.4 837 108.5 836.5 108.6"/>
-    <path class="lg-accent" fill="var(--lg-accent, #03adf9)" d="M156.3 0.6C155.7 0.8 154.8 1.4 154.4 1.9L128.2 44C125.6 47.5 125.3 49.6 127.4 50.5C129.1 51.2 156.3 51.2 157.6 50.5C159 49.8 160.6 48 161.6 46.2L186.6 4.8C187.6 3.2 187.8 1.9 187.1 1C186.5 0.2 186.5 0.2 172 0.2C161.4 0.2 157.2 0.3 156.3 0.6"/>
-  </symbol>
-  <symbol id="vs-mark" viewBox="0 0 668 359">
-    <path class="lg-ink" fill="var(--lg-ink, currentColor)" d="M1 0.8C-0.1 1.3 0.3 2.8 2.8 8L161 343.7C166.6 355.6 167.9 357.9 169.1 358.5L219.1 358.7C219.7 358.5 220.7 357.2 221.9 355.4L341.3 151C344.6 145.6 344.9 144.7 343.7 144C343.3 143.8 330.3 143.7 304 143.7C260 143.7 263.5 143.5 261.7 146.3L199.6 250.1C198.8 250.7 197.6 249.4 196.5 246.7L83.8 2.8C82.9 0.6 85.9 0.7 41.8 0.6C16.9 0.5 1.4 0.6 1 0.8M496.5 0.7C475.2 1.7 458.8 7.7 446.9 19C442.4 23.3 440.1 26.3 435.5 33.9L363.8 153.4C363.3 155.7 370.1 166.7 376.2 173.4C384.7 182.8 395.5 190.7 405.4 194.7C406.8 195.2 409 196.1 410.5 196.7L464.8 211.3L566.7 237C586 241.5 594.9 250.5 593.3 264.1C592.4 271.8 587.9 278.7 580.6 283.5C573.9 287.8 567.3 290 555.6 291.7C550.5 292.5 550.1 292.5 505.7 292.5C457.2 292.5 459.1 292.6 449.6 290.6C440.1 288.7 434.3 285.9 426.3 279.6C418.9 273.7 412.6 264.3 401.5 242.2C399.3 237.8 398.3 236.1 397.7 235.8C397 235.4 388.3 235.3 359 235.3C317.4 235.3 320 235.2 320.4 237.3C320.9 239.5 343.3 284 348 292.2C360.1 312.8 372.9 326.6 391.7 339.2C408.3 350.4 430.3 357 456.7 358.7C463.9 359.1 559.2 358.9 563 358.4C573.2 357.1 577.2 356.5 581.7 355.5C590.1 353.7 594.5 352.5 599.2 350.7C622.5 341.9 640.8 327.7 653.4 308.5C663.2 293.5 668.4 274.3 667.9 254.3C667.6 242.9 666.7 237 664 228.7C658.8 212.8 651.6 203 637.3 192.2C628.4 185.5 619.6 181.2 606 176.7L467 138.2C449.1 133.4 442.3 130.3 436.8 124.6C430.8 118.3 428.6 112.7 428.6 103.8C428.7 98.5 428.8 97.7 430.6 93.2C432.2 89 433 87.6 435.2 84.7C441.9 76.1 454.2 70.8 470.5 69.3C475.3 68.9 529.9 68.2 537.5 68.5C554.1 69.1 567.2 72.8 576.1 79.5C584.1 85.5 588.9 93.1 591.2 103.2C592.6 109.5 592.7 109.6 593.3 110C593.7 110.2 607.1 110.3 628.5 110.4C663.1 110.5 663.1 110.5 663.9 109.5C664.8 108.4 664.8 108.8 664 101.8C662.2 86.1 659.1 74.7 652.9 61.3C648 50.6 637 36.3 626.8 27.6C616.1 18.4 601.3 10.6 587 6.6C571.1 2.2 560.3 1 535.8 0.8L496.5 0.7"/>
-    <path class="lg-accent" fill="var(--lg-accent, #03adf9)" d="M386.4 1L351.4 1.2L349.5 3L324.8 41.6L284.1 106.9C282.6 108.8 282 110.3 282 112.2C282 115 282.4 115.2 289.2 115.4C301.7 115.6 357.1 115.3 357.8 114.9C359.2 114.2 361.4 111.8 362.6 109.7L423.6 9.9C426.2 6.1 427 3.4 426 2.1C425.3 1.3 423.5 0.7 422.4 0.7C421.9 0.8 405.7 0.9 386.4 1"/>
-  </symbol>
-  <symbol id="i-contactless" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M6.5 8.5a5 5 0 0 1 0 7"/><path d="M10 6.2a9 9 0 0 1 0 11.6"/><path d="M13.6 4a13 13 0 0 1 0 16"/><path d="M17.2 2.2a16.5 16.5 0 0 1 0 19.6"/></g></symbol>
-  <symbol id="i-arrow-down" viewBox="0 0 24 24"><path fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" d="M12 5v14M6 13l6 6 6-6"/></symbol>
-  <symbol id="i-arrow-right" viewBox="0 0 24 24"><path fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" d="M5 12h14M13 6l6 6-6 6"/></symbol>
-  <symbol id="i-play" viewBox="0 0 24 24"><path fill="currentColor" d="M8 5.6v12.8c0 .8.9 1.3 1.6.9l10-6.4c.6-.4.6-1.3 0-1.7l-10-6.4C8.9 4.3 8 4.8 8 5.6z"/></symbol>
-  <symbol id="i-pause" viewBox="0 0 24 24"><rect x="6.5" y="5" width="4" height="14" rx="1.2" fill="currentColor"/><rect x="13.5" y="5" width="4" height="14" rx="1.2" fill="currentColor"/></symbol>
-  <symbol id="i-menu" viewBox="0 0 24 24"><path fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" d="M4 8h16M4 16h16"/></symbol>
-  <symbol id="i-close" viewBox="0 0 24 24"><path fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" d="M6 6l12 12M18 6L6 18"/></symbol>
-  <symbol id="i-check" viewBox="0 0 24 24"><path fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" d="M5 12.5l4.5 4.5L19 7.5"/></symbol>
-  <symbol id="i-alert" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"><path d="M12 3.5 2.8 19.5h18.4z"/><path stroke-linecap="round" d="M12 10v4.5M12 17.2v.1"/></g></symbol>
-  <symbol id="i-verified" viewBox="-2 -2 60 60"><path fill="currentColor" d="M28.00 4.80Q35.82 -1.17 39.60 7.91Q49.35 6.65 48.09 16.40Q57.17 20.18 51.20 28.00Q57.17 35.82 48.09 39.60Q49.35 49.35 39.60 48.09Q35.82 57.17 28.00 51.20Q20.18 57.17 16.40 48.09Q6.65 49.35 7.91 39.60Q-1.17 35.82 4.80 28.00Q-1.17 20.18 7.91 16.40Q6.65 6.65 16.40 7.91Q20.18 -1.17 28.00 4.80Z"/><path class="vb-check" fill="none" stroke="#fff" stroke-width="5" stroke-linecap="round" stroke-linejoin="round" d="M18 28.5l7 7 13.5-14"/></symbol>
-  <symbol id="i-alert-badge" viewBox="-2 -2 60 60"><path fill="currentColor" d="M28.00 4.80Q35.82 -1.17 39.60 7.91Q49.35 6.65 48.09 16.40Q57.17 20.18 51.20 28.00Q57.17 35.82 48.09 39.60Q49.35 49.35 39.60 48.09Q35.82 57.17 28.00 51.20Q20.18 57.17 16.40 48.09Q6.65 49.35 7.91 39.60Q-1.17 35.82 4.80 28.00Q-1.17 20.18 7.91 16.40Q6.65 6.65 16.40 7.91Q20.18 -1.17 28.00 4.80Z"/><path fill="none" stroke="#fff" stroke-width="5" stroke-linecap="round" d="M28 16v15M28 39.5v.5"/></symbol>
-  <symbol id="i-pulse" viewBox="0 0 24 24"><path fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" d="M3 12h4l2.5-6 5 12 2.5-6H21"/></symbol>
-  <!-- ameaças -->
-  <symbol id="i-drop" viewBox="0 0 48 48"><g fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path class="draw" pathLength="1" d="M24 6c6 8 12 14.5 12 22a12 12 0 0 1-24 0c0-7.5 6-14 12-22z"/><path class="draw" pathLength="1" d="M19.5 25.5l9 9M28.5 25.5l-9 9"/></g></symbol>
-  <symbol id="i-copy" viewBox="0 0 48 48"><g fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><rect class="draw" pathLength="1" x="8" y="12" width="20" height="28" rx="4"/><path class="draw" pathLength="1" d="M18 12V10a4 4 0 0 1 4-4h14a4 4 0 0 1 4 4v20a4 4 0 0 1-4 4h-8"/><path class="draw" pathLength="1" d="M13 22h10M13 28h7"/></g></symbol>
-  <symbol id="i-refill" viewBox="0 0 48 48"><g fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path class="draw" pathLength="1" d="M21 6h6v6c3 1.5 5 4.5 5 8v18a4 4 0 0 1-4 4h-8a4 4 0 0 1-4-4V20c0-3.5 2-6.5 5-8z"/><path class="draw" pathLength="1" d="M40 18a17 17 0 0 1-2 16M37 34l1 4 4-1.5M8 30a17 17 0 0 1 2-16M11 14l-1-4-4 1.5"/></g></symbol>
-  <symbol id="i-route" viewBox="0 0 48 48"><g fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path class="draw" pathLength="1" d="M10 38c6 0 6-8 14-8s8-8 14-8"/><circle class="draw" pathLength="1" cx="10" cy="38" r="3"/><path class="draw" pathLength="1" d="M38 22c-5-5-8-8.5-8-12a8 8 0 0 1 16 0c0 3.5-3 7-8 12z"/><path class="draw" pathLength="1" d="M36 8.5a2.4 2.4 0 1 1 3 2.4c-.8.3-1 .8-1 1.6M38 15.5v.1"/></g></symbol>
-  <symbol id="i-unlink" viewBox="0 0 48 48"><g fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path class="draw" pathLength="1" d="M20 14l3-3a8.5 8.5 0 0 1 12 12l-3 3"/><path class="draw" pathLength="1" d="M28 34l-3 3a8.5 8.5 0 0 1-12-12l3-3"/><path class="draw" pathLength="1" d="M8 8l4 4M40 40l-4-4M6 18h5M18 6v5M42 30h-5M30 42v-5"/></g></symbol>
-  <!-- benefícios -->
-  <symbol id="i-shield" viewBox="0 0 48 48"><g fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path class="draw" pathLength="1" d="M24 5l15 5v12c0 10-6.5 17.5-15 21-8.5-3.5-15-11-15-21V10z"/><path class="draw" pathLength="1" d="M17 24l5 5 9-10"/></g></symbol>
-  <symbol id="i-eye" viewBox="0 0 48 48"><g fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path class="draw" pathLength="1" d="M4 24s7-12 20-12 20 12 20 12-7 12-20 12S4 24 4 24z"/><circle class="draw" pathLength="1" cx="24" cy="24" r="6"/></g></symbol>
-  <symbol id="i-phone" viewBox="0 0 48 48"><g fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><rect class="draw" pathLength="1" x="11" y="5" width="20" height="38" rx="5"/><path class="draw" pathLength="1" d="M18 9h6M36 17a9 9 0 0 1 0 14M40.5 13a15 15 0 0 1 0 22"/></g></symbol>
-  <symbol id="i-star" viewBox="0 0 48 48"><path class="draw" pathLength="1" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linejoin="round" d="M24 6l5.4 11.2 12.3 1.6-9 8.6 2.3 12.2L24 33.7l-11 5.9 2.3-12.2-9-8.6 12.3-1.6z"/></symbol>
-  <symbol id="i-people" viewBox="0 0 48 48"><g fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle class="draw" pathLength="1" cx="18" cy="16" r="6"/><path class="draw" pathLength="1" d="M6 40c0-7 5.4-12 12-12s12 5 12 12"/><path class="draw" pathLength="1" d="M30 10.5a6 6 0 0 1 0 11M34 28c5 1.4 8 6 8 12"/></g></symbol>
-  <symbol id="i-search-bottle" viewBox="0 0 48 48"><g fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path class="draw" pathLength="1" d="M15 5h6v6c2.5 1.4 4 4 4 7v6M25 34v4a4 4 0 0 1-4 4h-6a4 4 0 0 1-4-4V18c0-3 1.5-5.6 4-7"/><circle class="draw" pathLength="1" cx="33" cy="30" r="7"/><path class="draw" pathLength="1" d="M38 35l5 5"/></g></symbol>
-  <symbol id="i-trace" viewBox="0 0 48 48"><g fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle class="draw" pathLength="1" cx="9" cy="12" r="4"/><circle class="draw" pathLength="1" cx="39" cy="12" r="4"/><circle class="draw" pathLength="1" cx="24" cy="36" r="4"/><path class="draw" pathLength="1" d="M13 12h22M11 15.5l10 17M37 15.5l-10 17"/></g></symbol>
-  <symbol id="i-chart" viewBox="0 0 48 48"><g fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path class="draw" pathLength="1" d="M6 6v36h36"/><path class="draw" pathLength="1" d="M13 32l8-9 6 5 11-13"/><path class="draw" pathLength="1" d="M32 15h6v6"/></g></symbol>
-</svg>
+  <!-- logos (vetorizadas a partir dos arquivos da marca) e ícones -->
+  <svg class="sprite" aria-hidden="true" focusable="false">
+    <symbol id="vs-wordmark" viewBox="0 0 977 161">
+      <path class="lg-ink" fill="var(--lg-ink, currentColor)"
+        d="M0.7 0.7C-0.2 1.6-0.5 0.9 10.3 23.8L73.5 157.9C73.8 158.3 74.4 158.8 74.9 159C76.2 159.5 95.1 159.4 96.4 158.9L125.8 110L147.7 72.5C151.6 65.8 152 64.7 150.8 64.2C149.9 63.9 117.5 64 116.5 64.3L91.7 104.8C89 109.4 88.4 110.1 87.4 109.5L38.7 5C36.4-0.1 38.4 0.3 18.4 0.3C5.4 0.3 1 0.4 0.7 0.7M415 1.2C414.4 2.1 414.3 2.5 414.3 12.8C414.3 22.9 414.4 23.6 415 24.4C415.6 25.2 415.6 25.2 431.8 25.2C448.1 25.2 448.1 25.2 448.7 24.4C449.3 23.6 449.3 22.9 449.3 12.9C449.3 2.4 449.2 1.3 448.2 0.6C448 0.5 440.6 0.3 431.8 0.3C415.7 0.3 415.7 0.3 415 1.2M549.2 0.7C542.3 1.2 537.8 2.6 532.9 5.8C528.4 8.7 526.3 11.2 522 18.5L492.6 67.6C492.2 68.8 492.7 70.1 494.8 73.2C498.5 78.6 504.7 83.8 510.3 86.2L555 98.3C580.9 104.7 588.3 106.9 591 109.2C593.2 111.1 593.8 112.7 593.8 116C593.8 122.1 590.8 125.4 582.2 128.6C579.8 129.5 579.8 129.5 556 129.6C529.1 129.7 530.6 129.8 524.7 126.9C518.9 124.2 516.5 121.3 510.7 110.7C508.1 105.7 507.7 105.1 506.6 104.8C505.1 104.2 476.6 104.2 475 104.7C473 105.4 473.1 105.9 478.3 116.1C484.2 128 486.4 131.9 489 135.5C498.1 147.9 508.8 155 523.3 158.1C528.2 159.1 528.2 159.1 545.3 159.2C554.8 159.3 567.8 159.2 574.3 159.1C585.9 158.7 586.2 158.7 590.2 157.7C607.8 153.2 620.2 142.6 625.1 127.7C626.7 122.8 627.1 119.4 626.9 112C626.7 104.8 626.1 102.1 623.9 97.5C618.5 86.5 608.6 80.3 589 75.3L539.7 61.8C527.2 58.4 523.3 55.8 521.6 49.8C519.7 42.6 523.4 36.1 531.6 32.7C534.9 31.3 537.1 31.1 551 30.6C569 30.1 575.3 30.5 580.8 32.7C587.7 35.4 591.2 39.1 593.1 45.7C594.1 49.1 592.5 48.8 609.5 48.9C626.2 49 625.7 49.1 625.7 46.7C625.7 44.4 624.6 39.1 623.3 34.7C617.5 15.2 601.7 3 580 1C574.6 0.5 554.3 0.3 549.2 0.7M943.5 0.8C942.8 1.3 942.8 2.5 942.7 79.5C942.7 157.7 942.7 157.7 943.5 158.5C944.3 159.4 944.3 159.4 960 159.3C975.1 159.2 975.7 159.1 976.2 158.5C976.6 158 976.7 146.7 976.7 79.6C976.7 1.4 976.7 1.4 975.9 0.9C974.9 0.1 944.5 0.1 943.5 0.8M217.7 39.7C200.6 40.6 188.8 43.8 181.8 49.5C171.6 57.7 168.1 70.8 168.2 100.8C168.2 127.8 170.4 138.9 177 147.2C182.4 153.7 189.9 157.3 203 159.5C211.3 160.9 213.7 161 229.7 161C244.9 161 251.4 160.7 258.2 159.8C260.2 159.6 263.6 159.2 265.7 159C270.6 158.6 273.5 157.9 274.3 157.2C275 156.6 275 156.2 275 145.7C275 135.1 275 134.8 274.3 134.1C273.6 133.5 273.4 133.5 266.7 134.1C252 135.4 228.6 135.6 219 134.7C209.6 133.7 204.9 130.8 203 124.8C202.6 123.4 202.2 120.7 202 117.2C201.6 111.3 201.7 110.2 203.2 109.7C203.7 109.5 217.7 109.3 241.4 109.3C278.7 109.3 278.7 109.3 279.5 108.5C280.3 107.7 280.3 107.7 280.3 100.4C280.3 92.3 279.9 80.7 279.3 75.2C276.8 49.9 266.1 41.5 234.3 39.7C227.6 39.3 224.6 39.3 217.7 39.7M703.8 39.7C674.2 41.3 661.8 48.7 656.9 67.7C654.8 75.8 654 84.8 654 101C654 124.4 655.6 135.4 660.5 143.7C666.3 153.7 677.6 158.8 697.5 160.7C702.2 161.1 730.3 161.1 735.3 160.7C742.5 160.1 752.8 159 756 158.5C761.2 157.7 760.8 158.7 760.9 145.7C761 133.2 761.1 133.7 758.4 133.7C757.5 133.7 754.5 133.9 751.8 134.2C737.6 135.6 708.7 135.7 702 134.3C691.4 132.2 688.6 128.7 687.7 116.7C687.4 111.7 687.6 110.3 688.9 109.7L765.5 108.7C766 108.1 766.1 107.1 766 97.1C766 80.8 765.4 73.2 764 67C761.3 55.7 756.8 49.6 748.2 45.4C738.9 40.9 721.9 38.7 703.8 39.7M838.5 39.7C829 40 816.1 41.1 808.5 42.2C800.2 43.4 801 42 801 55.1C801 67.8 800.8 67.2 804.9 67.1C806.3 67 811.5 66.7 816.3 66.4C828.7 65.6 852.1 65.6 858 66.4C864.9 67.4 868.6 69.8 870 74.3C870.8 76.7 871.6 86.4 871.2 88.5C870.8 90.7 870.7 90.7 859.9 90.3C826.8 89.2 815.2 90 806.7 94.1C802 96.4 798.4 100.5 796.3 105.7C792.7 115 792.3 133.1 795.5 142.1C799 151.7 804.9 156.9 815.7 159.7C819.8 160.8 819.9 160.8 829.9 160.9C843.7 161.1 850.3 160.1 857.2 156.8C862.2 154.5 864.8 152.4 869.2 147.2C870.5 145.7 871.8 145.6 872.3 146.9C872.5 147.4 872.8 150 872.9 152.7C873.1 155.3 873.4 157.7 873.5 158C874 159.2 875.1 159.3 889.5 159.3C902.9 159.3 903.6 159.3 904.4 158.7C905.2 158.1 905.2 158.1 905.2 118.4C905.2 76.2 905.1 74.4 903.5 66.7C899.6 47.8 888.1 41.1 857 39.7C849.3 39.3 849.5 39.3 838.5 39.7M380 39.9C369.5 41.5 366 42.5 361.6 45.1C356.4 48.2 352.4 52.7 349.9 58.1C349.3 59.4 348.5 60.8 348.1 61.1C347.4 61.7 347.4 61.7 346.8 61.1C346.2 60.5 346.1 59.5 345.7 51.8C345.3 42.3 345.1 41.8 343.3 41.5C342.7 41.4 336 41.3 328.4 41.4C315.8 41.5 314.6 41.5 314.1 42.1L314.1 158.6C314.6 159.1 315.8 159.2 329.4 159.3C345.1 159.4 346.5 159.3 346.8 157.9C346.9 157.5 347 145.5 347.1 131.2C347.3 104.6 347.3 103.6 348.7 96.3C349.9 89.9 351.1 86.6 353.5 83C358.7 75.2 367.5 71.5 382.6 70.7C386.7 70.5 387.5 70.4 387.9 69.8C388.3 69.2 388.6 53.7 388.4 44.5C388.2 39.7 388.1 39.7 384.1 39.7C382.3 39.7 380.5 39.8 380 39.9M416.1 41.7C415.7 41.8 415.2 42.3 415 42.6C414.8 43.1 414.7 60.7 414.7 100.5C414.7 157.7 414.7 157.7 415.5 158.5C416.3 159.3 416.3 159.3 431.5 159.3C439.9 159.3 447 159.2 447.4 159C447.9 158.9 448.3 158.5 448.5 158.1L448.7 43.4C448.7 41.4 448.3 41.3 431.6 41.4C423.5 41.4 416.5 41.5 416.1 41.7M220.3 64.7C213 65.1 208.7 66.3 206.6 68.5C203.8 71.6 202.6 75 202 82.1C201.5 88.6 201.5 89.2 202.5 90.2C203.3 91 203.3 91 225.1 90.9C250.9 90.8 248.5 91.3 248.4 86.6C248.3 82.9 247.7 78.1 247 75.1C245.2 68.1 241.3 65.3 232.4 64.8C230.5 64.7 228 64.6 227 64.5C226 64.5 223 64.5 220.3 64.7M701.7 65C691.6 66.4 688.8 70.3 687.7 84.1C687.3 89.2 687.6 90.4 689.3 90.8C691.1 91.1 731.9 91 732.8 90.7C734.3 90.1 734.4 89.1 734 83.2C733.3 71.8 730.9 67.8 723.7 65.5C721.6 64.8 705.6 64.5 701.7 65M836.5 108.6C828.1 109.6 826.5 111.1 825.7 119.1C825.3 123.1 825.6 128.3 826.5 130.6C828.1 135.2 831.8 136.5 843.3 136.9C850.3 137.1 853.7 136.8 858.2 135.6C867.2 133.3 870.9 127.1 871.1 114.4C871.2 109.7 871.1 109.6 870.4 109C869.6 108.4 868.9 108.3 853.5 108.4C844.7 108.4 837 108.5 836.5 108.6" />
+      <path class="lg-accent" fill="var(--lg-accent, #03adf9)"
+        d="M156.3 0.6C155.7 0.8 154.8 1.4 154.4 1.9L128.2 44C125.6 47.5 125.3 49.6 127.4 50.5C129.1 51.2 156.3 51.2 157.6 50.5C159 49.8 160.6 48 161.6 46.2L186.6 4.8C187.6 3.2 187.8 1.9 187.1 1C186.5 0.2 186.5 0.2 172 0.2C161.4 0.2 157.2 0.3 156.3 0.6" />
+    </symbol>
+    <symbol id="vs-mark" viewBox="0 0 668 359">
+      <path class="lg-ink" fill="var(--lg-ink, currentColor)"
+        d="M1 0.8C-0.1 1.3 0.3 2.8 2.8 8L161 343.7C166.6 355.6 167.9 357.9 169.1 358.5L219.1 358.7C219.7 358.5 220.7 357.2 221.9 355.4L341.3 151C344.6 145.6 344.9 144.7 343.7 144C343.3 143.8 330.3 143.7 304 143.7C260 143.7 263.5 143.5 261.7 146.3L199.6 250.1C198.8 250.7 197.6 249.4 196.5 246.7L83.8 2.8C82.9 0.6 85.9 0.7 41.8 0.6C16.9 0.5 1.4 0.6 1 0.8M496.5 0.7C475.2 1.7 458.8 7.7 446.9 19C442.4 23.3 440.1 26.3 435.5 33.9L363.8 153.4C363.3 155.7 370.1 166.7 376.2 173.4C384.7 182.8 395.5 190.7 405.4 194.7C406.8 195.2 409 196.1 410.5 196.7L464.8 211.3L566.7 237C586 241.5 594.9 250.5 593.3 264.1C592.4 271.8 587.9 278.7 580.6 283.5C573.9 287.8 567.3 290 555.6 291.7C550.5 292.5 550.1 292.5 505.7 292.5C457.2 292.5 459.1 292.6 449.6 290.6C440.1 288.7 434.3 285.9 426.3 279.6C418.9 273.7 412.6 264.3 401.5 242.2C399.3 237.8 398.3 236.1 397.7 235.8C397 235.4 388.3 235.3 359 235.3C317.4 235.3 320 235.2 320.4 237.3C320.9 239.5 343.3 284 348 292.2C360.1 312.8 372.9 326.6 391.7 339.2C408.3 350.4 430.3 357 456.7 358.7C463.9 359.1 559.2 358.9 563 358.4C573.2 357.1 577.2 356.5 581.7 355.5C590.1 353.7 594.5 352.5 599.2 350.7C622.5 341.9 640.8 327.7 653.4 308.5C663.2 293.5 668.4 274.3 667.9 254.3C667.6 242.9 666.7 237 664 228.7C658.8 212.8 651.6 203 637.3 192.2C628.4 185.5 619.6 181.2 606 176.7L467 138.2C449.1 133.4 442.3 130.3 436.8 124.6C430.8 118.3 428.6 112.7 428.6 103.8C428.7 98.5 428.8 97.7 430.6 93.2C432.2 89 433 87.6 435.2 84.7C441.9 76.1 454.2 70.8 470.5 69.3C475.3 68.9 529.9 68.2 537.5 68.5C554.1 69.1 567.2 72.8 576.1 79.5C584.1 85.5 588.9 93.1 591.2 103.2C592.6 109.5 592.7 109.6 593.3 110C593.7 110.2 607.1 110.3 628.5 110.4C663.1 110.5 663.1 110.5 663.9 109.5C664.8 108.4 664.8 108.8 664 101.8C662.2 86.1 659.1 74.7 652.9 61.3C648 50.6 637 36.3 626.8 27.6C616.1 18.4 601.3 10.6 587 6.6C571.1 2.2 560.3 1 535.8 0.8L496.5 0.7" />
+      <path class="lg-accent" fill="var(--lg-accent, #03adf9)"
+        d="M386.4 1L351.4 1.2L349.5 3L324.8 41.6L284.1 106.9C282.6 108.8 282 110.3 282 112.2C282 115 282.4 115.2 289.2 115.4C301.7 115.6 357.1 115.3 357.8 114.9C359.2 114.2 361.4 111.8 362.6 109.7L423.6 9.9C426.2 6.1 427 3.4 426 2.1C425.3 1.3 423.5 0.7 422.4 0.7C421.9 0.8 405.7 0.9 386.4 1" />
+    </symbol>
+    <symbol id="i-contactless" viewBox="0 0 24 24">
+      <g fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round">
+        <path d="M6.5 8.5a5 5 0 0 1 0 7" />
+        <path d="M10 6.2a9 9 0 0 1 0 11.6" />
+        <path d="M13.6 4a13 13 0 0 1 0 16" />
+        <path d="M17.2 2.2a16.5 16.5 0 0 1 0 19.6" />
+      </g>
+    </symbol>
+    <symbol id="i-arrow-down" viewBox="0 0 24 24">
+      <path fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+        d="M12 5v14M6 13l6 6 6-6" />
+    </symbol>
+    <symbol id="i-arrow-right" viewBox="0 0 24 24">
+      <path fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+        d="M5 12h14M13 6l6 6-6 6" />
+    </symbol>
+    <symbol id="i-play" viewBox="0 0 24 24">
+      <path fill="currentColor"
+        d="M8 5.6v12.8c0 .8.9 1.3 1.6.9l10-6.4c.6-.4.6-1.3 0-1.7l-10-6.4C8.9 4.3 8 4.8 8 5.6z" />
+    </symbol>
+    <symbol id="i-pause" viewBox="0 0 24 24">
+      <rect x="6.5" y="5" width="4" height="14" rx="1.2" fill="currentColor" />
+      <rect x="13.5" y="5" width="4" height="14" rx="1.2" fill="currentColor" />
+    </symbol>
+    <symbol id="i-menu" viewBox="0 0 24 24">
+      <path fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" d="M4 8h16M4 16h16" />
+    </symbol>
+    <symbol id="i-close" viewBox="0 0 24 24">
+      <path fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" d="M6 6l12 12M18 6L6 18" />
+    </symbol>
+    <symbol id="i-check" viewBox="0 0 24 24">
+      <path fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"
+        d="M5 12.5l4.5 4.5L19 7.5" />
+    </symbol>
+    <symbol id="i-alert" viewBox="0 0 24 24">
+      <g fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round">
+        <path d="M12 3.5 2.8 19.5h18.4z" />
+        <path stroke-linecap="round" d="M12 10v4.5M12 17.2v.1" />
+      </g>
+    </symbol>
+    <symbol id="i-verified" viewBox="-2 -2 60 60">
+      <path fill="currentColor"
+        d="M28.00 4.80Q35.82 -1.17 39.60 7.91Q49.35 6.65 48.09 16.40Q57.17 20.18 51.20 28.00Q57.17 35.82 48.09 39.60Q49.35 49.35 39.60 48.09Q35.82 57.17 28.00 51.20Q20.18 57.17 16.40 48.09Q6.65 49.35 7.91 39.60Q-1.17 35.82 4.80 28.00Q-1.17 20.18 7.91 16.40Q6.65 6.65 16.40 7.91Q20.18 -1.17 28.00 4.80Z" />
+      <path class="vb-check" fill="none" stroke="#fff" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"
+        d="M18 28.5l7 7 13.5-14" />
+    </symbol>
+    <symbol id="i-alert-badge" viewBox="-2 -2 60 60">
+      <path fill="currentColor"
+        d="M28.00 4.80Q35.82 -1.17 39.60 7.91Q49.35 6.65 48.09 16.40Q57.17 20.18 51.20 28.00Q57.17 35.82 48.09 39.60Q49.35 49.35 39.60 48.09Q35.82 57.17 28.00 51.20Q20.18 57.17 16.40 48.09Q6.65 49.35 7.91 39.60Q-1.17 35.82 4.80 28.00Q-1.17 20.18 7.91 16.40Q6.65 6.65 16.40 7.91Q20.18 -1.17 28.00 4.80Z" />
+      <path fill="none" stroke="#fff" stroke-width="5" stroke-linecap="round" d="M28 16v15M28 39.5v.5" />
+    </symbol>
+    <symbol id="i-pulse" viewBox="0 0 24 24">
+      <path fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"
+        d="M3 12h4l2.5-6 5 12 2.5-6H21" />
+    </symbol>
+    <!-- ameaças -->
+    <symbol id="i-drop" viewBox="0 0 48 48">
+      <g fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+        <path class="draw" pathLength="1" d="M24 6c6 8 12 14.5 12 22a12 12 0 0 1-24 0c0-7.5 6-14 12-22z" />
+        <path class="draw" pathLength="1" d="M19.5 25.5l9 9M28.5 25.5l-9 9" />
+      </g>
+    </symbol>
+    <symbol id="i-copy" viewBox="0 0 48 48">
+      <g fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+        <rect class="draw" pathLength="1" x="8" y="12" width="20" height="28" rx="4" />
+        <path class="draw" pathLength="1" d="M18 12V10a4 4 0 0 1 4-4h14a4 4 0 0 1 4 4v20a4 4 0 0 1-4 4h-8" />
+        <path class="draw" pathLength="1" d="M13 22h10M13 28h7" />
+      </g>
+    </symbol>
+    <symbol id="i-refill" viewBox="0 0 48 48">
+      <g fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+        <path class="draw" pathLength="1"
+          d="M21 6h6v6c3 1.5 5 4.5 5 8v18a4 4 0 0 1-4 4h-8a4 4 0 0 1-4-4V20c0-3.5 2-6.5 5-8z" />
+        <path class="draw" pathLength="1"
+          d="M40 18a17 17 0 0 1-2 16M37 34l1 4 4-1.5M8 30a17 17 0 0 1 2-16M11 14l-1-4-4 1.5" />
+      </g>
+    </symbol>
+    <symbol id="i-route" viewBox="0 0 48 48">
+      <g fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+        <path class="draw" pathLength="1" d="M10 38c6 0 6-8 14-8s8-8 14-8" />
+        <circle class="draw" pathLength="1" cx="10" cy="38" r="3" />
+        <path class="draw" pathLength="1" d="M38 22c-5-5-8-8.5-8-12a8 8 0 0 1 16 0c0 3.5-3 7-8 12z" />
+        <path class="draw" pathLength="1" d="M36 8.5a2.4 2.4 0 1 1 3 2.4c-.8.3-1 .8-1 1.6M38 15.5v.1" />
+      </g>
+    </symbol>
+    <symbol id="i-unlink" viewBox="0 0 48 48">
+      <g fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+        <path class="draw" pathLength="1" d="M20 14l3-3a8.5 8.5 0 0 1 12 12l-3 3" />
+        <path class="draw" pathLength="1" d="M28 34l-3 3a8.5 8.5 0 0 1-12-12l3-3" />
+        <path class="draw" pathLength="1" d="M8 8l4 4M40 40l-4-4M6 18h5M18 6v5M42 30h-5M30 42v-5" />
+      </g>
+    </symbol>
+    <!-- benefícios -->
+    <symbol id="i-shield" viewBox="0 0 48 48">
+      <g fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+        <path class="draw" pathLength="1" d="M24 5l15 5v12c0 10-6.5 17.5-15 21-8.5-3.5-15-11-15-21V10z" />
+        <path class="draw" pathLength="1" d="M17 24l5 5 9-10" />
+      </g>
+    </symbol>
+    <symbol id="i-eye" viewBox="0 0 48 48">
+      <g fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+        <path class="draw" pathLength="1" d="M4 24s7-12 20-12 20 12 20 12-7 12-20 12S4 24 4 24z" />
+        <circle class="draw" pathLength="1" cx="24" cy="24" r="6" />
+      </g>
+    </symbol>
+    <symbol id="i-phone" viewBox="0 0 48 48">
+      <g fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+        <rect class="draw" pathLength="1" x="11" y="5" width="20" height="38" rx="5" />
+        <path class="draw" pathLength="1" d="M18 9h6M36 17a9 9 0 0 1 0 14M40.5 13a15 15 0 0 1 0 22" />
+      </g>
+    </symbol>
+    <symbol id="i-star" viewBox="0 0 48 48">
+      <path class="draw" pathLength="1" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linejoin="round"
+        d="M24 6l5.4 11.2 12.3 1.6-9 8.6 2.3 12.2L24 33.7l-11 5.9 2.3-12.2-9-8.6 12.3-1.6z" />
+    </symbol>
+    <symbol id="i-people" viewBox="0 0 48 48">
+      <g fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+        <circle class="draw" pathLength="1" cx="18" cy="16" r="6" />
+        <path class="draw" pathLength="1" d="M6 40c0-7 5.4-12 12-12s12 5 12 12" />
+        <path class="draw" pathLength="1" d="M30 10.5a6 6 0 0 1 0 11M34 28c5 1.4 8 6 8 12" />
+      </g>
+    </symbol>
+    <symbol id="i-search-bottle" viewBox="0 0 48 48">
+      <g fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+        <path class="draw" pathLength="1"
+          d="M15 5h6v6c2.5 1.4 4 4 4 7v6M25 34v4a4 4 0 0 1-4 4h-6a4 4 0 0 1-4-4V18c0-3 1.5-5.6 4-7" />
+        <circle class="draw" pathLength="1" cx="33" cy="30" r="7" />
+        <path class="draw" pathLength="1" d="M38 35l5 5" />
+      </g>
+    </symbol>
+    <symbol id="i-trace" viewBox="0 0 48 48">
+      <g fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+        <circle class="draw" pathLength="1" cx="9" cy="12" r="4" />
+        <circle class="draw" pathLength="1" cx="39" cy="12" r="4" />
+        <circle class="draw" pathLength="1" cx="24" cy="36" r="4" />
+        <path class="draw" pathLength="1" d="M13 12h22M11 15.5l10 17M37 15.5l-10 17" />
+      </g>
+    </symbol>
+    <symbol id="i-chart" viewBox="0 0 48 48">
+      <g fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+        <path class="draw" pathLength="1" d="M6 6v36h36" />
+        <path class="draw" pathLength="1" d="M13 32l8-9 6 5 11-13" />
+        <path class="draw" pathLength="1" d="M32 15h6v6" />
+      </g>
+    </symbol>
+  </svg>
 
-<a class="skip" href="#conteudo">Pular para o conteúdo</a>
+  <a class="skip" href="#conteudo">Pular para o conteúdo</a>
 
-<header class="nav" id="nav">
-  <div class="nav-in">
-    <a class="nav-logo" href="#lacre" aria-label="VeriSeal, voltar ao início"><svg viewBox="0 0 977 161" aria-hidden="true"><use href="#vs-wordmark"/></svg></a>
-    <nav class="nav-links" aria-label="Seções">
+  <header class="nav" id="nav">
+    <div class="nav-in">
+      <a class="nav-logo" href="#lacre" aria-label="VeriSeal, voltar ao início"><svg viewBox="0 0 977 161"
+          aria-hidden="true">
+          <use href="#vs-wordmark" />
+        </svg></a>
+      <nav class="nav-links" aria-label="Seções">
+        <a href="#lacre">O lacre</a>
+        <a href="#garrafa">Na garrafa</a>
+        <a href="#como-funciona">Como funciona</a>
+        <a href="#beneficios">Benefícios</a>
+        <a href="#identidade">Identidade</a>
+      </nav>
+      <a class="btn btn-primary btn-sm nav-cta" href="#contato">Proteger minha marca</a>
+      <button class="nav-menu" id="navMenu" type="button" aria-expanded="false" aria-controls="navSheet"
+        aria-label="Abrir menu"><svg aria-hidden="true">
+          <use href="#i-menu" />
+        </svg></button>
+    </div>
+    <div class="nav-progress" aria-hidden="true"><i id="navProgress"></i></div>
+    <div class="nav-sheet" id="navSheet" hidden>
       <a href="#lacre">O lacre</a>
       <a href="#garrafa">Na garrafa</a>
       <a href="#como-funciona">Como funciona</a>
       <a href="#beneficios">Benefícios</a>
       <a href="#identidade">Identidade</a>
-    </nav>
-    <a class="btn btn-primary btn-sm nav-cta" href="#contato">Proteger minha marca</a>
-    <button class="nav-menu" id="navMenu" type="button" aria-expanded="false" aria-controls="navSheet" aria-label="Abrir menu"><svg aria-hidden="true"><use href="#i-menu"/></svg></button>
-  </div>
-  <div class="nav-progress" aria-hidden="true"><i id="navProgress"></i></div>
-  <div class="nav-sheet" id="navSheet" hidden>
-    <a href="#lacre">O lacre</a>
-    <a href="#garrafa">Na garrafa</a>
-    <a href="#como-funciona">Como funciona</a>
-    <a href="#beneficios">Benefícios</a>
-    <a href="#identidade">Identidade</a>
-    <a class="btn btn-primary" href="#contato">Proteger minha marca</a>
-  </div>
-</header>
-
-<main id="conteudo">
-
-<!-- 1 · HERO: o lacre em tela cheia, com lupa de raio-x e vista explodida -->
-<section class="hero dark" id="lacre" data-theme="dark" data-seq="hero">
-  <div class="hero-pin">
-    <div class="hero-bg" aria-hidden="true"><div class="hero-grid"></div><div class="hero-glow"></div></div>
-
-    <div class="hero-copy" id="heroCopy">
-      <p class="eyebrow eyebrow-holo">Lacre inteligente para destilados</p>
-      <h1 class="h-hero" aria-label="A prova está no lacre."><span class="w" aria-hidden="true">A</span> <span class="w" aria-hidden="true">prova</span> <span class="w" aria-hidden="true">está</span> <span class="w" aria-hidden="true">no</span> <span class="w grad" aria-hidden="true">lacre.</span></h1>
-      <p class="lede">Lacre com chip NFC que mostra no celular <strong>se a garrafa é original e se já foi aberta.</strong></p>
+      <a class="btn btn-primary" href="#contato">Proteger minha marca</a>
     </div>
+  </header>
 
-    <div class="anatomy-copy" id="anatomyCopy" aria-hidden="true">
-      <p class="eyebrow">Anatomia do lacre</p>
-      <h2 class="h-sec">Quatro camadas.<br>Uma identidade.</h2>
-    </div>
+  <main id="conteudo">
 
-    <div class="seal-stage" id="sealStage">
-      <div class="seal" id="seal" role="img" aria-label="Lacre VeriSeal: faixa azul-marinho com a logo VeriSeal, selo holográfico, linha de ruptura, símbolo de aproximação do celular e o número de série A7F3K9B21. Por dentro, um chip NFC com antena e um circuito que se rompe ao abrir a garrafa.">
-        <div class="seal-layer" data-layer="adhesive"></div>
-        <div class="seal-layer" data-layer="tamper"></div>
-        <div class="seal-layer" data-layer="inlay"></div>
-        <div class="seal-layer" data-layer="print"><div class="seal-glare"></div><div class="seal-scan"></div></div>
-      </div>
-      <div class="loupe" id="loupe" aria-hidden="true"><div class="loupe-view"></div><span class="loupe-tag">Raio-X</span></div>
-      <svg class="layer-lines" id="layerLines" aria-hidden="true"></svg>
-      <ol class="layer-labels" id="layerLabels">
-        <li data-for="print"><b>Película impressa</b><span>Marca, código único e holograma.</span></li>
-        <li data-for="inlay"><b>Chip NFC e antena</b><span>Respondem ao celular.</span></li>
-        <li data-for="tamper"><b>Circuito de ruptura</b><span>Abrir a garrafa rompe o circuito.</span></li>
-        <li data-for="adhesive"><b>Adesivo de alta aderência</b><span>Não sai inteiro.</span></li>
-      </ol>
-    </div>
-
-    <p class="hero-next" id="heroNext" aria-hidden="true">Agora, veja o lacre na garrafa <svg><use href="#i-arrow-down"/></svg></p>
-
-    <div class="hero-foot" id="heroFoot">
-      <p class="hero-hint"><span class="hint-dot" aria-hidden="true"></span><span class="hint-fine">Passe o cursor sobre o lacre para ver por dentro.</span><span class="hint-coarse">Arraste a lente sobre o lacre para ver por dentro.</span></p>
-      <div class="ctas">
-        <a class="btn btn-primary magnetic" href="#contato">Quero proteger minha marca</a>
-        <a class="btn btn-ghost" href="#garrafa">Ver na garrafa <svg aria-hidden="true"><use href="#i-arrow-down"/></svg></a>
-      </div>
-    </div>
-  </div>
-</section>
-
-<!-- 2 · A ANIMAÇÃO 3D DENTRO DE UM QUADRO -->
-<section class="closer light" id="garrafa" data-theme="light">
-  <div class="wrap closer-head">
-    <p class="eyebrow" data-reveal>Na garrafa</p>
-    <h2 class="h-sec" data-reveal style="--d:.06s">Veja o lacre em ação.</h2>
-    <p class="lead" data-reveal style="--d:.12s">Role para girar a garrafa. Ou <strong>pule a animação</strong> quando quiser.</p>
-  </div>
-
-  <div class="track" id="track" data-theme="light">
-    <div class="track-pin" id="trackPin">
-      <div class="frame" id="stage">
-        <canvas id="scene" role="img" aria-label="Garrafa de whisky com o lacre VeriSeal. Ao rolar, a garrafa gira e a câmera se aproxima da tampa para mostrar o lacre."></canvas>
-        <div class="vignette" aria-hidden="true"></div>
-        <div class="nogl"><p>Seu navegador não conseguiu iniciar a cena 3D.<br>O restante da página funciona normalmente.</p></div>
-
-        <div class="frame-top">
-          <span class="frame-badge"><svg viewBox="0 0 668 359" aria-hidden="true"><use href="#vs-mark"/></svg>Simulação 3D</span>
-          <a class="frame-skip" href="#como-funciona" id="skipAnim">Pular animação <svg aria-hidden="true"><use href="#i-arrow-down"/></svg></a>
+    <!-- 1 · HERO: o lacre em tela cheia, com lupa de raio-x e vista explodida -->
+    <section class="hero dark" id="lacre" data-theme="dark" data-seq="hero">
+      <div class="hero-pin">
+        <div class="hero-bg" aria-hidden="true">
+          <div class="hero-grid"></div>
+          <div class="hero-glow"></div>
         </div>
 
-        <section class="chapter ch-left" data-from="0" data-to="0.14" aria-labelledby="ch1">
-          <span class="eyebrow">A garrafa</span>
-          <h3 id="ch1">Por fora, igual a qualquer outra.</h3>
-          <p>Vidro, rótulo e tampa não provam que o conteúdo é original.</p>
-        </section>
-
-        <section class="chapter ch-right" data-from="0.2" data-to="0.4" aria-labelledby="ch2">
-          <span class="eyebrow">O problema</span>
-          <h3 id="ch2">A fraude reaproveita a garrafa.</h3>
-          <div class="facts">
-            <div><b>Vidro</b><span>o mesmo, recolhido vazio</span></div>
-            <div><b>Rótulo</b><span>o mesmo, sem retoque</span></div>
-            <div><b>Bebida</b><span>trocada por outra</span></div>
-            <div><b>Tampa</b><span>o único ponto que precisa ser violado</span></div>
-          </div>
-        </section>
-
-        <section class="chapter ch-left" data-from="0.46" data-to="0.64" aria-labelledby="ch3">
-          <span class="eyebrow">A resposta</span>
-          <h3 id="ch3">Cada garrafa, uma identidade digital.</h3>
-          <p>O lacre cruza a tampa. Abrir rompe o lacre. O celular confirma a origem.</p>
-          <div class="facts">
-            <div><b>Chip NFC</b><span>leitura direta no celular</span></div>
-            <div><b>Código único</b><span>gravado no envase</span></div>
-          </div>
-        </section>
-
-        <div class="hud" id="hud" aria-hidden="true">
-          <svg id="hud-svg"></svg>
-          <div class="callout left" data-cal="tear" style="top:30%"><b><i class="cn">1</i>Linha de ruptura</b><span>O lacre cruza a junção entre tampa e gargalo. Girar a tampa rompe a tira e o circuito.</span></div>
-          <div class="callout left" data-cal="nfc" style="top:54%"><b><i class="cn">2</i>Chip e antena NFC</b><span>Laminados dentro do lacre. O celular lê a identidade da garrafa.</span></div>
-          <div class="callout right" data-cal="top" style="top:24%"><b><i class="cn">3</i>Selo holográfico</b><span>Cobre a tampa. Não existe como abrir sem violar o lacre.</span></div>
-          <div class="callout right" data-cal="code" style="top:56%"><b><i class="cn">4</i>Código único</b><span>A identidade da garrafa, gravada na linha de envase.</span></div>
-          <i class="dot" data-dot="tear" data-n="1"></i><i class="dot" data-dot="nfc" data-n="2"></i><i class="dot" data-dot="top" data-n="3"></i><i class="dot" data-dot="code" data-n="4"></i>
+        <div class="hero-copy" id="heroCopy">
+          <p class="eyebrow eyebrow-holo">Lacre inteligente para destilados</p>
+          <h1 class="h-hero" aria-label="A prova está no lacre."><span class="w" aria-hidden="true">A</span> <span
+              class="w" aria-hidden="true">prova</span> <span class="w" aria-hidden="true">está</span> <span class="w"
+              aria-hidden="true">no</span> <span class="w grad" aria-hidden="true">lacre.</span></h1>
+          <p class="lede">Lacre com chip NFC que mostra no celular <strong>se a garrafa é original e se já foi
+              aberta.</strong></p>
         </div>
 
-        <section class="chapter ch-final" data-from="0.9" data-to="1.2" aria-labelledby="ch5">
-          <span class="eyebrow">Verificação</span>
-          <h3 id="ch5">Violado? Você sabe antes do primeiro gole.</h3>
-          <a class="btn btn-dark btn-sm" href="#como-funciona">Ver como verificar <svg aria-hidden="true"><use href="#i-arrow-right"/></svg></a>
-        </section>
-
-        <aside class="status" data-from="0.9" data-to="1.2" aria-label="Exemplo de tela de verificação">
-          <div class="row"><i aria-hidden="true"></i>Lacre íntegro</div>
-          <dl>
-            <dt>Garrafa</dt><dd>A7F3K9B21</dd>
-            <dt>Primeira abertura</dt><dd>não registrada</dd>
-            <dt>Lote</dt><dd>2026-09 · produção 14/09</dd>
-            <dt>Verificações</dt><dd>3 · última há 2 min</dd>
-          </dl>
-        </aside>
-
-        <p class="frame-hint" id="hint" aria-hidden="true"><span class="mouse"><i></i></span>Role para explorar · Arraste para girar</p>
-
-        <div class="frame-controls" role="group" aria-label="Controles da animação">
-          <button class="fc-play" id="fcPlay" type="button" aria-label="Reproduzir animação"><svg class="ic-play" aria-hidden="true"><use href="#i-play"/></svg><svg class="ic-pause" aria-hidden="true"><use href="#i-pause"/></svg></button>
-          <div class="fc-chips" id="fcChips">
-            <button type="button" data-go="0.07"><span>Garrafa</span><i></i></button>
-            <button type="button" data-go="0.3"><span>Problema</span><i></i></button>
-            <button type="button" data-go="0.55"><span>Identidade</span><i></i></button>
-            <button type="button" data-go="0.84"><span>Lacre</span><i></i></button>
-            <button type="button" data-go="1"><span>Verificação</span><i></i></button>
-          </div>
+        <div class="anatomy-copy" id="anatomyCopy" aria-hidden="true">
+          <p class="eyebrow">Anatomia do lacre</p>
+          <h2 class="h-sec">Quatro camadas.<br>Uma identidade.</h2>
         </div>
-      </div>
-    </div>
-  </div>
-</section>
 
-<!-- 3 · COMO FUNCIONA: demonstração automática, com a garrafa 3D real ao lado do celular -->
-<section class="how light" id="como-funciona" data-theme="light">
-  <div class="wrap how-grid">
-    <div class="how-copy">
-      <p class="eyebrow" data-reveal>Como funciona</p>
-      <h2 class="h-sec" data-reveal style="--d:.06s">Verificar é simples.</h2>
-      <p class="lead" data-reveal style="--d:.12s">Rápida e confiável, <strong>antes do primeiro gole.</strong></p>
-      <ol class="steps" id="steps" data-reveal style="--d:.18s">
-        <li><button type="button" data-step="0"><span class="s-n">1</span><span class="s-t"><b>Aproxime o celular</b><span>do lacre na garrafa.</span></span><i class="s-bar"><i></i></i></button></li>
-        <li><button type="button" data-step="1"><span class="s-n">2</span><span class="s-t"><b>Verifique o produto</b><span>A identidade digital é consultada.</span></span><i class="s-bar"><i></i></i></button></li>
-        <li><button type="button" data-step="2"><span class="s-n">3</span><span class="s-t"><b>Confirme a autenticidade</b><span>Original e íntegra, ou violada.</span></span><i class="s-bar"><i></i></i></button></li>
-      </ol>
-      <div class="how-ctrl" data-reveal style="--d:.24s">
-        <button class="how-play is-playing" id="howPlay" type="button" aria-label="Pausar demonstração"><svg class="ic-play" aria-hidden="true"><use href="#i-play"/></svg><svg class="ic-pause" aria-hidden="true"><use href="#i-pause"/></svg></button>
-        <div class="seg" role="radiogroup" aria-label="Simular resultado">
-          <button type="button" role="radio" aria-checked="true" data-mode="ok">Lacre íntegro</button>
-          <button type="button" role="radio" aria-checked="false" data-mode="bad">Lacre violado</button>
-          <i class="seg-thumb" aria-hidden="true"></i>
-        </div>
-      </div>
-    </div>
-
-    <div class="how-scene" id="howScene">
-      <div class="how-gl" id="howGL" aria-hidden="true"></div>
-      <div class="waves" id="howWaves" aria-hidden="true"><i></i><i></i><i></i></div>
-
-      <div class="phone" id="phone" aria-hidden="true">
-        <div class="phone-screen">
-          <div class="ph-status"><span>9:41</span><i class="ph-island"></i><span class="ph-icons"><i></i><i></i><i></i></span></div>
-
-          <div class="ph-home">
-            <div class="ph-widget"><b>9:41</b><span>Boa noite</span></div>
-            <div class="ph-grid">
-              <i class="ic g1"></i><i class="ic g2"></i><i class="ic g3"></i><i class="ic g4"></i>
-              <i class="ic g5"></i><i class="ic g6"></i><span class="ic vs-app"><svg viewBox="0 0 668 359"><use href="#vs-mark"/></svg><em>VeriSeal</em></span><i class="ic g7"></i>
-              <i class="ic g8"></i><i class="ic g9"></i><i class="ic g10"></i><i class="ic g11"></i>
-            </div>
-            <div class="ph-dock"><i class="ic d1"></i><i class="ic d2"></i><i class="ic d3"></i><i class="ic d4"></i></div>
-          </div>
-
-          <div class="ph-banner"><span class="ic vs-app"><svg viewBox="0 0 668 359"><use href="#vs-mark"/></svg></span><div><b>VeriSeal</b><span>Lacre detectado. Abrindo verificação…</span></div></div>
-
-          <div class="ph-app">
-            <div class="ap-top"><svg viewBox="0 0 977 161"><use href="#vs-wordmark"/></svg></div>
-
-            <div class="ap-scr ap-read">
-              <div class="ap-sym read"><i></i><i></i><i></i><svg><use href="#i-contactless"/></svg></div>
-              <p class="ap-title">Lendo o lacre…</p>
-              <p class="ap-sub">Mantenha o celular próximo</p>
-              <ul class="ap-checks">
-                <li data-at=".12"><svg><use href="#i-check"/></svg>Lacre detectado</li>
-                <li data-at=".42"><svg><use href="#i-check"/></svg>Identidade digital</li>
-                <li data-at=".72"><svg><use href="#i-check"/></svg>Integridade conferida</li>
-              </ul>
-            </div>
-
-            <div class="ap-scr ap-ok">
-              <div class="ap-sym ok"><svg viewBox="0 0 52 52"><path d="M15 27.5l7.5 7.5L37.5 19.5" pathLength="1"/></svg></div>
-              <p class="ap-title ok">Autêntico</p>
-              <p class="ap-sub">Lacre íntegro · nunca aberto</p>
-              <div class="ap-prod"><span class="ap-thumb"><img class="ap-bottle" alt=""></span><div><b>Whisky 12 anos</b><span>700 ml · 40% vol</span></div></div>
-              <dl class="ap-card">
-                <div><dt>Garrafa</dt><dd class="mono">A7F3K9B21</dd></div>
-                <div><dt>Produção</dt><dd>14/09/2026</dd></div>
-              </dl>
-              <ol class="ap-journey"><li>Produção</li><li>Distribuidor</li><li>Loja</li><li class="me">Você</li></ol>
-              <span class="ap-btn">Ver jornada completa</span>
-            </div>
-
-            <div class="ap-scr ap-bad">
-              <div class="ap-sym bad"><svg viewBox="0 0 52 52"><path d="M26 14.5v15M26 37v.5" pathLength="1"/></svg></div>
-              <p class="ap-title bad">Lacre violado</p>
-              <p class="ap-sub">Esta garrafa já foi aberta</p>
-              <div class="ap-prod"><span class="ap-thumb"><img class="ap-bottle bad" alt=""></span><div><b>Whisky 12 anos</b><span>700 ml · 40% vol</span></div></div>
-              <dl class="ap-card">
-                <div><dt>1ª abertura</dt><dd>02/10 · 21:42</dd></div>
-                <div><dt>Situação</dt><dd class="bad-t">circuito rompido</dd></div>
-              </dl>
-              <p class="ap-note">Desconfie da procedência e fale com o vendedor.</p>
-              <span class="ap-btn bad">Avisar a marca</span>
+        <div class="seal-stage" id="sealStage">
+          <div class="seal" id="seal" role="img"
+            aria-label="Lacre VeriSeal: faixa azul-marinho com a logo VeriSeal, selo holográfico, linha de ruptura, símbolo de aproximação do celular e o número de série A7F3K9B21. Por dentro, um chip NFC com antena e um circuito que se rompe ao abrir a garrafa.">
+            <div class="seal-layer" data-layer="adhesive"></div>
+            <div class="seal-layer" data-layer="tamper"></div>
+            <div class="seal-layer" data-layer="inlay"></div>
+            <div class="seal-layer" data-layer="print">
+              <div class="seal-glare"></div>
+              <div class="seal-scan"></div>
             </div>
           </div>
-        </div>
-      </div>
-    </div>
-  </div>
-</section>
-
-<!-- 3 · O PROBLEMA: "qual delas é original?" — começa sozinho quando aparece -->
-<section class="problem dark" id="problema" data-theme="dark">
-  <div class="wrap problem-grid">
-    <div class="problem-copy">
-      <p class="eyebrow" data-reveal>O problema</p>
-      <h2 class="h-sec" data-reveal style="--d:.06s">Por fora, original. Por dentro, ninguém sabe.</h2>
-      <p class="lead" data-reveal style="--d:.12s">Garrafas originais são reaproveitadas com bebida adulterada. <strong>A marca paga o prejuízo e a reputação.</strong></p>
-    </div>
-    <div class="game" id="game">
-      <p class="game-q" id="gameQ">Qual delas é original?</p>
-      <div class="game-timer" aria-hidden="true"><i id="gameTimer"></i></div>
-      <div class="game-stage">
-        <button class="gb" type="button" data-i="0" aria-label="Escolher a garrafa da esquerda">
-          <span class="gb-img"><img class="gb-a" alt=""><img class="gb-b" alt=""></span>
-          <span class="gb-ring" aria-hidden="true"></span>
-          <span class="gb-badge" aria-hidden="true"></span>
-          <span class="gb-pick">Esta</span>
-        </button>
-        <button class="gb" type="button" data-i="1" aria-label="Escolher a garrafa da direita">
-          <span class="gb-img"><img class="gb-a" alt=""><img class="gb-b" alt=""></span>
-          <span class="gb-ring" aria-hidden="true"></span>
-          <span class="gb-badge" aria-hidden="true"></span>
-          <span class="gb-pick">Esta</span>
-        </button>
-        <i class="game-scan" aria-hidden="true"></i>
-      </div>
-      <div class="game-foot">
-        <p class="game-msg" id="gameMsg" role="status" aria-live="polite"></p>
-        <button class="btn btn-ghost btn-sm" id="gameAgain" type="button" hidden>Jogar de novo</button>
-      </div>
-    </div>
-  </div>
-</section>
-
-<!-- 4 · PARA QUE SERVE -->
-<section class="threats light" id="para-que-serve" data-theme="light">
-  <div class="wrap">
-    <p class="eyebrow" data-reveal>Para que serve</p>
-    <h2 class="h-sec" data-reveal style="--d:.06s">Feito para combater.</h2>
-    <div class="bento threat-grid">
-      <article class="tile tile-mini" data-reveal style="--d:.0s"><svg class="ic" aria-hidden="true"><use href="#i-drop"/></svg><h3>Adulteração</h3></article>
-      <article class="tile tile-mini" data-reveal style="--d:.06s"><svg class="ic" aria-hidden="true"><use href="#i-copy"/></svg><h3>Falsificação</h3></article>
-      <article class="tile tile-mini" data-reveal style="--d:.12s"><svg class="ic" aria-hidden="true"><use href="#i-refill"/></svg><h3>Reutilização de garrafas</h3></article>
-      <article class="tile tile-mini" data-reveal style="--d:.18s"><svg class="ic" aria-hidden="true"><use href="#i-route"/></svg><h3>Procedência desconhecida</h3></article>
-      <article class="tile tile-mini" data-reveal style="--d:.24s"><svg class="ic" aria-hidden="true"><use href="#i-unlink"/></svg><h3>Perda de confiança</h3></article>
-      <article class="tile tile-statement" data-reveal style="--d:.3s">
-        <p>Proteja <strong>sua marca, seus produtos e sua reputação.</strong></p>
-        <a class="btn btn-primary" href="#contato">Falar com a VeriSeal <svg aria-hidden="true"><use href="#i-arrow-right"/></svg></a>
-      </article>
-    </div>
-  </div>
-</section>
-
-<!-- 5 · A IDEIA: frase revelada palavra por palavra -->
-<section class="idea dark" id="ideia" data-theme="dark">
-  <div class="idea-pin">
-    <svg class="idea-mark" viewBox="0 0 668 359" aria-hidden="true"><use href="#vs-mark"/></svg>
-    <div class="wrap idea-in">
-      <p class="eyebrow">A ideia</p>
-      <p class="idea-text" id="ideaText">Transformar cada garrafa em um produto capaz de comprovar a própria autenticidade.</p>
-      <p class="idea-sub" id="ideaSub">Mais do que embalagem: <strong>uma camada tecnológica de segurança.</strong></p>
-    </div>
-  </div>
-</section>
-
-<!-- faixa de conversão -->
-<section class="band dark" data-theme="dark">
-  <div class="wrap band-in" data-reveal>
-    <p class="band-t">Suas garrafas provando a própria origem.</p>
-    <a class="btn btn-primary magnetic" href="#contato">Quero uma demonstração</a>
-  </div>
-</section>
-
-<!-- 7 · BENEFÍCIOS -->
-<section class="benefits light" id="beneficios" data-theme="light">
-  <div class="wrap">
-    <p class="eyebrow" data-reveal>Benefícios</p>
-    <h2 class="h-sec" data-reveal style="--d:.06s">Confiança dos dois lados do balcão.</h2>
-
-    <div class="tabs" role="tablist" aria-label="Benefícios por público" data-reveal style="--d:.12s">
-      <button role="tab" id="tab-m" aria-selected="true" aria-controls="pan-m" type="button">Para marcas</button>
-      <button role="tab" id="tab-c" aria-selected="false" aria-controls="pan-c" tabindex="-1" type="button">Para quem consome</button>
-      <i class="tabs-thumb" aria-hidden="true"></i>
-    </div>
-
-    <div class="panels" data-reveal style="--d:.16s">
-      <div class="panel" role="tabpanel" id="pan-m" aria-labelledby="tab-m">
-        <div class="bento ben-grid ben-grid-5">
-          <article class="tile tile-lg"><svg class="ic" aria-hidden="true"><use href="#i-star"/></svg><h3>Reputação protegida</h3><p>Cada garrafa prova a própria origem.</p><a class="btn btn-primary btn-sm" href="#contato">Proteger minha marca</a></article>
-          <article class="tile"><svg class="ic" aria-hidden="true"><use href="#i-search-bottle"/></svg><h3>Reutilização identificada</h3></article>
-          <article class="tile"><svg class="ic" aria-hidden="true"><use href="#i-trace"/></svg><h3>Rastreabilidade</h3></article>
-          <article class="tile"><svg class="ic" aria-hidden="true"><use href="#i-people"/></svg><h3>Mais confiança do consumidor</h3></article>
-          <article class="tile"><svg class="ic" aria-hidden="true"><use href="#i-chart"/></svg><h3>Dados das verificações</h3></article>
-        </div>
-      </div>
-      <div class="panel" role="tabpanel" id="pan-c" aria-labelledby="tab-c" hidden>
-        <div class="bento ben-grid">
-          <article class="tile tile-lg"><svg class="ic" aria-hidden="true"><use href="#i-phone"/></svg><h3>Verificação no celular</h3><p>Origem confirmada em segundos, antes de beber.</p></article>
-          <article class="tile"><svg class="ic" aria-hidden="true"><use href="#i-eye"/></svg><h3>Violação à vista</h3></article>
-          <article class="tile"><svg class="ic" aria-hidden="true"><use href="#i-shield"/></svg><h3>Compra mais segura</h3></article>
-        </div>
-      </div>
-    </div>
-  </div>
-</section>
-
-<!-- 8 · IDENTIDADE DIGITAL: o que o consumidor vê ao verificar -->
-<section class="passport dark" id="identidade" data-theme="dark">
-  <div class="wrap pass-grid">
-    <div class="pass-copy">
-      <p class="eyebrow" data-reveal>Identidade digital</p>
-      <h2 class="h-sec" data-reveal style="--d:.06s">Cada garrafa conta a própria história.</h2>
-      <p class="lead" data-reveal style="--d:.12s">Ao verificar, você vê <strong>de onde ela veio e por onde passou.</strong></p>
-      <ul class="results" data-reveal style="--d:.18s">
-        <li class="r-ok"><svg aria-hidden="true"><use href="#i-check"/></svg><div><b>Original e íntegra</b><span>Pode abrir com tranquilidade.</span></div></li>
-        <li class="r-warn"><svg aria-hidden="true"><use href="#i-alert"/></svg><div><b>Já foi aberta</b><span>Comprou lacrada? Desconfie e fale com o vendedor.</span></div></li>
-        <li class="r-bad"><svg aria-hidden="true"><use href="#i-close"/></svg><div><b>Não reconhecida</b><span>Pode ser falsificada. Avise a marca.</span></div></li>
-      </ul>
-    </div>
-
-    <div class="pass-3d" id="pass">
-      <div class="pass-card" id="passCard">
-        <div class="pc-face pc-front">
-          <div class="pc-head"><svg viewBox="0 0 668 359" aria-hidden="true"><use href="#vs-mark"/></svg><span>Identidade digital</span></div>
-          <div class="pc-auth"><svg class="pc-auth-ic" aria-hidden="true"><use href="#i-verified"/></svg><div><b>Autêntico</b><span>Lacre íntegro · nunca aberto</span></div></div>
-          <p class="pc-prod">Whisky 12 anos</p>
-          <p class="pc-sub">700 ml · 40% vol</p>
-          <dl class="pc-grid">
-            <div><dt>Garrafa</dt><dd class="mono">A7F3K9B21</dd></div>
-            <div><dt>Lote</dt><dd>2026-09</dd></div>
-            <div><dt>Produção</dt><dd>14/09/2026</dd></div>
-            <div><dt>Verificações</dt><dd>3</dd></div>
-          </dl>
-          <div class="pc-holo" aria-hidden="true"></div>
-        </div>
-        <div class="pc-face pc-back">
-          <p class="pc-title">Jornada da garrafa</p>
-          <ol class="journey">
-            <li><b>Produção</b><span>14/09 · linha de envase</span></li>
-            <li><b>Distribuidor</b><span>20/09 · Campinas, SP</span></li>
-            <li><b>Loja</b><span>28/09 · São Paulo, SP</span></li>
-            <li class="now"><b>Sua verificação</b><span>agora · lacre íntegro</span></li>
+          <div class="loupe" id="loupe" aria-hidden="true">
+            <div class="loupe-view"></div><span class="loupe-tag">Raio-X</span>
+          </div>
+          <svg class="layer-lines" id="layerLines" aria-hidden="true"></svg>
+          <ol class="layer-labels" id="layerLabels">
+            <li data-for="print"><b>Película impressa</b><span>Marca, código único e holograma.</span></li>
+            <li data-for="inlay"><b>Chip NFC e antena</b><span>Respondem ao celular.</span></li>
+            <li data-for="tamper"><b>Circuito de ruptura</b><span>Abrir a garrafa rompe o circuito.</span></li>
+            <li data-for="adhesive"><b>Adesivo de alta aderência</b><span>Não sai inteiro.</span></li>
           </ol>
         </div>
-      </div>
-      <button class="btn btn-ghost btn-sm pass-flip" id="passFlip" type="button">Ver a jornada</button>
-      <p class="pass-note">Exemplo ilustrativo.</p>
-    </div>
-  </div>
-</section>
 
-<!-- 9 · NOSSA HISTÓRIA -->
-<section class="story light" id="historia" data-theme="light">
-  <div class="wrap story-grid">
-    <div class="story-mark" id="storyMark" aria-hidden="true">
-      <svg viewBox="0 0 668 359">
-        <path class="sm-ink" pathLength="1" d="M1 0.8C-0.1 1.3 0.3 2.8 2.8 8L161 343.7C166.6 355.6 167.9 357.9 169.1 358.5L219.1 358.7C219.7 358.5 220.7 357.2 221.9 355.4L341.3 151C344.6 145.6 344.9 144.7 343.7 144C343.3 143.8 330.3 143.7 304 143.7C260 143.7 263.5 143.5 261.7 146.3L199.6 250.1C198.8 250.7 197.6 249.4 196.5 246.7L83.8 2.8C82.9 0.6 85.9 0.7 41.8 0.6C16.9 0.5 1.4 0.6 1 0.8M496.5 0.7C475.2 1.7 458.8 7.7 446.9 19C442.4 23.3 440.1 26.3 435.5 33.9L363.8 153.4C363.3 155.7 370.1 166.7 376.2 173.4C384.7 182.8 395.5 190.7 405.4 194.7C406.8 195.2 409 196.1 410.5 196.7L464.8 211.3L566.7 237C586 241.5 594.9 250.5 593.3 264.1C592.4 271.8 587.9 278.7 580.6 283.5C573.9 287.8 567.3 290 555.6 291.7C550.5 292.5 550.1 292.5 505.7 292.5C457.2 292.5 459.1 292.6 449.6 290.6C440.1 288.7 434.3 285.9 426.3 279.6C418.9 273.7 412.6 264.3 401.5 242.2C399.3 237.8 398.3 236.1 397.7 235.8C397 235.4 388.3 235.3 359 235.3C317.4 235.3 320 235.2 320.4 237.3C320.9 239.5 343.3 284 348 292.2C360.1 312.8 372.9 326.6 391.7 339.2C408.3 350.4 430.3 357 456.7 358.7C463.9 359.1 559.2 358.9 563 358.4C573.2 357.1 577.2 356.5 581.7 355.5C590.1 353.7 594.5 352.5 599.2 350.7C622.5 341.9 640.8 327.7 653.4 308.5C663.2 293.5 668.4 274.3 667.9 254.3C667.6 242.9 666.7 237 664 228.7C658.8 212.8 651.6 203 637.3 192.2C628.4 185.5 619.6 181.2 606 176.7L467 138.2C449.1 133.4 442.3 130.3 436.8 124.6C430.8 118.3 428.6 112.7 428.6 103.8C428.7 98.5 428.8 97.7 430.6 93.2C432.2 89 433 87.6 435.2 84.7C441.9 76.1 454.2 70.8 470.5 69.3C475.3 68.9 529.9 68.2 537.5 68.5C554.1 69.1 567.2 72.8 576.1 79.5C584.1 85.5 588.9 93.1 591.2 103.2C592.6 109.5 592.7 109.6 593.3 110C593.7 110.2 607.1 110.3 628.5 110.4C663.1 110.5 663.1 110.5 663.9 109.5C664.8 108.4 664.8 108.8 664 101.8C662.2 86.1 659.1 74.7 652.9 61.3C648 50.6 637 36.3 626.8 27.6C616.1 18.4 601.3 10.6 587 6.6C571.1 2.2 560.3 1 535.8 0.8L496.5 0.7"/>
-        <path class="sm-acc" pathLength="1" d="M386.4 1L351.4 1.2L349.5 3L324.8 41.6L284.1 106.9C282.6 108.8 282 110.3 282 112.2C282 115 282.4 115.2 289.2 115.4C301.7 115.6 357.1 115.3 357.8 114.9C359.2 114.2 361.4 111.8 362.6 109.7L423.6 9.9C426.2 6.1 427 3.4 426 2.1C425.3 1.3 423.5 0.7 422.4 0.7C421.9 0.8 405.7 0.9 386.4 1"/>
-      </svg>
-    </div>
-    <div class="story-copy">
-      <p class="eyebrow" data-reveal>Nossa história</p>
-      <h2 class="h-sec" data-reveal style="--d:.06s">Nasceu de um problema real.</h2>
-      <p class="lead" data-reveal style="--d:.12s">A dificuldade de identificar bebidas adulteradas virou propósito: <strong>tecnologia para a segurança dos destilados.</strong></p>
-    </div>
-  </div>
-</section>
+        <p class="hero-next" id="heroNext" aria-hidden="true">Agora, veja o lacre na garrafa <svg>
+            <use href="#i-arrow-down" />
+          </svg></p>
 
-<!-- 10 · PROPOSTA + CHAMADA (formulário) -->
-<section class="cta dark" id="contato" data-theme="dark">
-  <div class="cta-rings" aria-hidden="true"><i></i><i></i><i></i><i></i></div>
-  <div class="wrap cta-in">
-    <p class="eyebrow" data-reveal>Nossa proposta</p>
-    <p class="cta-statement" data-reveal style="--d:.06s">Identidade digital para cada garrafa. <span class="grad">Confiança em cada consumo.</span></p>
-    <div class="cta-seal" id="ctaSeal" aria-hidden="true"><div class="cs-rig"><div class="cs-face cs-front"></div><div class="cs-face cs-back"></div></div><div class="cs-shadow"></div></div>
-    <div class="cta-box" data-reveal style="--d:.12s">
-      <h2>Proteja sua marca com a VeriSeal.</h2>
-      <p>Conte sobre a sua operação e a nossa equipe entra em contato.</p>
-      <form class="lead-form" id="leadForm" novalidate data-endpoint="" data-mailto="contato@veriseal.example">
-        <div class="f-row">
-          <label class="f"><span>Nome</span><input name="nome" autocomplete="name" required></label>
-          <label class="f"><span>Empresa</span><input name="empresa" autocomplete="organization" required></label>
-        </div>
-        <div class="f-row">
-          <label class="f"><span>E-mail corporativo</span><input name="email" type="email" autocomplete="email" inputmode="email" placeholder="nome@empresa.com.br" required></label>
-          <label class="f"><span>WhatsApp <em>(opcional)</em></span><input name="whatsapp" type="tel" autocomplete="tel" inputmode="tel"></label>
-        </div>
-        <fieldset class="f-vol">
-          <legend>Garrafas por mês</legend>
-          <div class="chips">
-            <label><input type="radio" name="volume" value="até 10 mil"><span>até 10 mil</span></label>
-            <label><input type="radio" name="volume" value="10 a 50 mil"><span>10 a 50 mil</span></label>
-            <label><input type="radio" name="volume" value="50 a 200 mil"><span>50 a 200 mil</span></label>
-            <label><input type="radio" name="volume" value="mais de 200 mil"><span>+200 mil</span></label>
+        <div class="hero-foot" id="heroFoot">
+          <p class="hero-hint"><span class="hint-dot" aria-hidden="true"></span><span class="hint-fine">Passe o cursor
+              sobre o lacre para ver por dentro.</span><span class="hint-coarse">Arraste a lente sobre o lacre para ver
+              por dentro.</span></p>
+          <div class="ctas">
+            <a class="btn btn-primary magnetic" href="#contato">Quero proteger minha marca</a>
+            <a class="btn btn-ghost" href="#garrafa">Ver na garrafa <svg aria-hidden="true">
+                <use href="#i-arrow-down" />
+              </svg></a>
           </div>
-        </fieldset>
-        <button class="btn btn-primary btn-lg magnetic f-submit" type="submit">Quero proteger minha marca</button>
-        <p class="f-msg" id="formMsg" role="status" aria-live="polite"></p>
-        <p class="f-privacy">Usamos seus dados só para responder ao seu contato.</p>
-      </form>
+        </div>
+      </div>
+    </section>
+
+    <!-- 2 · A ANIMAÇÃO 3D DENTRO DE UM QUADRO -->
+    <section class="closer light" id="garrafa" data-theme="light">
+      <div class="wrap closer-head">
+        <p class="eyebrow" data-reveal>Na garrafa</p>
+        <h2 class="h-sec" data-reveal style="--d:.06s">Veja o lacre em ação.</h2>
+        <p class="lead" data-reveal style="--d:.12s">Role para girar a garrafa. Ou <strong>pule a animação</strong>
+          quando quiser.</p>
+      </div>
+
+      <div class="track" id="track" data-theme="light">
+        <div class="track-pin" id="trackPin">
+          <div class="frame" id="stage">
+            <canvas id="scene" role="img"
+              aria-label="Garrafa de whisky com o lacre VeriSeal. Ao rolar, a garrafa gira e a câmera se aproxima da tampa para mostrar o lacre."></canvas>
+            <div class="vignette" aria-hidden="true"></div>
+            <div class="nogl">
+              <p>Seu navegador não conseguiu iniciar a cena 3D.<br>O restante da página funciona normalmente.</p>
+            </div>
+
+            <div class="frame-top">
+              <span class="frame-badge"><svg viewBox="0 0 668 359" aria-hidden="true">
+                  <use href="#vs-mark" />
+                </svg>Simulação 3D</span>
+              <a class="frame-skip" href="#como-funciona" id="skipAnim">Pular animação <svg aria-hidden="true">
+                  <use href="#i-arrow-down" />
+                </svg></a>
+            </div>
+
+            <section class="chapter ch-left" data-from="0" data-to="0.14" aria-labelledby="ch1">
+              <span class="eyebrow">A garrafa</span>
+              <h3 id="ch1">Por fora, igual a qualquer outra.</h3>
+              <p>Vidro, rótulo e tampa não provam que o conteúdo é original.</p>
+            </section>
+
+            <section class="chapter ch-right" data-from="0.2" data-to="0.4" aria-labelledby="ch2">
+              <span class="eyebrow">O problema</span>
+              <h3 id="ch2">A fraude reaproveita a garrafa.</h3>
+              <div class="facts">
+                <div><b>Vidro</b><span>o mesmo, recolhido vazio</span></div>
+                <div><b>Rótulo</b><span>o mesmo, sem retoque</span></div>
+                <div><b>Bebida</b><span>trocada por outra</span></div>
+                <div><b>Tampa</b><span>o único ponto que precisa ser violado</span></div>
+              </div>
+            </section>
+
+            <section class="chapter ch-left" data-from="0.46" data-to="0.64" aria-labelledby="ch3">
+              <span class="eyebrow">A resposta</span>
+              <h3 id="ch3">Cada garrafa, uma identidade digital.</h3>
+              <p>O lacre cruza a tampa. Abrir rompe o lacre. O celular confirma a origem.</p>
+              <div class="facts">
+                <div><b>Chip NFC</b><span>leitura direta no celular</span></div>
+                <div><b>Código único</b><span>gravado no envase</span></div>
+              </div>
+            </section>
+
+            <div class="hud" id="hud" aria-hidden="true">
+              <svg id="hud-svg"></svg>
+              <div class="callout left" data-cal="tear" style="top:30%"><b><i class="cn">1</i>Linha de
+                  ruptura</b><span>O lacre cruza a junção entre tampa e gargalo. Girar a tampa rompe a tira e o
+                  circuito.</span></div>
+              <div class="callout left" data-cal="nfc" style="top:54%"><b><i class="cn">2</i>Chip e antena
+                  NFC</b><span>Laminados dentro do lacre. O celular lê a identidade da garrafa.</span></div>
+              <div class="callout right" data-cal="top" style="top:24%"><b><i class="cn">3</i>Selo
+                  holográfico</b><span>Cobre a tampa. Não existe como abrir sem violar o lacre.</span></div>
+              <div class="callout right" data-cal="code" style="top:56%"><b><i class="cn">4</i>Código único</b><span>A
+                  identidade da garrafa, gravada na linha de envase.</span></div>
+              <i class="dot" data-dot="tear" data-n="1"></i><i class="dot" data-dot="nfc" data-n="2"></i><i class="dot"
+                data-dot="top" data-n="3"></i><i class="dot" data-dot="code" data-n="4"></i>
+            </div>
+
+            <section class="chapter ch-final" data-from="0.9" data-to="1.2" aria-labelledby="ch5">
+              <span class="eyebrow">Verificação</span>
+              <h3 id="ch5">Violado? Você sabe antes do primeiro gole.</h3>
+              <a class="btn btn-dark btn-sm" href="#como-funciona">Ver como verificar <svg aria-hidden="true">
+                  <use href="#i-arrow-right" />
+                </svg></a>
+            </section>
+
+            <aside class="status" data-from="0.9" data-to="1.2" aria-label="Exemplo de tela de verificação">
+              <div class="row"><i aria-hidden="true"></i>Lacre íntegro</div>
+              <dl>
+                <dt>Garrafa</dt>
+                <dd>A7F3K9B21</dd>
+                <dt>Primeira abertura</dt>
+                <dd>não registrada</dd>
+                <dt>Lote</dt>
+                <dd>2026-09 · produção 14/09</dd>
+                <dt>Verificações</dt>
+                <dd>3 · última há 2 min</dd>
+              </dl>
+            </aside>
+
+            <p class="frame-hint" id="hint" aria-hidden="true"><span class="mouse"><i></i></span>Role para explorar ·
+              Arraste para girar</p>
+
+            <div class="frame-controls" role="group" aria-label="Controles da animação">
+              <button class="fc-play" id="fcPlay" type="button" aria-label="Reproduzir animação"><svg class="ic-play"
+                  aria-hidden="true">
+                  <use href="#i-play" />
+                </svg><svg class="ic-pause" aria-hidden="true">
+                  <use href="#i-pause" />
+                </svg></button>
+              <div class="fc-chips" id="fcChips">
+                <button type="button" data-go="0.07"><span>Garrafa</span><i></i></button>
+                <button type="button" data-go="0.3"><span>Problema</span><i></i></button>
+                <button type="button" data-go="0.55"><span>Identidade</span><i></i></button>
+                <button type="button" data-go="0.84"><span>Lacre</span><i></i></button>
+                <button type="button" data-go="1"><span>Verificação</span><i></i></button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 3 · COMO FUNCIONA: demonstração automática, com a garrafa 3D real ao lado do celular -->
+    <section class="how light" id="como-funciona" data-theme="light">
+      <div class="wrap how-grid">
+        <div class="how-copy">
+          <p class="eyebrow" data-reveal>Como funciona</p>
+          <h2 class="h-sec" data-reveal style="--d:.06s">Verificar é simples.</h2>
+          <p class="lead" data-reveal style="--d:.12s">Rápida e confiável, <strong>antes do primeiro gole.</strong></p>
+          <ol class="steps" id="steps" data-reveal style="--d:.18s">
+            <li><button type="button" data-step="0"><span class="s-n">1</span><span class="s-t"><b>Aproxime o
+                    celular</b><span>do lacre na garrafa.</span></span><i class="s-bar"><i></i></i></button></li>
+            <li><button type="button" data-step="1"><span class="s-n">2</span><span class="s-t"><b>Verifique o
+                    produto</b><span>A identidade digital é consultada.</span></span><i
+                  class="s-bar"><i></i></i></button></li>
+            <li><button type="button" data-step="2"><span class="s-n">3</span><span class="s-t"><b>Confirme a
+                    autenticidade</b><span>Original e íntegra, ou violada.</span></span><i
+                  class="s-bar"><i></i></i></button></li>
+          </ol>
+          <div class="how-ctrl" data-reveal style="--d:.24s">
+            <button class="how-play is-playing" id="howPlay" type="button" aria-label="Pausar demonstração"><svg
+                class="ic-play" aria-hidden="true">
+                <use href="#i-play" />
+              </svg><svg class="ic-pause" aria-hidden="true">
+                <use href="#i-pause" />
+              </svg></button>
+            <div class="seg" role="radiogroup" aria-label="Simular resultado">
+              <button type="button" role="radio" aria-checked="true" data-mode="ok">Lacre íntegro</button>
+              <button type="button" role="radio" aria-checked="false" data-mode="bad">Lacre violado</button>
+              <i class="seg-thumb" aria-hidden="true"></i>
+            </div>
+          </div>
+        </div>
+
+        <div class="how-scene" id="howScene">
+          <div class="how-gl" id="howGL" aria-hidden="true"></div>
+          <div class="waves" id="howWaves" aria-hidden="true"><i></i><i></i><i></i></div>
+
+          <div class="phone" id="phone" aria-hidden="true">
+            <div class="phone-screen">
+              <div class="ph-status"><span>9:41</span><i class="ph-island"></i><span
+                  class="ph-icons"><i></i><i></i><i></i></span></div>
+
+              <div class="ph-home">
+                <div class="ph-widget"><b>9:41</b><span>Boa noite</span></div>
+                <div class="ph-grid">
+                  <i class="ic g1"></i><i class="ic g2"></i><i class="ic g3"></i><i class="ic g4"></i>
+                  <i class="ic g5"></i><i class="ic g6"></i><span class="ic vs-app"><svg viewBox="0 0 668 359">
+                      <use href="#vs-mark" />
+                    </svg><em>VeriSeal</em></span><i class="ic g7"></i>
+                  <i class="ic g8"></i><i class="ic g9"></i><i class="ic g10"></i><i class="ic g11"></i>
+                </div>
+                <div class="ph-dock"><i class="ic d1"></i><i class="ic d2"></i><i class="ic d3"></i><i
+                    class="ic d4"></i></div>
+              </div>
+
+              <div class="ph-banner"><span class="ic vs-app"><svg viewBox="0 0 668 359">
+                    <use href="#vs-mark" />
+                  </svg></span>
+                <div><b>VeriSeal</b><span>Lacre detectado. Abrindo verificação…</span></div>
+              </div>
+
+              <div class="ph-app">
+                <div class="ap-top"><svg viewBox="0 0 977 161">
+                    <use href="#vs-wordmark" />
+                  </svg></div>
+
+                <div class="ap-scr ap-read">
+                  <div class="ap-sym read"><i></i><i></i><i></i><svg>
+                      <use href="#i-contactless" />
+                    </svg></div>
+                  <p class="ap-title">Lendo o lacre…</p>
+                  <p class="ap-sub">Mantenha o celular próximo</p>
+                  <ul class="ap-checks">
+                    <li data-at=".12"><svg>
+                        <use href="#i-check" />
+                      </svg>Lacre detectado</li>
+                    <li data-at=".42"><svg>
+                        <use href="#i-check" />
+                      </svg>Identidade digital</li>
+                    <li data-at=".72"><svg>
+                        <use href="#i-check" />
+                      </svg>Integridade conferida</li>
+                  </ul>
+                </div>
+
+                <div class="ap-scr ap-ok">
+                  <div class="ap-sym ok"><svg viewBox="0 0 52 52">
+                      <path d="M15 27.5l7.5 7.5L37.5 19.5" pathLength="1" />
+                    </svg></div>
+                  <p class="ap-title ok">Autêntico</p>
+                  <p class="ap-sub">Lacre íntegro · nunca aberto</p>
+                  <div class="ap-prod"><span class="ap-thumb"><img class="ap-bottle" alt=""></span>
+                    <div><b>Whisky 12 anos</b><span>700 ml · 40% vol</span></div>
+                  </div>
+                  <dl class="ap-card">
+                    <div>
+                      <dt>Garrafa</dt>
+                      <dd class="mono">A7F3K9B21</dd>
+                    </div>
+                    <div>
+                      <dt>Produção</dt>
+                      <dd>14/09/2026</dd>
+                    </div>
+                  </dl>
+                  <ol class="ap-journey">
+                    <li>Produção</li>
+                    <li>Distribuidor</li>
+                    <li>Loja</li>
+                    <li class="me">Você</li>
+                  </ol>
+                  <span class="ap-btn">Ver jornada completa</span>
+                </div>
+
+                <div class="ap-scr ap-bad">
+                  <div class="ap-sym bad"><svg viewBox="0 0 52 52">
+                      <path d="M26 14.5v15M26 37v.5" pathLength="1" />
+                    </svg></div>
+                  <p class="ap-title bad">Lacre violado</p>
+                  <p class="ap-sub">Esta garrafa já foi aberta</p>
+                  <div class="ap-prod"><span class="ap-thumb"><img class="ap-bottle bad" alt=""></span>
+                    <div><b>Whisky 12 anos</b><span>700 ml · 40% vol</span></div>
+                  </div>
+                  <dl class="ap-card">
+                    <div>
+                      <dt>1ª abertura</dt>
+                      <dd>02/10 · 21:42</dd>
+                    </div>
+                    <div>
+                      <dt>Situação</dt>
+                      <dd class="bad-t">circuito rompido</dd>
+                    </div>
+                  </dl>
+                  <p class="ap-note">Desconfie da procedência e fale com o vendedor.</p>
+                  <span class="ap-btn bad">Avisar a marca</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 3 · O PROBLEMA: "qual delas é original?" — começa sozinho quando aparece -->
+    <section class="problem dark" id="problema" data-theme="dark">
+      <div class="wrap problem-grid">
+        <div class="problem-copy">
+          <p class="eyebrow" data-reveal>O problema</p>
+          <h2 class="h-sec" data-reveal style="--d:.06s">Por fora, original. Por dentro, ninguém sabe.</h2>
+          <p class="lead" data-reveal style="--d:.12s">Garrafas originais são reaproveitadas com bebida adulterada.
+            <strong>A marca paga o prejuízo e a reputação.</strong></p>
+        </div>
+        <div class="game" id="game">
+          <p class="game-q" id="gameQ">Qual delas é original?</p>
+          <div class="game-timer" aria-hidden="true"><i id="gameTimer"></i></div>
+          <div class="game-stage">
+            <button class="gb" type="button" data-i="0" aria-label="Escolher a garrafa da esquerda">
+              <span class="gb-img"><img class="gb-a" alt=""><img class="gb-b" alt=""></span>
+              <span class="gb-ring" aria-hidden="true"></span>
+              <span class="gb-badge" aria-hidden="true"></span>
+              <span class="gb-pick">Esta</span>
+            </button>
+            <button class="gb" type="button" data-i="1" aria-label="Escolher a garrafa da direita">
+              <span class="gb-img"><img class="gb-a" alt=""><img class="gb-b" alt=""></span>
+              <span class="gb-ring" aria-hidden="true"></span>
+              <span class="gb-badge" aria-hidden="true"></span>
+              <span class="gb-pick">Esta</span>
+            </button>
+            <i class="game-scan" aria-hidden="true"></i>
+          </div>
+          <div class="game-foot">
+            <p class="game-msg" id="gameMsg" role="status" aria-live="polite"></p>
+            <button class="btn btn-ghost btn-sm" id="gameAgain" type="button" hidden>Jogar de novo</button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 4 · PARA QUE SERVE -->
+    <section class="threats light" id="para-que-serve" data-theme="light">
+      <div class="wrap">
+        <p class="eyebrow" data-reveal>Para que serve</p>
+        <h2 class="h-sec" data-reveal style="--d:.06s">Feito para combater.</h2>
+        <div class="bento threat-grid">
+          <article class="tile tile-mini" data-reveal style="--d:.0s"><svg class="ic" aria-hidden="true">
+              <use href="#i-drop" />
+            </svg>
+            <h3>Adulteração</h3>
+          </article>
+          <article class="tile tile-mini" data-reveal style="--d:.06s"><svg class="ic" aria-hidden="true">
+              <use href="#i-copy" />
+            </svg>
+            <h3>Falsificação</h3>
+          </article>
+          <article class="tile tile-mini" data-reveal style="--d:.12s"><svg class="ic" aria-hidden="true">
+              <use href="#i-refill" />
+            </svg>
+            <h3>Reutilização de garrafas</h3>
+          </article>
+          <article class="tile tile-mini" data-reveal style="--d:.18s"><svg class="ic" aria-hidden="true">
+              <use href="#i-route" />
+            </svg>
+            <h3>Procedência desconhecida</h3>
+          </article>
+          <article class="tile tile-mini" data-reveal style="--d:.24s"><svg class="ic" aria-hidden="true">
+              <use href="#i-unlink" />
+            </svg>
+            <h3>Perda de confiança</h3>
+          </article>
+          <article class="tile tile-statement" data-reveal style="--d:.3s">
+            <p>Proteja <strong>sua marca, seus produtos e sua reputação.</strong></p>
+            <a class="btn btn-primary" href="#contato">Falar com a VeriSeal <svg aria-hidden="true">
+                <use href="#i-arrow-right" />
+              </svg></a>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <!-- 5 · A IDEIA: frase revelada palavra por palavra -->
+    <section class="idea dark" id="ideia" data-theme="dark">
+      <div class="idea-pin">
+        <svg class="idea-mark" viewBox="0 0 668 359" aria-hidden="true">
+          <use href="#vs-mark" />
+        </svg>
+        <div class="wrap idea-in">
+          <p class="eyebrow">A ideia</p>
+          <p class="idea-text" id="ideaText">Transformar cada garrafa em um produto capaz de comprovar a própria
+            autenticidade.</p>
+          <p class="idea-sub" id="ideaSub">Mais do que embalagem: <strong>uma camada tecnológica de segurança.</strong>
+          </p>
+        </div>
+      </div>
+    </section>
+
+    <!-- faixa de conversão -->
+    <section class="band dark" data-theme="dark">
+      <div class="wrap band-in" data-reveal>
+        <p class="band-t">Suas garrafas provando a própria origem.</p>
+        <a class="btn btn-primary magnetic" href="#contato">Quero uma demonstração</a>
+      </div>
+    </section>
+
+    <!-- 7 · BENEFÍCIOS -->
+    <section class="benefits light" id="beneficios" data-theme="light">
+      <div class="wrap">
+        <p class="eyebrow" data-reveal>Benefícios</p>
+        <h2 class="h-sec" data-reveal style="--d:.06s">Confiança dos dois lados do balcão.</h2>
+
+        <div class="tabs" role="tablist" aria-label="Benefícios por público" data-reveal style="--d:.12s">
+          <button role="tab" id="tab-m" aria-selected="true" aria-controls="pan-m" type="button">Para marcas</button>
+          <button role="tab" id="tab-c" aria-selected="false" aria-controls="pan-c" tabindex="-1" type="button">Para
+            quem consome</button>
+          <i class="tabs-thumb" aria-hidden="true"></i>
+        </div>
+
+        <div class="panels" data-reveal style="--d:.16s">
+          <div class="panel" role="tabpanel" id="pan-m" aria-labelledby="tab-m">
+            <div class="bento ben-grid ben-grid-5">
+              <article class="tile tile-lg"><svg class="ic" aria-hidden="true">
+                  <use href="#i-star" />
+                </svg>
+                <h3>Reputação protegida</h3>
+                <p>Cada garrafa prova a própria origem.</p><a class="btn btn-primary btn-sm" href="#contato">Proteger
+                  minha marca</a>
+              </article>
+              <article class="tile"><svg class="ic" aria-hidden="true">
+                  <use href="#i-search-bottle" />
+                </svg>
+                <h3>Reutilização identificada</h3>
+              </article>
+              <article class="tile"><svg class="ic" aria-hidden="true">
+                  <use href="#i-trace" />
+                </svg>
+                <h3>Rastreabilidade</h3>
+              </article>
+              <article class="tile"><svg class="ic" aria-hidden="true">
+                  <use href="#i-people" />
+                </svg>
+                <h3>Mais confiança do consumidor</h3>
+              </article>
+              <article class="tile"><svg class="ic" aria-hidden="true">
+                  <use href="#i-chart" />
+                </svg>
+                <h3>Dados das verificações</h3>
+              </article>
+            </div>
+          </div>
+          <div class="panel" role="tabpanel" id="pan-c" aria-labelledby="tab-c" hidden>
+            <div class="bento ben-grid">
+              <article class="tile tile-lg"><svg class="ic" aria-hidden="true">
+                  <use href="#i-phone" />
+                </svg>
+                <h3>Verificação no celular</h3>
+                <p>Origem confirmada em segundos, antes de beber.</p>
+              </article>
+              <article class="tile"><svg class="ic" aria-hidden="true">
+                  <use href="#i-eye" />
+                </svg>
+                <h3>Violação à vista</h3>
+              </article>
+              <article class="tile"><svg class="ic" aria-hidden="true">
+                  <use href="#i-shield" />
+                </svg>
+                <h3>Compra mais segura</h3>
+              </article>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 8 · IDENTIDADE DIGITAL: o que o consumidor vê ao verificar -->
+    <section class="passport dark" id="identidade" data-theme="dark">
+      <div class="wrap pass-grid">
+        <div class="pass-copy">
+          <p class="eyebrow" data-reveal>Identidade digital</p>
+          <h2 class="h-sec" data-reveal style="--d:.06s">Cada garrafa conta a própria história.</h2>
+          <p class="lead" data-reveal style="--d:.12s">Ao verificar, você vê <strong>de onde ela veio e por onde
+              passou.</strong></p>
+          <ul class="results" data-reveal style="--d:.18s">
+            <li class="r-ok"><svg aria-hidden="true">
+                <use href="#i-check" />
+              </svg>
+              <div><b>Original e íntegra</b><span>Pode abrir com tranquilidade.</span></div>
+            </li>
+            <li class="r-warn"><svg aria-hidden="true">
+                <use href="#i-alert" />
+              </svg>
+              <div><b>Já foi aberta</b><span>Comprou lacrada? Desconfie e fale com o vendedor.</span></div>
+            </li>
+            <li class="r-bad"><svg aria-hidden="true">
+                <use href="#i-close" />
+              </svg>
+              <div><b>Não reconhecida</b><span>Pode ser falsificada. Avise a marca.</span></div>
+            </li>
+          </ul>
+        </div>
+
+        <div class="pass-3d" id="pass">
+          <div class="pass-card" id="passCard">
+            <div class="pc-face pc-front">
+              <div class="pc-head"><svg viewBox="0 0 668 359" aria-hidden="true">
+                  <use href="#vs-mark" />
+                </svg><span>Identidade digital</span></div>
+              <div class="pc-auth"><svg class="pc-auth-ic" aria-hidden="true">
+                  <use href="#i-verified" />
+                </svg>
+                <div><b>Autêntico</b><span>Lacre íntegro · nunca aberto</span></div>
+              </div>
+              <p class="pc-prod">Whisky 12 anos</p>
+              <p class="pc-sub">700 ml · 40% vol</p>
+              <dl class="pc-grid">
+                <div>
+                  <dt>Garrafa</dt>
+                  <dd class="mono">A7F3K9B21</dd>
+                </div>
+                <div>
+                  <dt>Lote</dt>
+                  <dd>2026-09</dd>
+                </div>
+                <div>
+                  <dt>Produção</dt>
+                  <dd>14/09/2026</dd>
+                </div>
+                <div>
+                  <dt>Verificações</dt>
+                  <dd>3</dd>
+                </div>
+              </dl>
+              <div class="pc-holo" aria-hidden="true"></div>
+            </div>
+            <div class="pc-face pc-back">
+              <p class="pc-title">Jornada da garrafa</p>
+              <ol class="journey">
+                <li><b>Produção</b><span>14/09 · linha de envase</span></li>
+                <li><b>Distribuidor</b><span>20/09 · Campinas, SP</span></li>
+                <li><b>Loja</b><span>28/09 · São Paulo, SP</span></li>
+                <li class="now"><b>Sua verificação</b><span>agora · lacre íntegro</span></li>
+              </ol>
+            </div>
+          </div>
+          <button class="btn btn-ghost btn-sm pass-flip" id="passFlip" type="button">Ver a jornada</button>
+          <p class="pass-note">Exemplo ilustrativo.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- 9 · NOSSA HISTÓRIA -->
+    <section class="story light" id="historia" data-theme="light">
+      <div class="wrap story-grid">
+        <div class="story-mark" id="storyMark" aria-hidden="true">
+          <svg viewBox="0 0 668 359">
+            <path class="sm-ink" pathLength="1"
+              d="M1 0.8C-0.1 1.3 0.3 2.8 2.8 8L161 343.7C166.6 355.6 167.9 357.9 169.1 358.5L219.1 358.7C219.7 358.5 220.7 357.2 221.9 355.4L341.3 151C344.6 145.6 344.9 144.7 343.7 144C343.3 143.8 330.3 143.7 304 143.7C260 143.7 263.5 143.5 261.7 146.3L199.6 250.1C198.8 250.7 197.6 249.4 196.5 246.7L83.8 2.8C82.9 0.6 85.9 0.7 41.8 0.6C16.9 0.5 1.4 0.6 1 0.8M496.5 0.7C475.2 1.7 458.8 7.7 446.9 19C442.4 23.3 440.1 26.3 435.5 33.9L363.8 153.4C363.3 155.7 370.1 166.7 376.2 173.4C384.7 182.8 395.5 190.7 405.4 194.7C406.8 195.2 409 196.1 410.5 196.7L464.8 211.3L566.7 237C586 241.5 594.9 250.5 593.3 264.1C592.4 271.8 587.9 278.7 580.6 283.5C573.9 287.8 567.3 290 555.6 291.7C550.5 292.5 550.1 292.5 505.7 292.5C457.2 292.5 459.1 292.6 449.6 290.6C440.1 288.7 434.3 285.9 426.3 279.6C418.9 273.7 412.6 264.3 401.5 242.2C399.3 237.8 398.3 236.1 397.7 235.8C397 235.4 388.3 235.3 359 235.3C317.4 235.3 320 235.2 320.4 237.3C320.9 239.5 343.3 284 348 292.2C360.1 312.8 372.9 326.6 391.7 339.2C408.3 350.4 430.3 357 456.7 358.7C463.9 359.1 559.2 358.9 563 358.4C573.2 357.1 577.2 356.5 581.7 355.5C590.1 353.7 594.5 352.5 599.2 350.7C622.5 341.9 640.8 327.7 653.4 308.5C663.2 293.5 668.4 274.3 667.9 254.3C667.6 242.9 666.7 237 664 228.7C658.8 212.8 651.6 203 637.3 192.2C628.4 185.5 619.6 181.2 606 176.7L467 138.2C449.1 133.4 442.3 130.3 436.8 124.6C430.8 118.3 428.6 112.7 428.6 103.8C428.7 98.5 428.8 97.7 430.6 93.2C432.2 89 433 87.6 435.2 84.7C441.9 76.1 454.2 70.8 470.5 69.3C475.3 68.9 529.9 68.2 537.5 68.5C554.1 69.1 567.2 72.8 576.1 79.5C584.1 85.5 588.9 93.1 591.2 103.2C592.6 109.5 592.7 109.6 593.3 110C593.7 110.2 607.1 110.3 628.5 110.4C663.1 110.5 663.1 110.5 663.9 109.5C664.8 108.4 664.8 108.8 664 101.8C662.2 86.1 659.1 74.7 652.9 61.3C648 50.6 637 36.3 626.8 27.6C616.1 18.4 601.3 10.6 587 6.6C571.1 2.2 560.3 1 535.8 0.8L496.5 0.7" />
+            <path class="sm-acc" pathLength="1"
+              d="M386.4 1L351.4 1.2L349.5 3L324.8 41.6L284.1 106.9C282.6 108.8 282 110.3 282 112.2C282 115 282.4 115.2 289.2 115.4C301.7 115.6 357.1 115.3 357.8 114.9C359.2 114.2 361.4 111.8 362.6 109.7L423.6 9.9C426.2 6.1 427 3.4 426 2.1C425.3 1.3 423.5 0.7 422.4 0.7C421.9 0.8 405.7 0.9 386.4 1" />
+          </svg>
+        </div>
+        <div class="story-copy">
+          <p class="eyebrow" data-reveal>Nossa história</p>
+          <h2 class="h-sec" data-reveal style="--d:.06s">Nasceu de um problema real.</h2>
+          <p class="lead" data-reveal style="--d:.12s">A dificuldade de identificar bebidas adulteradas virou propósito:
+            <strong>tecnologia para a segurança dos destilados.</strong></p>
+        </div>
+      </div>
+    </section>
+
+    <!-- 10 · PROPOSTA + CHAMADA (formulário) -->
+    <section class="cta dark" id="contato" data-theme="dark">
+      <div class="cta-rings" aria-hidden="true"><i></i><i></i><i></i><i></i></div>
+      <div class="wrap cta-in">
+        <p class="eyebrow" data-reveal>Nossa proposta</p>
+        <p class="cta-statement" data-reveal style="--d:.06s">Identidade digital para cada garrafa. <span
+            class="grad">Confiança em cada consumo.</span></p>
+        <div class="cta-seal" id="ctaSeal" aria-hidden="true">
+          <div class="cs-rig">
+            <div class="cs-face cs-front"></div>
+            <div class="cs-face cs-back"></div>
+          </div>
+          <div class="cs-shadow"></div>
+        </div>
+        <div class="cta-box" data-reveal style="--d:.12s">
+          <h2>Proteja sua marca com a VeriSeal.</h2>
+          <p>Conte sobre a sua operação e a nossa equipe entra em contato.</p>
+          <form class="lead-form" id="leadForm" novalidate data-endpoint="" data-mailto="contato@veriseal.example">
+            <div class="f-row">
+              <label class="f"><span>Nome</span><input name="nome" autocomplete="name" required></label>
+              <label class="f"><span>Empresa</span><input name="empresa" autocomplete="organization" required></label>
+            </div>
+            <div class="f-row">
+              <label class="f"><span>E-mail corporativo</span><input name="email" type="email" autocomplete="email"
+                  inputmode="email" placeholder="nome@empresa.com.br" required></label>
+              <label class="f"><span>WhatsApp <em>(opcional)</em></span><input name="whatsapp" type="tel"
+                  autocomplete="tel" inputmode="tel"></label>
+            </div>
+            <fieldset class="f-vol">
+              <legend>Garrafas por mês</legend>
+              <div class="chips">
+                <label><input type="radio" name="volume" value="até 10 mil"><span>até 10 mil</span></label>
+                <label><input type="radio" name="volume" value="10 a 50 mil"><span>10 a 50 mil</span></label>
+                <label><input type="radio" name="volume" value="50 a 200 mil"><span>50 a 200 mil</span></label>
+                <label><input type="radio" name="volume" value="mais de 200 mil"><span>+200 mil</span></label>
+              </div>
+            </fieldset>
+            <button class="btn btn-primary btn-lg magnetic f-submit" type="submit">Quero proteger minha marca</button>
+            <p class="f-msg" id="formMsg" role="status" aria-live="polite"></p>
+            <p class="f-privacy">Usamos seus dados só para responder ao seu contato.</p>
+          </form>
+        </div>
+      </div>
+    </section>
+
+    <a class="mcta btn btn-primary" id="mcta" href="#contato" aria-hidden="true" tabindex="-1">Quero proteger minha
+      marca</a>
+
+  </main>
+
+  <footer class="foot dark" data-theme="dark">
+    <div class="wrap foot-in">
+      <a class="foot-logo" href="#lacre" aria-label="VeriSeal, voltar ao início"><svg viewBox="0 0 977 161"
+          aria-hidden="true">
+          <use href="#vs-wordmark" />
+        </svg></a>
+      <p class="foot-tag">Identidade digital para cada garrafa.</p>
+      <nav class="foot-links" aria-label="Rodapé">
+        <a href="#lacre">O lacre</a><a href="#garrafa">Na garrafa</a><a href="#como-funciona">Como funciona</a><a
+          href="#beneficios">Benefícios</a><a href="#identidade">Identidade</a><a href="#contato">Contato</a>
+      </nav>
+      <p class="foot-legal">Copyright © 2026 VeriSeal. Todos os direitos reservados.</p>
     </div>
-  </div>
-</section>
+  </footer>
 
-<a class="mcta btn btn-primary" id="mcta" href="#contato" aria-hidden="true" tabindex="-1">Quero proteger minha marca</a>
-
-</main>
-
-<footer class="foot dark" data-theme="dark">
-  <div class="wrap foot-in">
-    <a class="foot-logo" href="#lacre" aria-label="VeriSeal, voltar ao início"><svg viewBox="0 0 977 161" aria-hidden="true"><use href="#vs-wordmark"/></svg></a>
-    <p class="foot-tag">Identidade digital para cada garrafa.</p>
-    <nav class="foot-links" aria-label="Rodapé">
-      <a href="#lacre">O lacre</a><a href="#garrafa">Na garrafa</a><a href="#como-funciona">Como funciona</a><a href="#beneficios">Benefícios</a><a href="#identidade">Identidade</a><a href="#contato">Contato</a>
-    </nav>
-    <p class="foot-legal">Copyright © 2026 VeriSeal. Todos os direitos reservados.</p>
-  </div>
-</footer>
-
-<script src="site.js"></script>
-<script src="main.js"></script>
+  <script src="site.js"></script>
+  <script src="main.js"></script>
 </body>
+
 </html>

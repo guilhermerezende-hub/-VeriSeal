@@ -104,13 +104,13 @@
 
   /* ---------- scroll choreography (p = 0..1 along the track) ---------- */
   const K = {
-    rot:  kf([[0, 0], [0.12, 0.25 * PI], [0.5, 2.4 * PI], [0.72, 3.7 * PI], [0.85, 4 * PI], [0.93, 4.08 * PI], [1, 4.25 * PI]]),
+    rot: kf([[0, 0], [0.12, 0.25 * PI], [0.5, 2.4 * PI], [0.72, 3.7 * PI], [0.85, 4 * PI], [0.93, 4.08 * PI], [1, 4.25 * PI]]),
     dist: kf([[0, 13.5], [0.14, 13.2], [0.2, 12.5], [0.4, 12.5], [0.48, 7.8], [0.64, 6.4], [0.72, 4.4], [0.85, 2.6], [1, 2.35]]),
-    ty:   kf([[0, 2.95], [0.4, 2.95], [0.48, 3.4], [0.64, 3.9], [0.72, 4.7], [0.85, 5.16], [1, 5.18]]),
-    el:   kf([[0, 0.08], [0.5, 0.12], [0.72, 0.24], [0.85, 0.36], [1, 0.42]]),
+    ty: kf([[0, 2.95], [0.4, 2.95], [0.48, 3.4], [0.64, 3.9], [0.72, 4.7], [0.85, 5.16], [1, 5.18]]),
+    el: kf([[0, 0.08], [0.5, 0.12], [0.72, 0.24], [0.85, 0.36], [1, 0.42]]),
     // lateral lens shift in world units at the target depth (negative = bottle to the right of the text)
     offx: kf([[0, -1.6], [0.14, -1.6], [0.2, 1.8], [0.4, 1.8], [0.46, -1.3], [0.64, -1.1], [0.72, 0], [0.88, 0], [1, -0.3]]),
-    hud:  kf([[0, 0], [0.79, 0], [0.83, 1], [0.88, 1], [0.905, 0], [1, 0]]),   // balões só no capítulo "Lacre"
+    hud: kf([[0, 0], [0.79, 0], [0.83, 1], [0.88, 1], [0.905, 0], [1, 0]]),   // balões só no capítulo "Lacre"
   };
 
   /* ---------- liquid model: one height field shared by the volume, its surface, the glass and the shadow ----------
@@ -335,7 +335,7 @@
   const lateRedraw = [labelTex, backTex];
   // as texturas usam Inter e JetBrains Mono: redesenha quando os pesos usados no canvas estiverem carregados
   if (document.fonts) Promise.all([`200 400px Inter`, `500 42px Inter`, `600 26px Inter`, `700 48px Inter`, `700 50px Inter`, `700 34px Inter`, `500 26px Inter`, `700 42px Inter`, `500 30px Inter`, `600 24px "JetBrains Mono"`, `600 32px "JetBrains Mono"`, `600 20px "JetBrains Mono"`, `600 26px "JetBrains Mono"`, `600 18px "JetBrains Mono"`, `400 22px "JetBrains Mono"`, `500 22px "JetBrains Mono"`, `600 30px "JetBrains Mono"`].map(f => document.fonts.load(f)))
-    .catch(() => {}).then(() => lateRedraw.forEach(t => t.userData.redraw()));
+    .catch(() => { }).then(() => lateRedraw.forEach(t => t.userData.redraw()));
   const gradientTex = (w, h, draw) => canvasTex(w, h, draw);
 
   /* ---------- renderer ---------- */
@@ -387,11 +387,13 @@
   /* studio sweep behind the bottle (in 3D so the liquid refracts it) and a floor that only receives the shadow */
   const backdrop = new THREE.Mesh(
     new THREE.PlaneGeometry(60, 40),
-    new THREE.MeshBasicMaterial({ map: gradientTex(64, 512, c => {
-      const g = c.getContext('2d'), grd = g.createLinearGradient(0, 0, 0, 512);
-      grd.addColorStop(0, '#f7f8fa'); grd.addColorStop(0.55, '#eceff3'); grd.addColorStop(1, '#cdd3dc');
-      g.fillStyle = grd; g.fillRect(0, 0, 64, 512);
-    }), toneMapped: false })
+    new THREE.MeshBasicMaterial({
+      map: gradientTex(64, 512, c => {
+        const g = c.getContext('2d'), grd = g.createLinearGradient(0, 0, 0, 512);
+        grd.addColorStop(0, '#f7f8fa'); grd.addColorStop(0.55, '#eceff3'); grd.addColorStop(1, '#cdd3dc');
+        g.fillStyle = grd; g.fillRect(0, 0, 64, 512);
+      }), toneMapped: false
+    })
   );
   backdrop.position.set(0, 4, -9); scene.add(backdrop);
   const floor = new THREE.Mesh(new THREE.PlaneGeometry(16, 16), new THREE.ShadowMaterial({ color: 0x2c2a2a, opacity: 0.3 }));
@@ -629,9 +631,9 @@
   const hudSvg = document.getElementById('hud-svg');
   const callouts = {
     tear: { pos: new THREE.Vector3(0.0, 5.22, 0.365) },
-    nfc:  { pos: new THREE.Vector3(0.0, 5.05, 0.345) },
+    nfc: { pos: new THREE.Vector3(0.0, 5.05, 0.345) },
     code: { pos: new THREE.Vector3(0.0, 4.85, 0.34) },
-    top:  { pos: new THREE.Vector3(0.0, 5.63, -0.02), up: true },
+    top: { pos: new THREE.Vector3(0.0, 5.63, -0.02), up: true },
   };
   for (const id in callouts) {
     const c = callouts[id];
@@ -852,12 +854,14 @@
     if (glowPlane && glowPlane.userData.bg !== bg) { scene.remove(glowPlane); glowPlane = null; }
     if (!glowPlane) {
       const hex = '#' + new THREE.Color(bg).getHexString(), light = new THREE.Color(bg).getHSL({}).l > 0.5;
-      glowPlane = new THREE.Mesh(new THREE.PlaneGeometry(4.8, 8), new THREE.MeshBasicMaterial({ toneMapped: false, map: canvasTex(256, 256, c => {
-        const g = c.getContext('2d'), grd = g.createRadialGradient(128, 128, 0, 128, 128, 128);
-        if (light) { grd.addColorStop(0, '#ffffff'); grd.addColorStop(0.5, '#ffffff'); grd.addColorStop(0.86, hex); grd.addColorStop(1, hex); }
-        else { grd.addColorStop(0, '#8fb0e6'); grd.addColorStop(0.3, '#3a64a8'); grd.addColorStop(0.62, '#0e2349'); grd.addColorStop(0.86, hex); grd.addColorStop(1, hex); }
-        g.fillStyle = grd; g.fillRect(0, 0, 256, 256);
-      }) }));
+      glowPlane = new THREE.Mesh(new THREE.PlaneGeometry(4.8, 8), new THREE.MeshBasicMaterial({
+        toneMapped: false, map: canvasTex(256, 256, c => {
+          const g = c.getContext('2d'), grd = g.createRadialGradient(128, 128, 0, 128, 128, 128);
+          if (light) { grd.addColorStop(0, '#ffffff'); grd.addColorStop(0.5, '#ffffff'); grd.addColorStop(0.86, hex); grd.addColorStop(1, hex); }
+          else { grd.addColorStop(0, '#8fb0e6'); grd.addColorStop(0.3, '#3a64a8'); grd.addColorStop(0.62, '#0e2349'); grd.addColorStop(0.86, hex); grd.addColorStop(1, hex); }
+          g.fillStyle = grd; g.fillRect(0, 0, 256, 256);
+        })
+      }));
       glowPlane.position.set(0, 3.5, -6); glowPlane.userData.bg = bg; scene.add(glowPlane);
     }
     glowPlane.visible = true;
