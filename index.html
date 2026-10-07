@@ -190,7 +190,7 @@
           <dl>
             <dt>Garrafa</dt><dd>A7F3K9B21</dd>
             <dt>Primeira abertura</dt><dd>não registrada</dd>
-            <dt>Lote</dt><dd>2026-09 · envase 14/09</dd>
+            <dt>Lote</dt><dd>2026-09 · produção 14/09</dd>
             <dt>Verificações</dt><dd>3 · última há 2 min</dd>
           </dl>
         </aside>
@@ -331,9 +331,9 @@
               <p class="scr-t">Produto autêntico</p>
               <p class="scr-s ok-t">Lacre íntegro · nunca aberto</p>
               <dl class="res-card">
-                <dt>Produto</dt><dd>Single Malt 12 anos</dd>
+                <dt>Produto</dt><dd>Whisky 12 anos</dd>
                 <dt>Garrafa</dt><dd class="mono">A7F3K9B21</dd>
-                <dt>Lote</dt><dd>2026-09 · envase 14/09</dd>
+                <dt>Lote</dt><dd>2026-09 · produção 14/09</dd>
                 <dt>Verificações</dt><dd>3 · última há 2 min</dd>
               </dl>
             </div>
@@ -361,7 +361,6 @@
 <!-- faixa de conversão -->
 <section class="band dark" data-theme="dark">
   <div class="wrap band-in" data-reveal>
-    <svg class="band-mark" viewBox="0 0 668 359" aria-hidden="true"><use href="#vs-mark"/></svg>
     <p class="band-t">Suas garrafas provando a própria origem.</p>
     <a class="btn btn-primary magnetic" href="#contato">Quero uma demonstração</a>
   </div>
@@ -417,21 +416,22 @@
     <div class="pass-3d" id="pass">
       <div class="pass-card" id="passCard">
         <div class="pc-face pc-front">
-          <div class="pc-head"><svg viewBox="0 0 668 359" aria-hidden="true"><use href="#vs-mark"/></svg><span>Identidade digital</span><em class="pc-ok"><svg aria-hidden="true"><use href="#i-check"/></svg>Autêntica</em></div>
-          <p class="pc-prod">Single Malt<br>12 anos</p>
-          <p class="pc-sub">Whisky · 700 ml · 40% vol</p>
+          <div class="pc-head"><svg viewBox="0 0 668 359" aria-hidden="true"><use href="#vs-mark"/></svg><span>Identidade digital</span></div>
+          <div class="pc-auth"><span class="pc-auth-ic"><svg aria-hidden="true"><use href="#i-check"/></svg></span><div><b>Autêntico</b><span>Lacre íntegro · nunca aberto</span></div></div>
+          <p class="pc-prod">Whisky 12 anos</p>
+          <p class="pc-sub">700 ml · 40% vol</p>
           <dl class="pc-grid">
             <div><dt>Garrafa</dt><dd class="mono">A7F3K9B21</dd></div>
             <div><dt>Lote</dt><dd>2026-09</dd></div>
-            <div><dt>Envase</dt><dd>14/09/2026</dd></div>
-            <div><dt>Lacre</dt><dd class="pc-green">íntegro</dd></div>
+            <div><dt>Produção</dt><dd>14/09/2026</dd></div>
+            <div><dt>Verificações</dt><dd>3</dd></div>
           </dl>
           <div class="pc-holo" aria-hidden="true"></div>
         </div>
         <div class="pc-face pc-back">
           <p class="pc-title">Jornada da garrafa</p>
           <ol class="journey">
-            <li><b>Envase</b><span>14/09 · linha de produção</span></li>
+            <li><b>Produção</b><span>14/09 · linha de envase</span></li>
             <li><b>Distribuidor</b><span>20/09 · Campinas, SP</span></li>
             <li><b>Loja</b><span>28/09 · São Paulo, SP</span></li>
             <li class="now"><b>Sua verificação</b><span>agora · lacre íntegro</span></li>
@@ -477,7 +477,7 @@
           <label class="f"><span>Empresa</span><input name="empresa" autocomplete="organization" required></label>
         </div>
         <div class="f-row">
-          <label class="f"><span>E-mail corporativo</span><input name="email" type="email" autocomplete="email" inputmode="email" required></label>
+          <label class="f"><span>E-mail corporativo</span><input name="email" type="email" autocomplete="email" inputmode="email" placeholder="nome@empresa.com.br" required></label>
           <label class="f"><span>WhatsApp <em>(opcional)</em></span><input name="whatsapp" type="tel" autocomplete="tel" inputmode="tel"></label>
         </div>
         <fieldset class="f-vol">
@@ -491,6 +491,7 @@
         </fieldset>
         <button class="btn btn-primary btn-lg magnetic f-submit" type="submit">Quero proteger minha marca</button>
         <p class="f-msg" id="formMsg" role="status" aria-live="polite"></p>
+        <p class="f-privacy">Usamos seus dados só para responder ao seu contato.</p>
       </form>
     </div>
   </div>

@@ -701,3 +701,31 @@ h1,h2,h3,p{margin:0}
   .seal-stage{top:50%}
   .hero-foot{gap:14px}
 }
+
+/* identidade digital: "Autêntico" em destaque */
+.btn-ghost{background:transparent}
+.pc-auth{display:flex;align-items:center;gap:14px;margin-top:clamp(22px,3.4vh,32px);padding:14px 16px;border-radius:20px;background:linear-gradient(135deg,rgba(48,209,88,.22),rgba(48,209,88,.08));box-shadow:inset 0 0 0 1px rgba(48,209,88,.45),0 0 40px -10px rgba(48,209,88,.5)}
+.pc-auth-ic{flex:none;display:grid;place-items:center;width:48px;height:48px;border-radius:50%;background:var(--ok);color:#03210f;box-shadow:0 0 0 6px rgba(48,209,88,.18)}
+.pc-auth-ic svg{width:26px;height:26px}
+.pc-auth b{display:block;font-size:clamp(28px,2.8vw,36px);line-height:1;font-weight:800;letter-spacing:-.03em;color:#8ef5b0}
+.pc-auth span{display:block;font-size:14px;color:rgba(255,255,255,.78);margin-top:6px}
+.pass-card:not(.is-back) .pc-auth-ic{animation:authPop .8s var(--spring) .6s both}
+@keyframes authPop{from{transform:scale(.3);opacity:0}}
+.pc-prod{font-size:clamp(28px,2.8vw,36px);margin-top:clamp(20px,3vh,28px)}
+
+/* revisão (apple-design): vidro só na camada de controles; pausa real da demonstração; privacidade */
+.status{background:rgba(255,255,255,.94);-webkit-backdrop-filter:none;backdrop-filter:none}
+.gb-badge{-webkit-backdrop-filter:none;backdrop-filter:none}
+.gb.is-real .gb-badge{background:#0d3a2a}
+.gb.is-fake .gb-badge{background:#3d1520}
+.how-scene.is-paused *,.how-scene.is-paused *::before,.how-scene.is-paused *::after{animation-play-state:paused!important}
+.f input::placeholder{color:rgba(148,160,184,.7)}
+.f-privacy{font-size:13px;color:var(--on-night-2);text-align:center;margin-top:-4px}
+
+/* verificação rápida: celular e telas respondem mais depressa */
+.phone{transition:transform .7s var(--spring),opacity .4s ease}
+.scr{transition:opacity .25s var(--ease),transform .25s var(--ease)}
+.checks li,.checks li svg{transition-duration:.15s}
+.scr.is-on .res-ic circle{transition:stroke-dashoffset .4s var(--ease-io) .05s}
+.scr.is-on .res-ic path{transition:stroke-dashoffset .3s var(--ease-io) .35s}
+.spinner svg{animation-duration:.6s}

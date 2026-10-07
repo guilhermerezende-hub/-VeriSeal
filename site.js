@@ -335,7 +335,7 @@
       loupe.style.setProperty('--lo', lo.toFixed(3));
       if (lo > 0.001) {
         const now = performance.now(), active = hover || dragging || now - lastInput < 2500;
-        if (!active) { tu = 0.5 + 0.42 * Math.sin(t * 0.33); tv = 0.5 + 0.2 * Math.sin(t * 0.71); }
+        if (!active) { if (reduce) { tu = 0.73; tv = 0.42; } else { tu = 0.5 + 0.42 * Math.sin(t * 0.33); tv = 0.5 + 0.2 * Math.sin(t * 0.71); } }
         lu = damp(lu, tu, active ? 10 : 2.4, dt); lv = damp(lv, tv, active ? 10 : 2.4, dt);
         const x = lu * sw, y = lv * sh;
         loupe.style.setProperty('--lx', x.toFixed(1) + 'px'); loupe.style.setProperty('--ly', y.toFixed(1) + 'px');
@@ -428,7 +428,11 @@
   const game = (() => {
     const root = $('#game'), btns = $$('.gb', root), msg = $('#gameMsg'), again = $('#gameAgain'), timer = $('#gameTimer');
     const AUTO = 6;
-    let fake = Math.random() < 0.5 ? 0 : 1, state = 'idle', clock = 0, inView = false, hasImg = false;
+    let fake = Math.random() < 0.5 ? 0 : 1, state = 'idle', clock = 0, inView = false, hasImg = false, considering = false;
+    btns.forEach(b => {
+      b.addEventListener('pointerenter', () => { considering = true; }); b.addEventListener('pointerleave', () => { considering = false; });
+      b.addEventListener('focus', () => { considering = true; }); b.addEventListener('blur', () => { considering = false; });
+    });
     function fallback(bad) {
       const liq = bad ? '#c2b47a' : '#d98a2b';
       const svg = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 190 380">'
@@ -466,8 +470,9 @@
       }, reduce ? 0 : 420 + k * 640));
       setTimeout(() => {
         state = 'done';
-        const tail = ' Por fora, são idênticas. Só o lacre VeriSeal conta a verdade.';
-        msg.innerHTML = choice == null ? '<b>Impossível saber só de olhar.</b> Só o lacre VeriSeal conta a verdade.'
+        const side = fake === 0 ? 'da esquerda' : 'da direita';
+        const tail = ' A garrafa ' + side + ' estava com o lacre rompido. Por fora, são idênticas.';
+        msg.innerHTML = choice == null ? '<b>Impossível saber só de olhar.</b> A garrafa ' + side + ' estava com o lacre rompido.'
           : choice === fake ? '<b>Errou.</b>' + tail : '<b>Acertou, mas foi sorte.</b>' + tail;
         again.hidden = false;
       }, reduce ? 0 : 1700);
@@ -476,7 +481,7 @@
     again.addEventListener('click', () => { reset(); btns[0].focus(); });
     new IntersectionObserver(es => es.forEach(e => { inView = e.isIntersecting; }), { threshold: 0.5 }).observe(root);
     function update(dt) {
-      if (!inView || state !== 'idle' || !hasImg) return;
+      if (!inView || state !== 'idle' || !hasImg || considering) return;
       clock += dt;
       timer.style.setProperty('--gt', clamp(clock / AUTO, 0, 1).toFixed(3));
       if (clock >= AUTO) reveal(null);
@@ -490,8 +495,8 @@
   (() => {
     const sec = $('#ideia'), text = $('#ideaText'), sub = $('#ideaSub');
     const words = text.textContent.trim().split(/\s+/);
-    text.setAttribute('aria-label', text.textContent.trim());
-    text.innerHTML = words.map((w, i) => '<span class="iw' + (i >= words.length - 2 ? ' hl' : '') + '" aria-hidden="true" style="--i:' + i + '">' + w + '</span>').join(' ');
+    const full = text.textContent.trim();
+    text.innerHTML = '<span class="sprite">' + full + '</span>' + words.map((w, i) => '<span class="iw' + (i >= words.length - 2 ? ' hl' : '') + '" aria-hidden="true" style="--i:' + i + '">' + w + '</span>').join(' ');
     sub.style.setProperty('--sd', (words.length * 0.085 + 0.5).toFixed(2) + 's');
     new IntersectionObserver((es, o) => es.forEach(e => { if (e.isIntersecting) { sec.classList.add('is-on'); o.disconnect(); } }), { threshold: 0.4 }).observe(sec);
   })();
@@ -505,7 +510,7 @@
     const scene = $('#howScene'), steps = $$('#steps li'), stepBtns = $$('#steps button'), checks = $$('.checks li', scene);
     const scr1 = $('.scr-1', scene), scr2 = $('.scr-2', scene), scrOk = $('.scr-ok', scene), scrBad = $('.scr-bad', scene);
     const seg = $('#como-funciona .seg'), segBtns = $$('button', seg), playBtn = $('#howPlay');
-    const DUR = [3.4, 3.8, 5.2];
+    const DUR = [1.2, 0.9, 3];   // verificação rápida: aproxima, lê em menos de um segundo, mostra o resultado
     let local = 0, playing = !reduce, inView = false, started = false;
     function render() {
       const st = howState.step;
@@ -522,7 +527,7 @@
     }
     function go(i) { howState.step = i; local = 0; render(); }
     stepBtns.forEach((b, i) => b.addEventListener('click', () => { started = true; go(i); }));
-    function setPlaying(v) { playing = v; playBtn.classList.toggle('is-playing', v); playBtn.setAttribute('aria-label', v ? 'Pausar demonstração' : 'Reproduzir demonstração'); }
+    function setPlaying(v) { playing = v; scene.classList.toggle('is-paused', !v); playBtn.classList.toggle('is-playing', v); playBtn.setAttribute('aria-label', v ? 'Pausar demonstração' : 'Reproduzir demonstração'); }
     setPlaying(playing);
     playBtn.addEventListener('click', () => setPlaying(!playing));
     segBtns.forEach(b => b.addEventListener('click', () => {
@@ -696,6 +701,12 @@
     const form = $('#leadForm'), msg = $('#formMsg');
     const say = (text, cls) => { msg.textContent = text; msg.className = 'f-msg' + (cls ? ' ' + cls : ''); };
     form.addEventListener('input', e => { if (e.target.matches('input')) e.target.removeAttribute('aria-invalid'); });
+    const email = form.querySelector('input[type="email"]');
+    email.addEventListener('blur', () => {
+      const v = email.value.trim();
+      if (v && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v)) { email.setAttribute('aria-invalid', 'true'); say('Confira o e-mail: ele parece incompleto.', 'err'); }
+      else if (msg.classList.contains('err')) say('');
+    });
     form.addEventListener('submit', async e => {
       e.preventDefault();
       const fields = $$('input[required]', form);
