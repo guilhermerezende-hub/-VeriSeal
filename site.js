@@ -515,7 +515,7 @@
   const howState = { step: 0, bad: false };
   const how = (() => {
     const scene = $('#howScene'), steps = $$('#steps li'), stepBtns = $$('#steps button');
-    const scrRead = $('.ap-read', scene), scrOk = $('.ap-ok', scene), scrBad = $('.ap-bad', scene), apChecks = $('.ap-checks li', scene);
+    const scrRead = $('.ap-read', scene), scrOk = $('.ap-ok', scene), scrBad = $('.ap-bad', scene), apChecks = $$('.ap-checks li', scene);
     const seg = $('#como-funciona .seg'), segBtns = $$('button', seg), playBtn = $('#howPlay');
     const DUR = [1.8, 1.1, 3.2];   // aproxima (o app abre sozinho), lê em ~1 s, mostra o resultado
     let local = 0, playing = !reduce, inView = false, started = false;
@@ -557,7 +557,7 @@
       let ok = null, bad = null;
       try { if (window.VeriSeal3D) { ok = window.VeriSeal3D.renderBottle({ w: 260, h: 520, bg: 0xf1f5fb }); bad = window.VeriSeal3D.renderBottle({ bad: true, w: 260, h: 520, bg: 0xf1f5fb }); } } catch (e) { ok = null; }
       if (!ok) { ok = game.fallback(false); bad = game.fallback(true); }
-      $('.ap-bottle', scene).forEach(img => { img.src = img.classList.contains('bad') ? bad : ok; });
+      $$('.ap-bottle', scene).forEach(img => { img.src = img.classList.contains('bad') ? bad : ok; });
     };
     let near3d = false, ready3d = !!window.VeriSeal3D;
     addEventListener('veriseal:3d', () => { ready3d = true; if (near3d) takeShots(); });
