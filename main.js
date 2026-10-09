@@ -27,13 +27,17 @@
 
   let THREE;
   try {
-    THREE = await import('https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js');
+    THREE = await import('https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.min.js');
   } catch (err) {
     console.error('Three.js não carregou', err);
     stage.classList.add('is-nogl');
     hud.style.display = 'none';
     return;
   }
+  // o trabalho pesado (texturas, shaders) só começa depois que a página carregou, em momentos ociosos
+  if (document.readyState !== 'complete') await new Promise(r => addEventListener('load', r, { once: true }));
+  const idle = () => new Promise(r => window.requestIdleCallback ? requestIdleCallback(() => r(), { timeout: 600 }) : setTimeout(r, 16));
+  await idle();
 
   /* ---------- helpers ---------- */
   const PI = Math.PI;
@@ -337,6 +341,7 @@
   if (document.fonts) Promise.all([`200 400px Inter`, `500 42px Inter`, `600 26px Inter`, `700 48px Inter`, `700 50px Inter`, `700 34px Inter`, `500 26px Inter`, `700 42px Inter`, `500 30px Inter`, `600 24px "JetBrains Mono"`, `600 32px "JetBrains Mono"`, `600 20px "JetBrains Mono"`, `600 26px "JetBrains Mono"`, `600 18px "JetBrains Mono"`, `400 22px "JetBrains Mono"`, `500 22px "JetBrains Mono"`, `600 30px "JetBrains Mono"`].map(f => document.fonts.load(f)))
     .catch(() => { }).then(() => lateRedraw.forEach(t => t.userData.redraw()));
   const gradientTex = (w, h, draw) => canvasTex(w, h, draw);
+  await idle();
 
   /* ---------- renderer ---------- */
   let renderer;
@@ -348,6 +353,8 @@
   renderer.toneMappingExposure = 1.0;
   renderer.shadowMap.enabled = true;
   renderer.shadowMap.type = THREE.VSMShadowMap;
+  renderer.shadowMap.autoUpdate = false;   // a sombra só é refeita quando a garrafa gira ou inclina (syncShadow)
+  renderer.shadowMap.needsUpdate = true;
   const maxAniso = renderer.capabilities.getMaxAnisotropy();
   labelTex.anisotropy = maxAniso; backTex.anisotropy = maxAniso;
 
@@ -379,7 +386,8 @@
   scene.add(new THREE.AmbientLight(0xfff4e6, 0.25));
   // key light high and to the left, slightly in front: a short warm shadow that falls to the right where it can be seen
   const key = new THREE.DirectionalLight(0xfff0dc, 2.6); key.position.set(-6.5, 9, 2.5); key.target.position.set(0, 3, 0); scene.add(key, key.target);
-  key.castShadow = true; key.shadow.mapSize.set(1024, 1024); key.shadow.bias = -0.0002; key.shadow.normalBias = 0.02; key.shadow.radius = 14; key.shadow.blurSamples = 25;
+  // sombra bem difusa: 512 px com metade do raio dá o mesmo desfoque de 1024 px, com 1/8 do custo
+  key.castShadow = true; key.shadow.mapSize.set(512, 512); key.shadow.bias = -0.0002; key.shadow.normalBias = 0.02; key.shadow.radius = 7; key.shadow.blurSamples = 12;
   Object.assign(key.shadow.camera, { left: -3.5, right: 3.5, top: 4.5, bottom: -4.5, near: 1, far: 30 });
   const rim = new THREE.DirectionalLight(0xdfe9ff, 1.2); rim.position.set(6, 5, -5); scene.add(rim);
   const fill = new THREE.DirectionalLight(0xfff0dc, 0.5); fill.position.set(4, 2, 7); scene.add(fill);
@@ -610,21 +618,43 @@
   });
   // o lacre é uma peça só, desenhada duas vezes com planos de corte na junção: a metade de cima vai com a tampa.
   // Girar a tampa ("lacre violado") separa as metades na linha de ruptura.
+  // O corte é feito no próprio shader (e não com clippingPlanes) para o programa poder ser pré-compilado em segundo plano.
   const SPLIT_Y = 5.222;
   const clipTop = new THREE.Plane(), clipBot = new THREE.Plane();
   const localUp = new THREE.Plane(new THREE.Vector3(0, 1, 0), -SPLIT_Y), localDown = new THREE.Plane(new THREE.Vector3(0, -1, 0), SPLIT_Y);
-  const stripTopMat = stripMat.clone(); stripTopMat.clippingPlanes = [clipTop];
-  stripMat.clippingPlanes = [clipBot];
-  renderer.localClippingEnabled = true;
+  const cutTop = new THREE.Vector4(), cutBot = new THREE.Vector4();
+  function cutBy(mat, cut) {
+    mat.onBeforeCompile = shader => {
+      shader.uniforms.uCut = { value: cut };
+      shader.vertexShader = 'varying vec3 vCutW;\n' + shader.vertexShader.replace('#include <project_vertex>', '#include <project_vertex>\nvCutW = (modelMatrix * vec4(transformed, 1.0)).xyz;');
+      shader.fragmentShader = 'uniform vec4 uCut;\nvarying vec3 vCutW;\n' + shader.fragmentShader.replace('void main() {', 'void main() {\nif (dot(vCutW, uCut.xyz) + uCut.w < 0.0) discard;');
+    };
+    mat.customProgramCacheKey = () => 'veriseal-strip-cut';
+    return mat;
+  }
+  const stripTopMat = cutBy(stripMat.clone(), cutTop);
+  cutBy(stripMat, cutBot);
   bottle.add(new THREE.Mesh(strip.geometry, stripMat));
   capGroup.add(new THREE.Mesh(strip.geometry, stripTopMat));
+  function setCuts() {
+    bottle.updateMatrixWorld(true);
+    clipTop.copy(localUp).applyMatrix4(capGroup.matrixWorld);
+    clipBot.copy(localDown).applyMatrix4(bottle.matrixWorld);
+    cutTop.set(clipTop.normal.x, clipTop.normal.y, clipTop.normal.z, clipTop.constant);
+    cutBot.set(clipBot.normal.x, clipBot.normal.y, clipBot.normal.z, clipBot.constant);
+  }
   let tear = 0, tearT = 0;
   function updateTear(dt) {
     tear += (tearT - tear) * (1 - Math.exp(-dt * (tearT > tear ? 3.2 : 4)));
     capGroup.rotation.y = 0.62 * tear; capGroup.position.y = 0.04 * tear;
-    bottle.updateMatrixWorld(true);
-    clipTop.copy(localUp).applyMatrix4(capGroup.matrixWorld);
-    clipBot.copy(localDown).applyMatrix4(bottle.matrixWorld);
+    setCuts();
+  }
+  // a sombra é refeita só quando a garrafa se mexe de verdade (a silhueta que projeta a sombra é dela, não da tampa)
+  const shadowAt = { y: 1e9, x: 1e9 };
+  function syncShadow() {
+    if (Math.abs(bottle.rotation.y - shadowAt.y) > 0.004 || Math.abs(bottle.rotation.x - shadowAt.x) > 0.002) {
+      shadowAt.y = bottle.rotation.y; shadowAt.x = bottle.rotation.x; renderer.shadowMap.needsUpdate = true;
+    }
   }
 
   /* ---------- overlay: chapters and the callouts anchored to the seal ---------- */
@@ -645,7 +675,7 @@
 
   /* ---------- state ---------- */
   let W = 1, H = 1, aspect = 1;
-  let pS = 0, visible = true;
+  let pS = 0, visible = false;   // o IntersectionObserver liga a cena quando o quadro ou a demonstração aparecem
   let px = 0, py = 0, pxS = 0, pyS = 0; // pointer parallax
   const tmp = new THREE.Vector3(), tmp2 = new THREE.Vector3();
   const nav = document.getElementById('nav');
@@ -659,11 +689,14 @@
     scene.background.set(m === 'how' ? 0xffffff : 0xe9ecf1);
     backdrop.visible = m !== 'how';
     if (m === 'how') turnBase = Math.round(dyn.spin / (2 * PI)) * 2 * PI;
+    else pS = progress();
     hud.style.opacity = 0;
   }
 
-  // progresso da animação = quanto o quadro fixo (sticky) já percorreu da sua trilha
+  // progresso da animação = quanto o quadro fixo (sticky) já percorreu da sua trilha.
+  // site.js já mede isso uma vez por quadro com posições em cache; ler o layout aqui forçaria um reflow a cada quadro
   function progress() {
+    if (window.VeriSeal && window.VeriSeal.frameProgress) return window.VeriSeal.frameProgress();
     const total = track.offsetHeight - trackPin.offsetHeight;
     return total > 0 ? clamp(((nav ? nav.offsetHeight : 0) - track.getBoundingClientRect().top) / total, 0, 1) : 0;
   }
@@ -682,11 +715,22 @@
   });
   const endDrag = () => { dragging = false; canvas.classList.remove('is-grabbing'); };
   canvas.addEventListener('pointerup', endDrag); canvas.addEventListener('pointercancel', endDrag);
+  // resolução adaptativa: no máximo 1,5x (acima disso a diferença não aparece e o custo dobra);
+  // se os quadros ficarem lentos por alguns instantes, a resolução baixa sozinha até 0,8x
+  const PR_MAX = Math.min(devicePixelRatio || 1, 1.5), PR_MIN = Math.min(PR_MAX, 0.8);
+  let pr = PR_MAX, slowSum = 0, slowN = 0, prHold = 1;
   function resize() {
     W = host.clientWidth || 1; H = host.clientHeight || 1; aspect = W / H;
-    renderer.setPixelRatio(Math.min(devicePixelRatio || 1, W < 760 ? 1.75 : 2));
+    renderer.setPixelRatio(pr);
     renderer.setSize(W, H, false);
     camera.aspect = aspect; camera.updateProjectionMatrix();
+  }
+  function adaptResolution(raw) {
+    if (prHold > 0) { prHold -= raw; slowSum = slowN = 0; return; }
+    slowSum += Math.min(raw, 0.1); slowN++;
+    if (slowN < 45) return;
+    const avg = slowSum / slowN; slowSum = slowN = 0;
+    if (avg > 1 / 40 && pr > PR_MIN) { pr = Math.max(PR_MIN, pr - 0.2); resize(); prHold = 1.5; }
   }
 
   /* ---------- physics ----------
@@ -754,9 +798,11 @@
 
   function updateHud(p) {
     const v = K.hud(p);
+    if (v <= 0.001) { hud.style.opacity = 0; return; }
+    // todas as leituras de layout antes de qualquer escrita (evita um reflow por balão)
+    const s = stage.getBoundingClientRect(), boxes = {};
+    for (const id in callouts) boxes[id] = callouts[id].box.getBoundingClientRect();
     hud.style.opacity = v.toFixed(3);
-    if (v <= 0.001) return;
-    const s = stage.getBoundingClientRect();
     for (const id in callouts) {
       const c = callouts[id];
       bottle.localToWorld(tmp.copy(c.pos));
@@ -767,22 +813,24 @@
       const ax = (tmp.x * 0.5 + 0.5) * W, ay = (-tmp.y * 0.5 + 0.5) * H;
       c.dot.style.left = ax + 'px'; c.dot.style.top = ay + 'px';
       c.dot.style.opacity = c.box.style.opacity = c.line.style.opacity = show ? 1 : 0;
-      const r = c.box.getBoundingClientRect(), isLeft = c.box.classList.contains('left');
+      const r = boxes[id], isLeft = c.box.classList.contains('left');
       const y0 = r.top - s.top + 8, x0 = isLeft ? r.right - s.left + 10 : r.left - s.left - 10, dir = isLeft ? 1 : -1;
       const elbowX = ax - dir * Math.max(26, Math.abs(ay - y0) * 0.6);
       c.line.setAttribute('points', (dir > 0 ? elbowX > x0 : elbowX < x0) ? `${x0},${y0} ${elbowX},${y0} ${ax},${ay}` : `${x0},${y0} ${ax},${ay}`);
     }
   }
 
-  let last = performance.now();
+  let last = performance.now(), wasVisible = false;
   function frame(now) {
-    const dt = clamp((now - last) / 1000, 0.001, 0.05); last = now;
+    const raw = (now - last) / 1000, dt = clamp(raw, 0.001, 0.05); last = now;
     const t = now / 1000;
+    if (!visible) { wasVisible = false; return; }     // fora da tela: nada de física nem de render
+    if (!wasVisible) { wasVisible = true; prHold = 1; if (mode === 'frame') pS = progress(); }
+    else adaptResolution(raw);
+    if (mode === 'how') { howFrame(dt, t); return; }
     const p = progress(), pPrev = pS;
     pS += (p - pS) * (1 - Math.exp(-dt * 4.5));
     const vP = (pS - pPrev) / dt;
-    if (!visible) return;
-    if (mode === 'how') { howFrame(dt, t); return; }
     tearT = 0;
 
     if (!dragging) {
@@ -807,6 +855,7 @@
     backdrop.position.y = ty;
 
     updateTear(dt);
+    syncShadow();
     renderer.render(scene, camera);
     updateHud(pS);
   }
@@ -831,6 +880,7 @@
     const visW = 2 * dist * Math.tan(camera.fov * PI / 360) * aspect;
     camera.setViewOffset(W, H, (ox / visW) * W, narrow ? 0.14 * H : 0, W, H);
     updateTear(dt);
+    syncShadow();
     renderer.render(scene, camera);
     // onde o símbolo de aproximação do lacre está na tela (as ondas saem dali)
     bottle.localToWorld(tmp.set(0, 5.05, 0.345)); tmp.project(camera);
@@ -839,7 +889,8 @@
   }
 
   /* fotos da garrafa renderizadas pela própria cena (usadas no jogo "qual delas é original?"):
-     bad = true só gira a tampa, rompendo o lacre (a bebida tem a mesma cor: por fora, as duas são idênticas) */
+     bad = true só gira a tampa, rompendo o lacre (a bebida tem a mesma cor: por fora, as duas são idênticas).
+     Devolve uma Promise com a URL da imagem: o PNG é codificado fora da thread principal (toBlob). */
   let glowPlane = null;
   function renderBottle({ bad = false, w = 380, h = 760, bg = 0x030b1c } = {}) {
     const prev = {
@@ -869,11 +920,13 @@
     liquidUniforms.uTilt.value.set(0, 0); liquidUniforms.uSym.value = 0; liquidUniforms.uRip.value = 0.0004; liquidUniforms.uSwirl.value = 0;
     camera.clearViewOffset(); camera.aspect = w / h; camera.updateProjectionMatrix();
     const d = 13.4; camera.position.set(0, 2.98 + d * Math.sin(0.05), d * Math.cos(0.05)); camera.lookAt(0, 2.98, 0);
-    bottle.updateMatrixWorld(true);
-    clipTop.copy(localUp).applyMatrix4(capGroup.matrixWorld); clipBot.copy(localDown).applyMatrix4(bottle.matrixWorld);
+    setCuts();
+    renderer.shadowMap.needsUpdate = true;
     renderer.render(scene, camera);
-    const url = renderer.domElement.toDataURL('image/png');
+    // o toBlob copia o quadro na hora (antes do redimensionamento abaixo) e codifica depois, sem travar a página
+    const url = new Promise(res => renderer.domElement.toBlob(b => res(b ? URL.createObjectURL(b) : null), 'image/png'));
     renderer.setPixelRatio(prev.pr); renderer.setSize(prev.size.x, prev.size.y, false);
+    shadowAt.y = 1e9;   // a próxima cena refaz a sombra na pose dela
     scene.background.copy(prev.bg); backdrop.visible = prev.bd; causticPivot.visible = true; glowPlane.visible = false;
     bottle.rotation.copy(prev.rot); capGroup.rotation.y = prev.cap; capGroup.position.y = prev.capY;
     liquid.material.attenuationColor.copy(prev.att); liquid.material.roughness = prev.rough; surface.material.color.copy(prev.surf);
@@ -895,9 +948,30 @@
     if (visible) setMode(vis.how > vis.frame ? 'how' : 'frame');
   }, { threshold: [0, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1] });
   io.observe(stage); io.observe(howHost);
-  window.VeriSeal3D = { renderBottle };
-  const ready = () => dispatchEvent(new Event('veriseal:3d'));
-  (document.fonts ? document.fonts.ready : Promise.resolve()).then(() => setTimeout(ready, 300));
   addEventListener('pointermove', e => { px = (e.clientX / innerWidth) * 2 - 1; py = (e.clientY / innerHeight) * 2 - 1; }, { passive: true });
+
+  /* pré-compilação: sem isto, todos os shaders eram compilados de uma vez no primeiro quadro, travando a página.
+     Aqui eles são enviados ao driver em paralelo (KHR_parallel_shader_compile) e a página segue rodando.
+     Além da passagem normal, a de transmissão desenha os opacos sem tone mapping num alvo linear, e o verso do líquido. */
+  async function precompile() {
+    camera.position.set(0, 3, 13); camera.lookAt(0, 3, 0);
+    const jobs = [renderer.compileAsync(scene, camera)];
+    const rt = new THREE.WebGLRenderTarget(1, 1, { type: THREE.HalfFloatType });
+    renderer.setRenderTarget(rt);
+    scene.traverse(o => { if (o.isMesh && !o.material.transparent && !(o.material.transmission > 0)) jobs.push(renderer.compileAsync(o, camera, scene)); });
+    liquid.material.side = THREE.BackSide;
+    jobs.push(renderer.compileAsync(liquid, camera, scene));
+    liquid.material.side = THREE.DoubleSide; liquid.material.needsUpdate = true;
+    renderer.setRenderTarget(null);
+    await idle();
+    [labelTex, backTex, stripTex, stripOrm, capSkinTex].forEach(t => renderer.initTexture(t));   // envia as texturas à GPU antes
+    await Promise.race([Promise.all(jobs), new Promise(r => setTimeout(r, 10000))]);
+    rt.dispose();
+  }
+  const compiled = precompile().catch(err => console.warn('VeriSeal: pré-compilação', err));
   renderer.setAnimationLoop(frame);
+  await compiled;
+  window.VeriSeal3D = { renderBottle };
+  await (document.fonts ? document.fonts.ready : Promise.resolve());
+  dispatchEvent(new Event('veriseal:3d'));
 })();

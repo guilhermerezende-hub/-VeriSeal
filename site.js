@@ -183,27 +183,40 @@
       if (s.el.id === 'track') s.pinOffset = navH;   // o quadro gruda logo abaixo da nav
     }
     sections.forEach(o => { const r = o.el.getBoundingClientRect(); o.top = r.top + scrollY; o.bottom = o.top + o.el.offsetHeight; });
+    // posições usadas a cada quadro: lidas só aqui, para o laço principal não forçar reflow
+    for (const k in at) { const el = $(k), r = el.getBoundingClientRect(); at[k] = { top: r.top + scrollY, bottom: r.bottom + scrollY }; }
+    navTargets.forEach(o => { o.top = o.el ? o.el.getBoundingClientRect().top + scrollY : Infinity; });
+    docH = document.documentElement.scrollHeight;
+    navY = -1;
     hero.layout();
   }
   const sections = $$('[data-theme]').filter(el => el.matches('section, footer, .track')).map(el => ({ el, theme: el.dataset.theme, top: 0, bottom: 0 }));
+  const at = { '#lacre': null, '#howScene': null, '#identidade': null, '#historia': null, '#contato': null, '#storyMark': null, '#ctaSeal': null };
+  let docH = 1;
 
   /* ============================================================
      NAV: tema conforme a seção embaixo dela, progresso, link atual, menu
      ============================================================ */
   const nav = $('#nav'), navProgress = $('#navProgress');
   const navLinks = $$('.nav-links a');
+  const navTargets = navLinks.map(a => ({ a, el: $(a.getAttribute('href')), top: Infinity }));
   const navMenu = $('#navMenu'), navSheet = $('#navSheet');
+  let navY = -1, navCur;
   function updateNav(y) {
+    if (y === navY) return;   // nada mudou desde o último quadro
+    navY = y;
     nav.classList.toggle('at-top', y < 8);
     const probe = y + navH * 0.5;
     let theme = 'dark';
     for (const o of sections) if (probe >= o.top && probe < o.bottom) theme = o.theme;
     nav.classList.toggle('on-light', theme === 'light');
-    const max = document.documentElement.scrollHeight - vh;
+    const max = docH - vh;
     navProgress.style.setProperty('--np', max > 0 ? (y / max).toFixed(4) : 0);
     const mid = y + vh * 0.4;
     let cur = null;
-    for (const a of navLinks) { const t = $(a.getAttribute('href')); if (t) { const top = t.getBoundingClientRect().top + y; if (top <= mid) cur = a; } }
+    for (const o of navTargets) if (o.top <= mid) cur = o.a;
+    if (cur === navCur) return;
+    navCur = cur;
     navLinks.forEach(a => a.toggleAttribute('aria-current', a === cur) || (a === cur && a.setAttribute('aria-current', 'true')));
   }
   function setMenu(open) {
@@ -236,6 +249,7 @@
     const heroCopy = $('#heroCopy'), anatomy = $('#anatomyCopy'), foot = $('#heroFoot'), next = $('#heroNext');
     const labels = $$('#layerLabels li'), lines = $('#layerLines');
     const linePaths = labels.map(() => { const g = document.createElementNS('http://www.w3.org/2000/svg', 'g'); g.innerHTML = '<path/><circle r="3.5"/>'; lines.appendChild(g); return g; });
+    const markEls = labels.map(li => { const lay = layers[li.dataset.for]; return [lay.querySelector('.mk'), lay.querySelector('.mk-t')]; });
 
     // palavras do título com atraso escalonado
     $$('.h-hero .w', section).forEach((w, i) => w.style.setProperty('--i', i));
@@ -349,21 +363,24 @@
         if (nextPing <= 0 && (pings < 3 || nearNfc)) { ping(); pings++; nextPing = nearNfc ? 1.2 : 2.6; }
       }
 
-      // rótulos das camadas, presos às pontas projetadas de cada camada
-      const stageR = stage.getBoundingClientRect();
+      // rótulos das camadas, presos às pontas projetadas de cada camada.
+      // Só lê o layout quando algum rótulo aparece, e lê tudo antes de escrever (um reflow por quadro, não um por rótulo)
+      const alphas = labels.map((li, i) => sstep(0.2 + i * 0.035, 0.3 + i * 0.035, p));
+      const anyOn = alphas.some(a => a > 0.001);
+      const stageR = anyOn && stage.getBoundingClientRect();
+      const marks = labels.map((li, i) => alphas[i] > 0.001 ? markEls[i][narrow ? 1 : 0].getBoundingClientRect() : null);
+      const widths = labels.map((li, i) => alphas[i] > 0.001 && !narrow ? li.offsetWidth : 0);
       labels.forEach((li, i) => {
-        const a = sstep(0.2 + i * 0.035, 0.3 + i * 0.035, p);
+        const a = alphas[i];
         li.style.opacity = a.toFixed(3);
         linePaths[i].style.opacity = narrow ? 0 : a.toFixed(3);
         if (a <= 0.001) return;
-        const lay = layers[li.dataset.for];
+        const m = marks[i];
         if (narrow) {
-          const m = lay.querySelector('.mk-t').getBoundingClientRect();
           li.style.transform = `translate(${(m.left - stageR.left).toFixed(1)}px,${(m.top - stageR.top - 30).toFixed(1)}px) translateX(-50%)`;
         } else {
-          const m = lay.querySelector('.mk').getBoundingClientRect();
           const mx = m.left - stageR.left, my = m.top - stageR.top;
-          const lx = Math.min(mx + 56, vw - stageR.left - li.offsetWidth - 20), ly = my - 18 - (3 - i) * 6;
+          const lx = Math.min(mx + 56, vw - stageR.left - widths[i] - 20), ly = my - 18 - (3 - i) * 6;
           li.style.transform = `translate(${lx.toFixed(1)}px,${(ly - 10).toFixed(1)}px)`;
           linePaths[i].firstChild.setAttribute('d', `M${mx.toFixed(1)} ${my.toFixed(1)}L${(mx + 22).toFixed(1)} ${ly.toFixed(1)}H${(lx - 6).toFixed(1)}`);
           linePaths[i].lastChild.setAttribute('cx', mx.toFixed(1)); linePaths[i].lastChild.setAttribute('cy', my.toFixed(1));
@@ -442,16 +459,23 @@
         + '<rect x="74" y="16" width="42" height="30" rx="5" fill="#0a1a3a"' + (bad ? ' transform="rotate(-14 95 31)"' : '') + '/></svg>';
       return 'data:image/svg+xml;charset=utf-8,' + encodeURIComponent(svg);
     }
-    function setImages() {
+    let img3d = false, rendering = false;
+    async function setImages() {
+      if (img3d || rendering) return;
+      rendering = true;
       let ok = null, bad = null;
-      try { if (window.VeriSeal3D) { ok = window.VeriSeal3D.renderBottle({ bad: false }); bad = window.VeriSeal3D.renderBottle({ bad: true }); } } catch (e) { ok = null; }
-      if (!ok) { ok = fallback(false); bad = fallback(true); }
+      try { if (window.VeriSeal3D) [ok, bad] = await Promise.all([window.VeriSeal3D.renderBottle({ bad: false }), window.VeriSeal3D.renderBottle({ bad: true })]); } catch (e) { ok = null; }
+      rendering = false;
+      if (ok && bad) img3d = true;
+      else if (hasImg) return;   // o desenho em SVG já está lá
+      else { ok = fallback(false); bad = fallback(true); }
       btns.forEach(b => { $('.gb-a', b).src = ok; $('.gb-b', b).src = bad; });
       hasImg = true;
     }
-    // as fotos 3D só são geradas quando o jogo se aproxima da tela (evita travar o carregamento)
+    // as fotos 3D só são geradas quando o jogo se aproxima da tela (evita travar o carregamento);
+    // se a cena 3D ficar pronta depois do desenho em SVG, as fotos substituem o desenho
     let near = false, ready3d = false;
-    const tryImages = () => { if (near && ready3d && !hasImg) setImages(); };
+    const tryImages = () => { if (near && ready3d && !img3d) setImages(); };
     addEventListener('veriseal:3d', () => { ready3d = true; tryImages(); });
     new IntersectionObserver((es, o) => es.forEach(e => {
       if (!e.isIntersecting) return;
@@ -551,12 +575,17 @@
       segBtns[j].click(); segBtns[j].focus(); e.preventDefault();
     });
     new IntersectionObserver(es => es.forEach(e => { inView = e.isIntersecting; if (inView && !started) { started = true; go(0); } }), { threshold: 0.35 }).observe(scene);
-    let shots = false;
-    const takeShots = () => {
-      if (shots) return; shots = true;
+    let shots = false, shots3d = false, shooting = false;
+    const takeShots = async () => {
+      if (shots3d || shooting) return;
+      shooting = true;
       let ok = null, bad = null;
-      try { if (window.VeriSeal3D) { ok = window.VeriSeal3D.renderBottle({ w: 260, h: 520, bg: 0xf1f5fb }); bad = window.VeriSeal3D.renderBottle({ bad: true, w: 260, h: 520, bg: 0xf1f5fb }); } } catch (e) { ok = null; }
-      if (!ok) { ok = game.fallback(false); bad = game.fallback(true); }
+      try { if (window.VeriSeal3D) [ok, bad] = await Promise.all([window.VeriSeal3D.renderBottle({ w: 260, h: 520, bg: 0xf1f5fb }), window.VeriSeal3D.renderBottle({ bad: true, w: 260, h: 520, bg: 0xf1f5fb })]); } catch (e) { ok = null; }
+      shooting = false;
+      if (ok && bad) shots3d = true;
+      else if (shots) return;
+      else { ok = game.fallback(false); bad = game.fallback(true); }
+      shots = true;
       $$('.ap-bottle', scene).forEach(img => { img.src = img.classList.contains('bad') ? bad : ok; });
     };
     let near3d = false, ready3d = !!window.VeriSeal3D;
@@ -652,16 +681,15 @@
     }
     front.style.transform = 'translateZ(1px)';
     rig.appendChild(front); box.appendChild(rig);
-    let top0 = 0, mx = 0, my = 0, rx = 8, ry = -24;
+    let mx = 0, my = 0, rx = 8, ry = -24;
     if (fine) box.parentElement.addEventListener('pointermove', e => { const r = box.getBoundingClientRect(); mx = clamp((e.clientX - r.left) / r.width * 2 - 1, -1, 1); my = clamp((e.clientY - r.top) / r.height * 2 - 1, -1, 1); });
     function update(y, dt) {
-      if (!top0) top0 = box.getBoundingClientRect().top + scrollY;
-      const p = clamp((y + vh - top0) / (vh + box.offsetHeight), 0, 1);
+      const b = at['#storyMark'], p = clamp((y + vh - b.top) / (vh + b.bottom - b.top), 0, 1);
       const try_ = reduce ? -14 : lerp(-34, 30, p) + mx * 12, trx = reduce ? 6 : lerp(14, -8, p) + my * -8;
       ry = damp(ry, try_, 5, dt); rx = damp(rx, trx, 5, dt);
       rig.style.setProperty('--sry', ry.toFixed(2) + 'deg'); rig.style.setProperty('--srx', rx.toFixed(2) + 'deg');
     }
-    return { update, reset() { top0 = 0; } };
+    return { update };
   })();
 
   /* ============================================================
@@ -672,18 +700,17 @@
     $('.cs-front', box).innerHTML = printSVG('cs');
     $('.cs-back', box).innerHTML = adhesiveSVG('csb');
     const rig = $('.cs-rig', box), shadow = $('.cs-shadow', box);
-    let top0 = 0, mx = 0, my = 0, ry = -24, rx = 16;
+    let mx = 0, my = 0, ry = -24, rx = 16;
     if (fine) $('#contato').addEventListener('pointermove', e => { mx = (e.clientX / vw) * 2 - 1; my = (e.clientY / vh) * 2 - 1; });
     function update(y, dt, t) {
-      if (!top0) top0 = box.getBoundingClientRect().top + scrollY;
-      const p = clamp((y + vh - top0) / (vh + box.offsetHeight), 0, 1);
+      const b = at['#ctaSeal'], p = clamp((y + vh - b.top) / (vh + b.bottom - b.top), 0, 1);
       const try_ = reduce ? -12 : lerp(-38, 22, p) + mx * 14 + Math.sin(t * 0.6) * 3;
       const trx = reduce ? 12 : lerp(24, 6, p) - my * 8 + Math.sin(t * 0.8) * 2;
       ry = damp(ry, try_, 4, dt); rx = damp(rx, trx, 4, dt);
       rig.style.setProperty('--cry', ry.toFixed(2) + 'deg'); rig.style.setProperty('--crx', rx.toFixed(2) + 'deg');
       shadow.style.setProperty('--css', (0.8 + 0.2 * Math.cos(ry * Math.PI / 180)).toFixed(3));
     }
-    return { update, reset() { top0 = 0; } };
+    return { update };
   })();
 
   /* ============================================================
@@ -755,12 +782,13 @@
   })();
   const mcta = $('#mcta');
   function updateMcta(y) {
-    const heroEnd = $('#lacre').offsetHeight - vh * 0.5;
+    const L = at['#lacre'], heroEnd = L.bottom - L.top - vh * 0.5;
     const tr = frameSeq, inTrack = y + vh > tr.top && y < tr.top + tr.h;
-    const ct = $('#contato'), nearForm = y + vh > ct.offsetTop + 120;
-    const hs = $('#howScene').getBoundingClientRect(), overDemo = hs.top < vh && hs.bottom > 0;   // não cobrir o celular da demonstração
+    const nearForm = y + vh > at['#contato'].top + 120;
+    const hs = at['#howScene'], overDemo = hs.top < y + vh && hs.bottom > y;   // não cobrir o celular da demonstração
     mcta.classList.toggle('is-on', y > heroEnd && !inTrack && !nearForm && !overDemo);
   }
+  const inView = (k, y) => y + vh > at[k].top && y < at[k].bottom;
 
   /* ============================================================
      laço principal
@@ -781,20 +809,24 @@
     updateMcta(y);
     game.update(dt);
     how.update(dt);
-    const ps = passport.sec;
-    if (y + vh > ps.offsetTop && y < ps.offsetTop + ps.offsetHeight) passport.update(dt, t);
-    const st = $('#historia');
-    if (y + vh > st.offsetTop && y < st.offsetTop + st.offsetHeight) story.update(y, dt);
-    const ct = $('#contato');
-    if (y + vh > ct.offsetTop && y < ct.offsetTop + ct.offsetHeight) ctaSeal.update(y, dt, t);
+    if (inView('#identidade', y)) passport.update(dt, t);
+    if (inView('#historia', y)) story.update(y, dt);
+    if (inView('#contato', y)) ctaSeal.update(y, dt, t);
     requestAnimationFrame(tick);
   }
 
-  function remeasure() { measure(); story.reset(); ctaSeal.reset(); }
+  // as posições ficam em cache; são medidas de novo quando algo muda de tamanho (janela, fontes, troca de abas…)
+  let remeasureQueued = false;
+  function remeasure() {
+    if (remeasureQueued) return;
+    remeasureQueued = true;
+    requestAnimationFrame(() => { remeasureQueued = false; measure(); });
+  }
   addEventListener('resize', remeasure);
   addEventListener('load', remeasure);
   document.fonts?.ready.then(remeasure);
   narrowMQ.addEventListener?.('change', remeasure);
+  if ('ResizeObserver' in window) new ResizeObserver(remeasure).observe(document.body);
   measure();
 
   // #p=0.86 leva direto a um ponto da animação do quadro (útil para revisar a cena)
