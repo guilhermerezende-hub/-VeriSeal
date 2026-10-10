@@ -334,12 +334,15 @@
     ls('6px'); g.font = `600 26px ${MONO}`; g.fillStyle = 'rgba(255,255,255,.9)'; g.fillText('Nº A7F3K9B21', 403, 815);
     ls('0px');
   }
-  const labelTex = canvasTex(1400, 2163, drawLabel);
-  const backTex = canvasTex(1024, 1152, drawBackLabel);
+  // as texturas usam Inter e JetBrains Mono: desenha uma vez só, depois que os pesos usados no canvas carregaram.
+  // Se as fontes demorarem mais de 3 s, desenha com a fonte do sistema e redesenha quando elas chegarem.
+  const fontsReady = document.fonts ? Promise.all([`500 42px Inter`, `600 26px Inter`, `700 42px Inter`, `500 26px "JetBrains Mono"`, `600 26px "JetBrains Mono"`].map(f => document.fonts.load(f))).catch(() => { }) : Promise.resolve();
+  const fontsLoaded = await Promise.race([fontsReady.then(() => true), new Promise(r => setTimeout(() => r(false), 3000))]);
+  // 1024 px de largura já sobram para o maior tamanho em que o rótulo aparece (o de 1400 custava o dobro para desenhar e enviar)
+  const labelTex = canvasTex(1024, 1582, drawLabel);
+  const backTex = canvasTex(768, 864, drawBackLabel);
   const lateRedraw = [labelTex, backTex];
-  // as texturas usam Inter e JetBrains Mono: redesenha quando os pesos usados no canvas estiverem carregados
-  if (document.fonts) Promise.all([`200 400px Inter`, `500 42px Inter`, `600 26px Inter`, `700 48px Inter`, `700 50px Inter`, `700 34px Inter`, `500 26px Inter`, `700 42px Inter`, `500 30px Inter`, `600 24px "JetBrains Mono"`, `600 32px "JetBrains Mono"`, `600 20px "JetBrains Mono"`, `600 26px "JetBrains Mono"`, `600 18px "JetBrains Mono"`, `400 22px "JetBrains Mono"`, `500 22px "JetBrains Mono"`, `600 30px "JetBrains Mono"`].map(f => document.fonts.load(f)))
-    .catch(() => { }).then(() => lateRedraw.forEach(t => t.userData.redraw()));
+  if (!fontsLoaded) fontsReady.then(() => lateRedraw.forEach(t => t.userData.redraw()));
   const gradientTex = (w, h, draw) => canvasTex(w, h, draw);
   await idle();
 
@@ -348,6 +351,12 @@
   try {
     renderer = new THREE.WebGLRenderer({ canvas, antialias: true, alpha: false, powerPreference: 'high-performance' });
   } catch (err) { stage.classList.add('is-nogl'); return; }
+  // em produção não confere erros de shader: a conferência força a compilação a terminar na hora, travando a página
+  renderer.debug.checkShaderErrors = false;
+  // o líquido refrata o estúdio atrás dele (degradê, piso e sombra, tudo suave): a imagem que ele refrata pode ter metade
+  // da resolução, o que corta o passe extra de cada quadro a 1/4. Nesta versão do Three.js só esse passe lê o tamanho.
+  const drawingBufferSize = renderer.getDrawingBufferSize.bind(renderer);
+  renderer.getDrawingBufferSize = target => drawingBufferSize(target).multiplyScalar(0.5).floor();
   renderer.outputColorSpace = THREE.SRGBColorSpace;
   renderer.toneMapping = THREE.ACESFilmicToneMapping;
   renderer.toneMappingExposure = 1.0;
@@ -377,10 +386,12 @@
     panel(4, 12, 0x000000, 1, -9, 2, -1);    // black flag left
     panel(4, 12, 0x000000, 1, 9, 2, 2);      // black flag right
     panel(20, 4, 0x1a1815, 1, 0, -6, 0);     // dark floor
+    await idle();   // criar o contexto WebGL já foi uma tarefa longa: deixa a página respirar antes da próxima
     const pm = new THREE.PMREMGenerator(renderer);
     scene.environment = pm.fromScene(env, 0.02).texture;
     pm.dispose();
   }
+  await idle();
 
   /* lights */
   scene.add(new THREE.AmbientLight(0xfff4e6, 0.25));
@@ -606,8 +617,10 @@
       g.save(); g.translate(cx + rr2 * Math.cos(a), cy + rr2 * Math.sin(a)); g.rotate(a + PI / 2); g.fillText(ring[i], 0, 0); g.restore();
     }
   }
+  await idle();
   const stripTex = canvasTex(512, Math.round(512 * strip.total / STRIP_W), c => drawStrip(c, false));
   const stripOrm = canvasTex(256, Math.round(256 * strip.total / STRIP_W), c => drawStrip(c, true));
+  await idle();
   stripOrm.colorSpace = THREE.NoColorSpace;
   stripTex.anisotropy = maxAniso; lateRedraw.push(stripTex);
   const stripMat = new THREE.MeshPhysicalMaterial({
@@ -820,13 +833,25 @@
     }
   }
 
+  /* parada (sem rolar, arrastar nem mexer o ponteiro) e com a garrafa assentada, a cena é redesenhada a 30 quadros por
+     segundo: o que ainda se move (o balanço leve e as ondinhas do líquido) é lento, e a GPU trabalha pela metade */
+  let lastProg = -1, lastPx = 0, lastPy = 0, skipNext = false;
+  function calm() {
+    const p = mode === 'frame' ? progress() : 0;
+    const still = !dragging && p === lastProg && px === lastPx && py === lastPy;
+    lastProg = p; lastPx = px; lastPy = py;
+    return still && (mode !== 'frame' || Math.abs(p - pS) < 1e-4) && Math.abs(dyn.spinV) < 0.05 && Math.abs(dyn.leanV) < 0.02 && Math.abs(dragV) < 0.05
+      && Math.abs(tear - tearT) < 0.002 && Math.abs(px - pxS) + Math.abs(py - pyS) < 0.004;
+  }
   let last = performance.now(), wasVisible = false;
   function frame(now) {
+    if (!visible) { wasVisible = false; last = now; return; }     // fora da tela: nada de física nem de render
+    const quiet = wasVisible && calm();
+    if (quiet) { skipNext = !skipNext; if (skipNext) return; } else skipNext = false;
     const raw = (now - last) / 1000, dt = clamp(raw, 0.001, 0.05); last = now;
     const t = now / 1000;
-    if (!visible) { wasVisible = false; return; }     // fora da tela: nada de física nem de render
     if (!wasVisible) { wasVisible = true; prHold = 1; if (mode === 'frame') pS = progress(); }
-    else adaptResolution(raw);
+    else if (!quiet) adaptResolution(raw);
     if (mode === 'how') { howFrame(dt, t); return; }
     const p = progress(), pPrev = pS;
     pS += (p - pS) * (1 - Math.exp(-dt * 4.5));
@@ -888,24 +913,16 @@
     howScene.style.setProperty('--nfc-y', ((-tmp.y * 0.5 + 0.5) * H).toFixed(1) + 'px');
   }
 
-  /* fotos da garrafa renderizadas pela própria cena (usadas no jogo "qual delas é original?"):
-     bad = true só gira a tampa, rompendo o lacre (a bebida tem a mesma cor: por fora, as duas são idênticas).
-     Devolve uma Promise com a URL da imagem: o PNG é codificado fora da thread principal (toBlob). */
-  let glowPlane = null;
-  function renderBottle({ bad = false, w = 380, h = 760, bg = 0x030b1c } = {}) {
-    const prev = {
-      pr: renderer.getPixelRatio(), size: renderer.getSize(new THREE.Vector2()), bg: scene.background.clone(), bd: backdrop.visible,
-      rot: bottle.rotation.clone(), cap: capGroup.rotation.y, capY: capGroup.position.y, aspect: camera.aspect,
-      att: liquid.material.attenuationColor.clone(), rough: liquid.material.roughness, surf: surface.material.color.clone(),
-      tilt: liquidUniforms.uTilt.value.clone(), sym: liquidUniforms.uSym.value, rip: liquidUniforms.uRip.value, swirl: liquidUniforms.uSwirl.value,
-    };
-    renderer.setPixelRatio(2); renderer.setSize(w, h, false);
-    scene.background.set(bg); backdrop.visible = false; causticPivot.visible = false;
+  /* fotos da garrafa renderizadas pela própria cena: as do jogo "qual delas é original?" (fundo escuro) e as do card da
+     demonstração (fundo claro). bad = true só gira a tampa, rompendo o lacre (a bebida tem a mesma cor: por fora, as duas
+     são idênticas). Saem todas de uma vez, com um único redimensionamento do canvas (redimensionar é o que mais custava) e
+     no tamanho em que aparecem na página. Cada foto é copiada para um canvas 2D e o PNG é codificado fora da thread principal. */
+  const glowPlanes = {};
+  function glowFor(bg) {
     // uma luz de fundo atrás da garrafa: o líquido a refrata (e a cor da bebida aparece) e a borda some no fundo da seção
-    if (glowPlane && glowPlane.userData.bg !== bg) { scene.remove(glowPlane); glowPlane = null; }
-    if (!glowPlane) {
+    if (!glowPlanes[bg]) {
       const hex = '#' + new THREE.Color(bg).getHexString(), light = new THREE.Color(bg).getHSL({}).l > 0.5;
-      glowPlane = new THREE.Mesh(new THREE.PlaneGeometry(4.8, 8), new THREE.MeshBasicMaterial({
+      const plane = new THREE.Mesh(new THREE.PlaneGeometry(4.8, 8), new THREE.MeshBasicMaterial({
         toneMapped: false, map: canvasTex(256, 256, c => {
           const g = c.getContext('2d'), grd = g.createRadialGradient(128, 128, 0, 128, 128, 128);
           if (light) { grd.addColorStop(0, '#ffffff'); grd.addColorStop(0.5, '#ffffff'); grd.addColorStop(0.86, hex); grd.addColorStop(1, hex); }
@@ -913,27 +930,55 @@
           g.fillStyle = grd; g.fillRect(0, 0, 256, 256);
         })
       }));
-      glowPlane.position.set(0, 3.5, -6); glowPlane.userData.bg = bg; scene.add(glowPlane);
+      plane.position.set(0, 3.5, -6); plane.visible = false; scene.add(plane); glowPlanes[bg] = plane;
     }
-    glowPlane.visible = true;
-    bottle.rotation.set(0, 0.42, 0); capGroup.rotation.y = bad ? 0.8 : 0; capGroup.position.y = bad ? 0.05 : 0;
+    return glowPlanes[bg];
+  }
+  function renderBottles(list) {
+    const prev = {
+      pr: renderer.getPixelRatio(), size: renderer.getSize(new THREE.Vector2()), bg: scene.background.clone(), bd: backdrop.visible,
+      rot: bottle.rotation.clone(), cap: capGroup.rotation.y, capY: capGroup.position.y, aspect: camera.aspect,
+      tilt: liquidUniforms.uTilt.value.clone(), sym: liquidUniforms.uSym.value, rip: liquidUniforms.uRip.value, swirl: liquidUniforms.uSwirl.value,
+    };
+    const sizes = list.map(o => [Math.round(o.w * o.pr), Math.round(o.h * o.pr)]);
+    const bw = Math.max(...sizes.map(s => s[0])), bh = Math.max(...sizes.map(s => s[1]));
+    renderer.setDrawingBufferSize(bw, bh, 1);
+    backdrop.visible = false; causticPivot.visible = false;
+    bottle.rotation.set(0, 0.42, 0);
     liquidUniforms.uTilt.value.set(0, 0); liquidUniforms.uSym.value = 0; liquidUniforms.uRip.value = 0.0004; liquidUniforms.uSwirl.value = 0;
-    camera.clearViewOffset(); camera.aspect = w / h; camera.updateProjectionMatrix();
+    camera.clearViewOffset();
     const d = 13.4; camera.position.set(0, 2.98 + d * Math.sin(0.05), d * Math.cos(0.05)); camera.lookAt(0, 2.98, 0);
-    setCuts();
-    renderer.shadowMap.needsUpdate = true;
-    renderer.render(scene, camera);
-    // o toBlob copia o quadro na hora (antes do redimensionamento abaixo) e codifica depois, sem travar a página
-    const url = new Promise(res => renderer.domElement.toBlob(b => res(b ? URL.createObjectURL(b) : null), 'image/png'));
-    renderer.setPixelRatio(prev.pr); renderer.setSize(prev.size.x, prev.size.y, false);
+    const urls = list.map((o, i) => {
+      const [w, h] = sizes[i];
+      renderer.setViewport(0, 0, w, h);
+      scene.background.set(o.bg);
+      for (const k in glowPlanes) glowPlanes[k].visible = false;
+      glowFor(o.bg).visible = true;
+      capGroup.rotation.y = o.bad ? 0.8 : 0; capGroup.position.y = o.bad ? 0.05 : 0;
+      camera.aspect = w / h; camera.updateProjectionMatrix();
+      setCuts();
+      renderer.shadowMap.needsUpdate = true;
+      renderer.render(scene, camera);
+      // a foto fica no canto de baixo do buffer (no canvas, embaixo à esquerda): copia só essa região
+      const c = document.createElement('canvas'); c.width = w; c.height = h;
+      c.getContext('2d').drawImage(renderer.domElement, 0, bh - h, w, h, 0, 0, w, h);
+      return new Promise(res => c.toBlob(b => res(b ? URL.createObjectURL(b) : null), 'image/png'));
+    });
+    renderer.setDrawingBufferSize(prev.size.x, prev.size.y, prev.pr);
     shadowAt.y = 1e9;   // a próxima cena refaz a sombra na pose dela
-    scene.background.copy(prev.bg); backdrop.visible = prev.bd; causticPivot.visible = true; glowPlane.visible = false;
+    scene.background.copy(prev.bg); backdrop.visible = prev.bd; causticPivot.visible = true;
+    for (const k in glowPlanes) glowPlanes[k].visible = false;
     bottle.rotation.copy(prev.rot); capGroup.rotation.y = prev.cap; capGroup.position.y = prev.capY;
-    liquid.material.attenuationColor.copy(prev.att); liquid.material.roughness = prev.rough; surface.material.color.copy(prev.surf);
     liquidUniforms.uTilt.value.copy(prev.tilt); liquidUniforms.uSym.value = prev.sym; liquidUniforms.uRip.value = prev.rip; liquidUniforms.uSwirl.value = prev.swirl;
     camera.aspect = prev.aspect; camera.updateProjectionMatrix();
-    return url;
+    return Promise.all(urls);
   }
+  // as quatro fotos, feitas uma vez só (na primeira vez em que alguém pede) e compartilhadas pelo jogo e pela demonstração
+  let shots = null;
+  const bottleShots = () => shots || (shots = renderBottles([
+    { bad: false, w: 380, h: 760, pr: 1.5, bg: 0x030b1c }, { bad: true, w: 380, h: 760, pr: 1.5, bg: 0x030b1c },
+    { bad: false, w: 130, h: 260, pr: 2, bg: 0xf1f5fb }, { bad: true, w: 130, h: 260, pr: 2, bg: 0xf1f5fb },
+  ]).then(([gameOk, gameBad, howOk, howBad]) => ({ game: { ok: gameOk, bad: gameBad }, how: { ok: howOk, bad: howBad } })));
 
   /* ---------- boot ---------- */
   pS = progress();
@@ -971,7 +1016,14 @@
   const compiled = precompile().catch(err => console.warn('VeriSeal: pré-compilação', err));
   renderer.setAnimationLoop(frame);
   await compiled;
-  window.VeriSeal3D = { renderBottle };
+  // aquecimento fora da tela: um quadro completo compila o que a pré-compilação não alcança (sombra, refração) e aloca os
+  // alvos de renderização agora, para o primeiro quadro visível não travar a rolagem
+  await idle();
+  if (!visible) { renderer.shadowMap.needsUpdate = true; renderer.render(scene, camera); shadowAt.y = 1e9; }
+  window.VeriSeal3D = { bottleShots };
   await (document.fonts ? document.fonts.ready : Promise.resolve());
   dispatchEvent(new Event('veriseal:3d'));
+  // as fotos da garrafa ficam prontas num momento ocioso, antes de a pessoa chegar ao jogo e à demonstração
+  await idle();
+  bottleShots();
 })();

@@ -248,8 +248,7 @@ p {
   text-decoration: none;
   border: 1px solid transparent;
   cursor: pointer;
-  transition: background-color .25s, color .25s, border-color .25s, box-shadow .25s, transform .35s var(--spring);
-  will-change: transform
+  transition: background-color .25s, color .25s, border-color .25s, box-shadow .25s, transform .35s var(--spring)
 }
 
 .btn svg {
@@ -676,7 +675,8 @@ p {
   left: 0;
   top: 0;
   overflow: visible;
-  transform-origin: 0 0
+  transform-origin: 0 0;
+  will-change: transform
 }
 
 .loupe-view::after {

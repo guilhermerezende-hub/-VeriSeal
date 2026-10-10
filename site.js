@@ -338,11 +338,13 @@
       const gap = sw * (narrow ? 0.34 : 0.2);
       order.forEach((key, i) => { layers[key].style.transform = `translateZ(${((i - 1.5) * gap * k + i * 0.8).toFixed(1)}px)`; });
 
-      // reflexo e holograma respondem à inclinação
-      glare.style.setProperty('--gx', (50 + tiltY * 4).toFixed(1) + '%');
-      glare.style.setProperty('--gy', (30 - tiltX * 5).toFixed(1) + '%');
-      holoGrad.setAttribute('gradientTransform', `rotate(${(tiltY * 9 - tiltX * 6 + t * 6).toFixed(1)} 150 140)`);
-      holoShine.setAttribute('opacity', (0.35 + 0.3 * Math.abs(Math.sin(tiltY * 0.25 + t * 0.3))).toFixed(3));
+      // reflexo e holograma respondem à inclinação. Cada mudança repinta o lacre inteiro: parado, a cada dois quadros basta
+      if (!quiet || quietTick % 2 === 0) {
+        glare.style.setProperty('--gx', (50 + tiltY * 4).toFixed(1) + '%');
+        glare.style.setProperty('--gy', (30 - tiltX * 5).toFixed(1) + '%');
+        holoGrad.setAttribute('gradientTransform', `rotate(${(tiltY * 9 - tiltX * 6 + t * 6).toFixed(1)} 150 140)`);
+        holoShine.setAttribute('opacity', (0.35 + 0.3 * Math.abs(Math.sin(tiltY * 0.25 + t * 0.3))).toFixed(3));
+      }
 
       // lupa de raio-x
       const lo = (1 - sstep(0.02, 0.08, p)) * (1 - k);
@@ -464,7 +466,7 @@
       if (img3d || rendering) return;
       rendering = true;
       let ok = null, bad = null;
-      try { if (window.VeriSeal3D) [ok, bad] = await Promise.all([window.VeriSeal3D.renderBottle({ bad: false }), window.VeriSeal3D.renderBottle({ bad: true })]); } catch (e) { ok = null; }
+      try { if (window.VeriSeal3D) ({ ok, bad } = (await window.VeriSeal3D.bottleShots()).game); } catch (e) { ok = null; }
       rendering = false;
       if (ok && bad) img3d = true;
       else if (hasImg) return;   // o desenho em SVG já está lá
@@ -581,7 +583,7 @@
       if (shots3d || shooting) return;
       shooting = true;
       let ok = null, bad = null;
-      try { if (window.VeriSeal3D) [ok, bad] = await Promise.all([window.VeriSeal3D.renderBottle({ w: 260, h: 520, bg: 0xf1f5fb }), window.VeriSeal3D.renderBottle({ bad: true, w: 260, h: 520, bg: 0xf1f5fb })]); } catch (e) { ok = null; }
+      try { if (window.VeriSeal3D) ({ ok, bad } = (await window.VeriSeal3D.bottleShots()).how); } catch (e) { ok = null; }
       shooting = false;
       if (ok && bad) shots3d = true;
       else if (shots) return;
@@ -682,13 +684,14 @@
     }
     front.style.transform = 'translateZ(1px)';
     rig.appendChild(front); box.appendChild(rig);
-    let mx = 0, my = 0, rx = 8, ry = -24;
+    let mx = 0, my = 0, rx = 8, ry = -24, last = '';
     if (fine) box.parentElement.addEventListener('pointermove', e => { const r = box.getBoundingClientRect(); mx = clamp((e.clientX - r.left) / r.width * 2 - 1, -1, 1); my = clamp((e.clientY - r.top) / r.height * 2 - 1, -1, 1); });
     function update(y, dt) {
       const b = at['#storyMark'], p = clamp((y + vh - b.top) / (vh + b.bottom - b.top), 0, 1);
       const try_ = reduce ? -14 : lerp(-34, 30, p) + mx * 12, trx = reduce ? 6 : lerp(14, -8, p) + my * -8;
       ry = damp(ry, try_, 5, dt); rx = damp(rx, trx, 5, dt);
-      rig.style.setProperty('--sry', ry.toFixed(2) + 'deg'); rig.style.setProperty('--srx', rx.toFixed(2) + 'deg');
+      const tf = `rotateX(${rx.toFixed(2)}deg) rotateY(${ry.toFixed(2)}deg)`;
+      if (tf !== last) { rig.style.transform = tf; last = tf; }
     }
     return { update };
   })();
@@ -701,15 +704,17 @@
     $('.cs-front', box).innerHTML = printSVG('cs');
     $('.cs-back', box).innerHTML = adhesiveSVG('csb');
     const rig = $('.cs-rig', box), shadow = $('.cs-shadow', box);
-    let mx = 0, my = 0, ry = -24, rx = 16;
+    let mx = 0, my = 0, ry = -24, rx = 16, last = '';
     if (fine) $('#contato').addEventListener('pointermove', e => { mx = (e.clientX / vw) * 2 - 1; my = (e.clientY / vh) * 2 - 1; });
     function update(y, dt, t) {
       const b = at['#ctaSeal'], p = clamp((y + vh - b.top) / (vh + b.bottom - b.top), 0, 1);
       const try_ = reduce ? -12 : lerp(-38, 22, p) + mx * 14 + Math.sin(t * 0.6) * 3;
       const trx = reduce ? 12 : lerp(24, 6, p) - my * 8 + Math.sin(t * 0.8) * 2;
       ry = damp(ry, try_, 4, dt); rx = damp(rx, trx, 4, dt);
-      rig.style.setProperty('--cry', ry.toFixed(2) + 'deg'); rig.style.setProperty('--crx', rx.toFixed(2) + 'deg');
-      shadow.style.setProperty('--css', (0.8 + 0.2 * Math.cos(ry * Math.PI / 180)).toFixed(3));
+      const tf = `rotateX(${rx.toFixed(2)}deg) rotateY(${ry.toFixed(2)}deg) rotateZ(-4deg)`;
+      if (tf === last) return;
+      last = tf; rig.style.transform = tf;
+      shadow.style.transform = `scaleX(${(0.8 + 0.2 * Math.cos(ry * Math.PI / 180)).toFixed(3)})`;
     }
     return { update };
   })();
@@ -794,10 +799,19 @@
   /* ============================================================
      laço principal
      ============================================================ */
-  let lastT = performance.now();
+  let lastT = performance.now(), lastY = -1, lastInput = 0, skipNext = false, quiet = false, quietTick = 0;
+  ['pointermove', 'pointerdown', 'wheel', 'touchmove', 'keydown'].forEach(ev => addEventListener(ev, () => { lastInput = performance.now(); }, { passive: true }));
   function tick(now) {
+    const y = scrollY;
+    if (y !== lastY) { lastY = y; lastInput = now; }
+    // calmo (sem rolar nem mexer há 1 s): o que ainda anda sozinho (flutuação, hologramas, demonstração) anda a 30 quadros
+    // por segundo, que para esses movimentos lentos não muda nada na tela e corta o trabalho pela metade.
+    // O hero fica a 60: a lupa passeia sozinha e precisa de movimento contínuo (lá só o holograma vai a 30)
+    quiet = now - lastInput > 1000;
+    if (quiet) quietTick++;
+    if (quiet && !seqs[0].vis) { skipNext = !skipNext; if (skipNext) { requestAnimationFrame(tick); return; } } else skipNext = false;
     const dt = clamp((now - lastT) / 1000, 0.001, 0.05); lastT = now;
-    const t = now / 1000, y = scrollY;
+    const t = now / 1000;
     for (const s of seqs) {
       const vis = y + vh > s.top - 50 && y < s.top + s.h + 50;
       if (!vis && !s.vis) continue;
