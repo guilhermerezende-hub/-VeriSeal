@@ -485,7 +485,7 @@
   backLabel.position.set(0, 2.0, -(HW + 0.004)); backLabel.rotation.y = PI; bottle.add(backLabel);
 
   // tampa de rosca curta, azul-marinho quase preto, com frisos e um filete ciano acima da saia.
-  // Fica num grupo próprio: no modo "lacre violado" ela gira e sobe, levando junto a parte de cima do lacre.
+  // Fica num grupo próprio: no modo "lacre adulterado" ela gira e sobe, levando junto a parte de cima do lacre.
   const capGroup = new THREE.Group(); bottle.add(capGroup);
   const capBody = new THREE.Mesh(new THREE.LatheGeometry([V2(0, 5.22), V2(0.35, 5.22), V2(0.35, 5.575), V2(0.335, 5.61), V2(0.30, 5.62), V2(0, 5.62)], 128),
     new THREE.MeshPhysicalMaterial({ color: 0x07142e, roughness: 0.34, metalness: 0.1, clearcoat: 0.6, clearcoatRoughness: 0.2, envMapIntensity: 1.0 }));
@@ -617,7 +617,7 @@
     polygonOffset: true, polygonOffsetFactor: -2, polygonOffsetUnits: -2, // the strip always wins the depth tie against the cap it sits on
   });
   // o lacre é uma peça só, desenhada duas vezes com planos de corte na junção: a metade de cima vai com a tampa.
-  // Girar a tampa ("lacre violado") separa as metades na linha de ruptura.
+  // Girar a tampa ("lacre adulterado") separa as metades na linha de ruptura.
   // O corte é feito no próprio shader (e não com clippingPlanes) para o programa poder ser pré-compilado em segundo plano.
   const SPLIT_Y = 5.222;
   const clipTop = new THREE.Plane(), clipBot = new THREE.Plane();
@@ -860,7 +860,7 @@
     updateHud(pS);
   }
 
-  /* "Como funciona": close no gargalo, o lacre vira para o celular; site.js informa a etapa e o modo violado */
+  /* "Como funciona": close no gargalo, o lacre vira para o celular; site.js informa a etapa e o modo adulterado */
   function howFrame(dt, t) {
     const st = (window.VeriSeal && window.VeriSeal.how) || { step: 0, bad: false };
     tearT = st.bad ? 1 : 0;

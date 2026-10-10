@@ -533,15 +533,17 @@
   })();
 
   /* ============================================================
-     6 · COMO FUNCIONA — demonstração que roda sozinha quando aparece; etapas clicáveis, pausa e modo violado.
+     6 · COMO FUNCIONA — demonstração que roda sozinha quando aparece; etapas clicáveis, pausa e modo adulterado.
+     Não existe app: o celular lê o lacre, o sistema mostra uma notificação e ela abre a página de verificação no
+     navegador, já com o resultado (o selo gira e o símbolo se desenha).
      A garrafa é a cena 3D real (main.js lê window.VeriSeal.how para girar o lacre e romper a tampa).
      ============================================================ */
   const howState = { step: 0, bad: false };
   const how = (() => {
     const scene = $('#howScene'), steps = $$('#steps li'), stepBtns = $$('#steps button');
-    const scrRead = $('.ap-read', scene), scrOk = $('.ap-ok', scene), scrBad = $('.ap-bad', scene), apChecks = $$('.ap-checks li', scene);
+    const resOk = $('.wb-ok', scene), resBad = $('.wb-bad', scene);
     const seg = $('#como-funciona .seg'), segBtns = $$('button', seg), playBtn = $('#howPlay');
-    const DUR = [1.8, 1.1, 3.2];   // aproxima (o app abre sozinho), lê em ~1 s, mostra o resultado
+    const DUR = [1.8, 1.3, 3.6];   // aproxima e chega a notificação, toque nela, a página abre no resultado
     let local = 0, playing = !reduce, inView = false, started = false;
     function render() {
       const st = howState.step;
@@ -551,11 +553,10 @@
         li.style.setProperty('--sp', i < st ? 1 : i === st ? clamp(local, 0, 1).toFixed(3) : 0);
         stepBtns[i].setAttribute('aria-current', i === st ? 'step' : 'false');
       });
-      scene.classList.toggle('ph-detect', started && st === 0 && local > 0.62);
-      scene.classList.toggle('ph-open', started && st >= 1);
-      scrRead.classList.toggle('is-on', st === 1);
-      scrOk.classList.toggle('is-on', st === 2 && !howState.bad); scrBad.classList.toggle('is-on', st === 2 && howState.bad);
-      apChecks.forEach(c => c.classList.toggle('is-on', st > 1 || (st === 1 && local >= +c.dataset.at)));
+      scene.classList.toggle('ph-detect', started && ((st === 0 && local > 0.62) || st === 1));
+      scene.classList.toggle('ph-tapped', started && st === 1 && local > 0.4);
+      scene.classList.toggle('ph-open', started && st === 2);
+      resOk.classList.toggle('is-on', st === 2 && !howState.bad); resBad.classList.toggle('is-on', st === 2 && howState.bad);
       scene.classList.toggle('is-reading', started && ((st === 0 && local > 0.5) || st === 1));
     }
     function go(i) { howState.step = i; local = 0; render(); }
@@ -586,7 +587,7 @@
       else if (shots) return;
       else { ok = game.fallback(false); bad = game.fallback(true); }
       shots = true;
-      $$('.ap-bottle', scene).forEach(img => { img.src = img.classList.contains('bad') ? bad : ok; });
+      $$('.wb-bottle', scene).forEach(img => { img.src = img.classList.contains('bad') ? bad : ok; });
     };
     let near3d = false, ready3d = !!window.VeriSeal3D;
     addEventListener('veriseal:3d', () => { ready3d = true; if (near3d) takeShots(); });
