@@ -469,8 +469,19 @@
                   </svg>
 
                   <div class="wb-res wb-ok">
-                    <div class="wb-badge"><svg viewBox="0 0 52 52">
-                        <path d="M15 27.5l7.5 7.5L37.5 19.5" pathLength="1" />
+                    <div class="wb-badge"><svg viewBox="0 0 100 100">
+                        <defs>
+                          <radialGradient id="wbg-ok" gradientUnits="userSpaceOnUse" cx="50" cy="30" r="86">
+                            <stop offset="0" stop-color="#45e083" />
+                            <stop offset=".72" stop-color="#14a64a" />
+                          </radialGradient>
+                        </defs>
+                        <circle class="wb-glow" cx="50" cy="50" r="52.94" />
+                        <circle class="wb-track" cx="50" cy="50" r="50" />
+                        <circle class="wb-fill" cx="50" cy="50" r="50" fill="url(#wbg-ok)" />
+                        <path class="wb-ring" d="M50 1.2a48.8 48.8 0 1 1 0 97.6a48.8 48.8 0 1 1 0-97.6" pathLength="1" />
+                        <path class="wb-mark" d="M15 27.5l7.5 7.5L37.5 19.5" transform="translate(22 22) scale(1.0769)"
+                          pathLength="1" />
                       </svg></div>
                     <p class="wb-title">Autêntico</p>
                     <p class="wb-sub">Lacre íntegro · nunca aberto</p>
@@ -491,8 +502,20 @@
                   </div>
 
                   <div class="wb-res wb-bad">
-                    <div class="wb-badge"><svg viewBox="0 0 52 52">
-                        <path d="M26 14.5v15M26 37v.5" pathLength="1" />
+                    <div class="wb-badge"><svg viewBox="0 0 100 100">
+                        <defs>
+                          <radialGradient id="wbg-bad" gradientUnits="userSpaceOnUse" cx="50" cy="30" r="86">
+                            <stop offset="0" stop-color="#ff7166" />
+                            <stop offset=".72" stop-color="#d93025" />
+                          </radialGradient>
+                        </defs>
+                        <circle class="wb-glow" cx="50" cy="50" r="52.94" />
+                        <circle class="wb-track" cx="50" cy="50" r="50" />
+                        <circle class="wb-fill" cx="50" cy="50" r="50" fill="url(#wbg-bad)" />
+                        <path class="wb-ring" d="M50 1.2a48.8 48.8 0 1 1 0 97.6a48.8 48.8 0 1 1 0-97.6" pathLength="1" />
+                        <path class="wb-mark" d="M26 14.5v15" transform="translate(22 22) scale(1.0769)" pathLength="1" />
+                        <path class="wb-mark wb-dot" d="M26 37v.5" transform="translate(22 22) scale(1.0769)"
+                          pathLength="1" />
                       </svg></div>
                     <p class="wb-title">Adulterado</p>
                     <p class="wb-sub">Esta garrafa já foi aberta</p>

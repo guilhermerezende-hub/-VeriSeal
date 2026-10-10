@@ -535,7 +535,7 @@
   /* ============================================================
      6 · COMO FUNCIONA — demonstração que roda sozinha quando aparece; etapas clicáveis, pausa e modo adulterado.
      Não existe app: o celular lê o lacre, o sistema mostra uma notificação e ela abre a página de verificação no
-     navegador, já com o resultado (o selo gira e o símbolo se desenha).
+     navegador, já com o resultado (o traço contorna o círculo, a cor surge dentro dele e o símbolo se desenha).
      A garrafa é a cena 3D real (main.js lê window.VeriSeal.how para girar o lacre e romper a tampa).
      ============================================================ */
   const howState = { step: 0, bad: false };

@@ -11,8 +11,8 @@
     href="https://fonts.googleapis.com/css2?family=Inter:wght@400..800&family=JetBrains+Mono:wght@500;600&display=swap">
   <!--
     Telas de resultado da verificação VeriSeal: Autêntico e Adulterado.
-    Arquivo independente (HTML + CSS + JS, sem dependências). A única animação é o giro do selo:
-    ele gira como uma moeda e, quando para de frente, o símbolo se desenha.
+    Arquivo independente (HTML + CSS + JS, sem dependências). A única animação é a do selo, que não se move:
+    o traço contorna o círculo, a cor surge de dentro para fora e o símbolo se desenha no centro.
     Abra com #autentico ou #adulterado no fim do endereço para ver só uma das telas.
   -->
   <style>
@@ -25,7 +25,7 @@
       --font: -apple-system, BlinkMacSystemFont, "SF Pro Text", "Inter", "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
       --mono: ui-monospace, "SF Mono", "JetBrains Mono", Menlo, Consolas, monospace;
       --ease-io: cubic-bezier(.65, 0, .35, 1);
-      --spin: cubic-bezier(.2, .75, .25, 1)
+      --grow: cubic-bezier(.3, .7, .4, 1)
     }
 
     *,
@@ -116,77 +116,120 @@
       text-align: center
     }
 
-    /* selo do resultado */
+    /* selo do resultado: não se move. O círculo claro já está ali; o traço dá uma volta nele,
+       a cor surge de dentro para fora e o símbolo se desenha no centro */
     .wb-badge {
+      --tone: 20, 166, 74;
+      position: relative;
       flex: none;
-      display: grid;
-      place-items: center;
       width: 34cqi;
-      height: 34cqi;
-      border-radius: 50%;
-      background: radial-gradient(circle at 50% 30%, #45e083, #14a64a 72%);
-      box-shadow: 0 0 0 2cqi rgba(20, 166, 74, .13), 0 3cqi 7cqi rgba(20, 166, 74, .3)
+      height: 34cqi
     }
 
     .bad .wb-badge {
-      background: radial-gradient(circle at 50% 30%, #ff7166, #d93025 72%);
-      box-shadow: 0 0 0 2cqi rgba(217, 48, 37, .13), 0 3cqi 7cqi rgba(217, 48, 37, .3)
+      --tone: 217, 48, 37
     }
 
+    /* sombra suave embaixo */
+    .wb-badge::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      border-radius: 50%;
+      box-shadow: 0 3cqi 7cqi rgba(var(--tone), .3)
+    }
+
+    /* os círculos são SVG: uma caixa HTML de 34cqi arredonda para o pixel e o círculo sairia achatado */
     .wb-badge svg {
-      width: 56%;
-      height: 56%
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      overflow: visible
+    }
+
+    .wb-glow {
+      fill: none;
+      stroke: rgba(var(--tone), .13);
+      stroke-width: 5.88
+    }
+
+    .wb-track {
+      fill: rgba(var(--tone), .1)
+    }
+
+    .wb-fill {
+      transform-box: fill-box;
+      transform-origin: center
     }
 
     .wb-badge path {
       fill: none;
-      stroke: #fff;
-      stroke-width: 5;
       stroke-linecap: round;
       stroke-linejoin: round;
-      stroke-dasharray: 1;
-      stroke-dashoffset: 1
+      stroke-dasharray: 1 2
     }
 
-    /* o giro: duas voltas como uma moeda, desacelerando até parar de frente; depois o símbolo se desenha */
-    .is-on .wb-badge {
-      animation: badgeSpin 1.1s var(--spin) .3s both
+    .wb-ring {
+      stroke: rgb(var(--tone));
+      stroke-width: 2.4
     }
 
-    .is-on .wb-badge path {
-      animation: badgeDraw .35s var(--ease-io) 1.25s forwards
+    .wb-mark {
+      stroke: #fff;
+      stroke-width: 5
     }
 
-    @keyframes badgeSpin {
+    .is-on .wb-ring {
+      animation: strokeIn .7s var(--ease-io) .3s both
+    }
+
+    .is-on .wb-fill {
+      animation: fillIn .4s var(--grow) .85s both
+    }
+
+    .is-on .wb-glow,
+    .is-on .wb-badge::before {
+      animation: glowIn .4s ease .95s both
+    }
+
+    .is-on .wb-mark {
+      animation: strokeIn .35s var(--ease-io) 1.15s both
+    }
+
+    /* o ponto do "!" aparece quando o traço termina */
+    .is-on .wb-dot {
+      animation-duration: .1s;
+      animation-delay: 1.45s
+    }
+
+    /* 1.05 (e não 1): com ponta redonda, um traço de comprimento zero no início apareceria como um ponto */
+    @keyframes strokeIn {
       from {
-        transform: perspective(500px) rotateY(-720deg) scale(.5);
-        opacity: 0
-      }
-
-      25% {
-        opacity: 1
-      }
-
-      to {
-        transform: perspective(500px) rotateY(0) scale(1);
-        opacity: 1
+        stroke-dashoffset: 1.05
       }
     }
 
-    @keyframes badgeDraw {
-      to {
-        stroke-dashoffset: 0
+    @keyframes fillIn {
+      from {
+        transform: scale(0)
+      }
+    }
+
+    @keyframes glowIn {
+      from {
+        opacity: 0
       }
     }
 
     @media (prefers-reduced-motion: reduce) {
-      .is-on .wb-badge {
-        animation: none
-      }
 
-      .is-on .wb-badge path {
-        animation: none;
-        stroke-dashoffset: 0
+      .is-on .wb-ring,
+      .is-on .wb-fill,
+      .is-on .wb-glow,
+      .is-on .wb-mark,
+      .is-on .wb-badge::before {
+        animation: none
       }
     }
 
@@ -351,8 +394,19 @@
         <use href="#vs-wordmark" />
       </svg>
       <div class="wb-res">
-        <div class="wb-badge" aria-hidden="true"><svg viewBox="0 0 52 52">
-            <path d="M15 27.5l7.5 7.5L37.5 19.5" pathLength="1" />
+        <div class="wb-badge" aria-hidden="true"><svg viewBox="0 0 100 100">
+            <defs>
+              <radialGradient id="wbg-ok" gradientUnits="userSpaceOnUse" cx="50" cy="30" r="86">
+                <stop offset="0" stop-color="#45e083" />
+                <stop offset=".72" stop-color="#14a64a" />
+              </radialGradient>
+            </defs>
+            <circle class="wb-glow" cx="50" cy="50" r="52.94" />
+            <circle class="wb-track" cx="50" cy="50" r="50" />
+            <circle class="wb-fill" cx="50" cy="50" r="50" fill="url(#wbg-ok)" />
+            <path class="wb-ring" d="M50 1.2a48.8 48.8 0 1 1 0 97.6a48.8 48.8 0 1 1 0-97.6" pathLength="1" />
+            <path class="wb-mark" d="M15 27.5l7.5 7.5L37.5 19.5" transform="translate(22 22) scale(1.0769)"
+              pathLength="1" />
           </svg></div>
         <h2 class="wb-title">Autêntico</h2>
         <p class="wb-sub">Lacre íntegro · nunca aberto</p>
@@ -379,8 +433,19 @@
         <use href="#vs-wordmark" />
       </svg>
       <div class="wb-res">
-        <div class="wb-badge" aria-hidden="true"><svg viewBox="0 0 52 52">
-            <path d="M26 14.5v15M26 37v.5" pathLength="1" />
+        <div class="wb-badge" aria-hidden="true"><svg viewBox="0 0 100 100">
+            <defs>
+              <radialGradient id="wbg-bad" gradientUnits="userSpaceOnUse" cx="50" cy="30" r="86">
+                <stop offset="0" stop-color="#ff7166" />
+                <stop offset=".72" stop-color="#d93025" />
+              </radialGradient>
+            </defs>
+            <circle class="wb-glow" cx="50" cy="50" r="52.94" />
+            <circle class="wb-track" cx="50" cy="50" r="50" />
+            <circle class="wb-fill" cx="50" cy="50" r="50" fill="url(#wbg-bad)" />
+            <path class="wb-ring" d="M50 1.2a48.8 48.8 0 1 1 0 97.6a48.8 48.8 0 1 1 0-97.6" pathLength="1" />
+            <path class="wb-mark" d="M26 14.5v15" transform="translate(22 22) scale(1.0769)" pathLength="1" />
+            <path class="wb-mark wb-dot" d="M26 37v.5" transform="translate(22 22) scale(1.0769)" pathLength="1" />
           </svg></div>
         <h2 class="wb-title">Adulterado</h2>
         <p class="wb-sub">Esta garrafa já foi aberta</p>
@@ -398,7 +463,6 @@
           </div>
         </dl>
         <p class="wb-note">Desconfie da procedência e fale com o vendedor.</p>
-        <button class="wb-btn" type="button">Avisar a marca</button>
       </div>
     </section>
   </main>
@@ -413,7 +477,7 @@
       const screens = [...document.querySelectorAll('.screen')];
       // #autentico ou #adulterado no endereço mostra só uma das telas
       const filter = () => { const only = location.hash.slice(1); screens.forEach(s => { s.hidden = !!only && screens.some(x => x.id === only) && s.id !== only; }); };
-      // reinicia o giro: tira a classe, força o recálculo e devolve
+      // reinicia a animação: tira a classe, força o recálculo e devolve
       const replay = () => screens.forEach(s => { s.classList.remove('is-on'); void s.offsetWidth; s.classList.add('is-on'); });
       filter();
       addEventListener('hashchange', () => { filter(); replay(); });
