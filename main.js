@@ -17,10 +17,12 @@
     const s = w / L.w; g.save(); g.translate(x, y); g.scale(s, s);
     g.fillStyle = ink; g.fill(L.ink); g.fillStyle = acc; g.fill(L.acc); g.restore();
   }
-  // símbolo de aproximação: quatro arcos abrindo para a direita
-  function drawContactless(g, x, y, size, color, width) {
-    g.save(); g.strokeStyle = color; g.lineWidth = width; g.lineCap = 'round';
-    [0.22, 0.47, 0.72, 0.97].forEach(f => { g.beginPath(); g.arc(x, y, size * f * 0.62, -0.9, 0.9); g.stroke(); });
+  // símbolo de aproximação, o mesmo do lacre em site.js: quatro arcos de um mesmo centro, cada um mais aberto.
+  // (x, y) é o centro do desenho e h a altura; os arcos abrem para a direita
+  function drawContactless(g, x, y, h, color) {
+    const ro = h / 1.052, cx = x - 0.684 * ro;
+    g.save(); g.strokeStyle = color; g.lineWidth = 0.11 * ro; g.lineCap = 'round';
+    [[0.396, 21.7], [0.597, 24.8], [0.799, 26.9], [1, 28.1]].forEach(([k, deg]) => { const a = deg * Math.PI / 180; g.beginPath(); g.arc(cx, y, ro * k, -a, a); g.stroke(); });
     g.restore();
   }
   const SANS = 'Inter, "Segoe UI", Roboto, sans-serif', MONO = '"JetBrains Mono", Consolas, monospace';
@@ -311,9 +313,9 @@
     ls('16px'); g.font = `700 34px ${SANS}`; g.fillText('PRODUTO ORIGINAL', 508, 1068);
     // chamada: símbolo + frase numa linha só
     ls('3px'); g.font = `500 26px ${SANS}`; g.fillStyle = 'rgba(255,255,255,.88)';
-    const t = 'Aproxime o celular do lacre', tw = g.measureText(t).width, gx = 500 - (tw + 74) / 2;
-    drawContactless(g, gx + 10, 1192, 96, '#ffffff', 7);
-    g.textAlign = 'left'; g.fillText(t, gx + 74, 1201);
+    const t = 'Aproxime o celular do lacre', tw = g.measureText(t).width, sw = 62, gx = 500 - (sw + 18 + tw) / 2;
+    drawContactless(g, gx + sw / 2, 1192, sw / 0.705, '#ffffff');
+    g.textAlign = 'left'; g.fillText(t, gx + sw + 18, 1201);
     g.textAlign = 'center'; g.fillStyle = 'rgba(255,255,255,.55)'; g.fillRect(380, 1290, 240, 1.5);
     ls('8px'); g.font = `600 32px ${MONO}`; g.fillStyle = 'rgba(255,255,255,.9)'; g.fillText('Nº A7F3K9B21', 504, 1392);
     ls('0px');
@@ -327,7 +329,7 @@
     capsTitle(g, 'COMO VERIFICAR', 400, 262, 20, 8, 'rgba(255,255,255,.8)');
     g.textAlign = 'center'; g.textBaseline = 'alphabetic'; g.fillStyle = '#ffffff'; ls('0px'); g.font = `700 42px ${SANS}`;
     g.fillText('Esta garrafa tem', 400, 360); g.fillText('identidade digital.', 400, 410);
-    drawContactless(g, 372, 535, 160, '#03adf9', 11);
+    drawContactless(g, 400, 535, 150, '#03adf9');
     g.font = `500 30px ${SANS}`; g.fillStyle = 'rgba(255,255,255,.86)';
     g.fillText('Aproxime o celular do lacre', 400, 670); g.fillText('para confirmar a autenticidade.', 400, 712);
     g.fillStyle = 'rgba(255,255,255,.5)'; g.fillRect(300, 760, 200, 1.5);
@@ -552,7 +554,8 @@
     return { geometry: g, total, neck: neckLen };
   }
   const strip = buildStrip();
-  // a arte do lacre: azul-marinho com guilhoché, logo VeriSeal no gargalo, holograma com o monograma no topo da tampa.
+  // a arte do lacre, a mesma do lacre do topo da página (site.js), agora de pé: holograma com o monograma no topo da
+  // tampa, a logo VeriSeal deitada na lateral da tampa e, no gargalo, o símbolo de aproximação com "Aproxime o celular".
   // A metade da frente é desenhada uma vez e girada 180° para a metade de trás (lê-se direito pelos dois lados).
   const stripLen = len => len; // comprimentos em unidades da cena ao longo da tira
   function drawStrip(c, orm) {
@@ -581,19 +584,17 @@
       // linha de ruptura (picote) exatamente na junção
       g.save(); g.setLineDash([12 * k, 12 * k]); g.strokeStyle = 'rgba(255,255,255,.75)'; g.lineWidth = 3 * k;
       g.beginPath(); g.moveTo(40 * k, yN + 14 * k); g.lineTo(W - 40 * k, yN + 14 * k); g.stroke(); g.restore();
-      drawLogo(g, WM, W / 2 - 200 * k, yN + 64 * k, 400 * k, '#ffffff', '#03adf9');
-      g.fillStyle = '#03adf9'; g.fillRect(W / 2 - 40 * k, yN + 166 * k, 80 * k, 4 * k);
-      drawContactless(g, W / 2 - 58 * k, yN + 300 * k, 210 * k, '#ffffff', 13 * k);
-      g.fillStyle = '#fff'; ls(`${4 * k}px`); g.font = `700 ${46 * k}px ${SANS}`;
-      g.fillText('APROXIME O', W / 2, yN + 468 * k); g.fillText('CELULAR', W / 2, yN + 522 * k);
-      g.fillStyle = 'rgba(255,255,255,.62)'; ls(`${6 * k}px`); g.font = `500 ${24 * k}px ${MONO}`; g.fillText('Nº DE SÉRIE', W / 2, yN + 618 * k);
-      g.fillStyle = '#fff'; ls(`${5 * k}px`); g.font = `600 ${52 * k}px ${MONO}`; g.fillText('A7F3K9B21', W / 2, yN + 676 * k);
-      // lateral da tampa
-      const ys = yN - sidePx / 2;
-      g.fillStyle = '#03adf9'; g.fillRect(W / 2 - 30 * k, ys - 98 * k, 60 * k, 4 * k); g.fillRect(W / 2 - 30 * k, ys + 94 * k, 60 * k, 4 * k);
-      g.fillStyle = '#fff'; ls(`${8 * k}px`); g.font = `700 ${44 * k}px ${SANS}`;
-      g.fillText('PRODUTO', W / 2, ys - 28 * k); g.fillText('ORIGINAL', W / 2, ys + 28 * k);
-      ls('0px');
+      // lateral da tampa: a logo deitada, lida de cima para baixo
+      const lw = Math.min(sidePx - 90 * k, 560 * k);
+      g.save(); g.translate(W / 2, yN - sidePx / 2); g.rotate(PI / 2);
+      drawLogo(g, WM, -lw / 2, -lw * WM.h / WM.w / 2, lw, '#ffffff', '#03adf9');
+      g.restore();
+      // gargalo: símbolo de aproximação e chamada, de pé (as mesmas proporções do lacre do topo da página)
+      const yc = yN + CTA_PX * k;
+      drawContactless(g, W / 2, yc, 234 * k, '#ffffff');
+      g.save(); g.textBaseline = 'alphabetic'; g.fillStyle = '#fff'; ls(`${1.3 * k}px`); g.font = `700 ${62 * k}px ${SANS}`;
+      g.fillText('APROXIME', W / 2, yc + 214 * k); g.fillText('O CELULAR', W / 2, yc + 289 * k);
+      ls('0px'); g.restore();
     };
     half();
     g.save(); g.translate(W / 2, H / 2); g.rotate(PI); g.translate(-W / 2, -H / 2); half(); g.restore();

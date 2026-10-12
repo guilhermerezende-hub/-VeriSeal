@@ -869,6 +869,12 @@ p {
   animation: chipPop .5s var(--spring) 1s both
 }
 
+/* os arcos do símbolo de aproximação acendem um a um, como uma onda saindo do lacre */
+.is-intro .seal .cl-arc {
+  animation: fadeIn .5s ease both;
+  animation-delay: calc(2.45s + var(--k, 0) * .14s)
+}
+
 .is-intro .loupe {
   animation: loupeIn .8s var(--spring) 2.55s both
 }
@@ -4560,7 +4566,7 @@ p {
   }
 
   .callout[data-cal="nfc"],
-  .callout[data-cal="code"] {
+  .callout[data-cal="cta"] {
     bottom: 116px
   }
 }

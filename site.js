@@ -20,9 +20,16 @@
 
   /* ============================================================
      O LACRE EM SVG — gerado aqui para ser reutilizado nas camadas, na lupa e no lacre 3D da chamada final
-     espaço de desenho 1000 x 280; a linha de ruptura fica em x = 655
+     espaço de desenho 1000 x 280; a linha de ruptura fica em x = 655.
+     Na garrafa o lacre fica de pé, com a ponta do holograma em cima: o holograma e a ponta de baixo (símbolo de
+     aproximação e chamada) são desenhados de pé para quem olha a garrafa, ou seja, girados 90° aqui.
+     A logo VeriSeal corre deitada ao longo da tira.
      ============================================================ */
   const SW = 1000, SH = 280, R = 24, NX = 655;
+  const HX = 142, HY = 140, HR = 94;                                   // holograma
+  const WMW = 344, WMH = WMW * 161 / 977, WMX = 435 - WMW / 2, WMY = SH / 2 - WMH / 2;   // logo VeriSeal
+  const CTA_V = 781;                                                   // centro do símbolo de aproximação, ao longo da tira
+  const UPRIGHT = `translate(0 ${SH}) rotate(-90)`;                    // (u atravessando a tira, v ao longo dela) → de pé na garrafa
   const OUTLINE = `M${R} 0H${NX - 11}L${NX} 13L${NX + 11} 0H${SW - R}A${R} ${R} 0 0 1 ${SW} ${R}V${SH - R}A${R} ${R} 0 0 1 ${SW - R} ${SH}H${NX + 11}L${NX} ${SH - 13}L${NX - 11} ${SH}H${R}A${R} ${R} 0 0 1 0 ${SH - R}V${R}A${R} ${R} 0 0 1 ${R} 0Z`;
   const SANS = `Inter, -apple-system, 'Segoe UI', Roboto, sans-serif`;
   const MONO = `'JetBrains Mono', ui-monospace, Menlo, Consolas, monospace`;
@@ -50,14 +57,15 @@
     }
     return d;
   }
-  // símbolo de aproximação (quatro arcos)
-  function contactless(x, y, s, stroke, w) {
-    let d = '';
-    [0.22, 0.47, 0.72, 0.97].forEach(f => {
-      const r = s * f * 0.62, a = 52 * Math.PI / 180;
-      d += `M${(x + r * Math.cos(-a)).toFixed(1)} ${(y + r * Math.sin(-a)).toFixed(1)}A${r.toFixed(1)} ${r.toFixed(1)} 0 0 1 ${(x + r * Math.cos(a)).toFixed(1)} ${(y + r * Math.sin(a)).toFixed(1)}`;
-    });
-    return `<path d="${d}" fill="none" stroke="${stroke}" stroke-width="${w}" stroke-linecap="round"/>`;
+  // símbolo de aproximação, como o dos cartões por aproximação: quatro arcos de um mesmo centro, cada um mais aberto.
+  // (x, y) é o centro do desenho e h a altura; os arcos abrem para a direita
+  function contactless(x, y, h, stroke) {
+    const ro = h / 1.052, cx = x - 0.684 * ro;
+    const arcs = [[0.396, 21.7], [0.597, 24.8], [0.799, 26.9], [1, 28.1]].map(([k, deg], i) => {
+      const r = ro * k, a = deg * Math.PI / 180, ax = (cx + r * Math.cos(a)).toFixed(1);
+      return `<path class="cl-arc" style="--k:${i}" d="M${ax} ${(y - r * Math.sin(a)).toFixed(1)}A${r.toFixed(1)} ${r.toFixed(1)} 0 0 1 ${ax} ${(y + r * Math.sin(a)).toFixed(1)}"/>`;
+    }).join('');
+    return `<g fill="none" stroke="${stroke}" stroke-width="${(0.11 * ro).toFixed(1)}" stroke-linecap="round">${arcs}</g>`;
   }
   // antena: espiral retangular em volta da zona do celular
   function spiral(x0, y0, x1, y1, n, p) {
@@ -102,41 +110,38 @@
       <defs>
         <clipPath id="${id}-clip"><path d="${OUTLINE}"/></clipPath>
         <linearGradient id="${id}-navy" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#0d3a80"/><stop offset=".45" stop-color="#062a63"/><stop offset="1" stop-color="#021a42"/></linearGradient>
-        <linearGradient id="${id}-holo" class="holo-grad" gradientUnits="userSpaceOnUse" x1="56" y1="46" x2="244" y2="234">
+        <linearGradient id="${id}-holo" class="holo-grad" gradientUnits="userSpaceOnUse" x1="${HX - HR}" y1="${HY - HR}" x2="${HX + HR}" y2="${HY + HR}">
           <stop offset="0" stop-color="#8fe3ff"/><stop offset=".18" stop-color="#b9a9ff"/><stop offset=".36" stop-color="#ffc4e5"/><stop offset=".52" stop-color="#fff1b0"/><stop offset=".7" stop-color="#b3ffd8"/><stop offset=".86" stop-color="#8fe3ff"/><stop offset="1" stop-color="#c8b8ff"/>
         </linearGradient>
         <radialGradient id="${id}-shine" cx=".35" cy=".3" r=".7"><stop offset="0" stop-color="#fff" stop-opacity=".85"/><stop offset=".35" stop-color="#fff" stop-opacity=".1"/><stop offset="1" stop-color="#fff" stop-opacity="0"/></radialGradient>
-        <path id="${id}-ring" d="M150 140m-80 0a80 80 0 1 1 160 0a80 80 0 1 1-160 0"/>
+        <path id="${id}-ring" d="M${HX} ${HY}m-80 0a80 80 0 1 1 160 0a80 80 0 1 1-160 0"/>
       </defs>
       <g clip-path="url(#${id}-clip)">
         <rect width="${SW}" height="${SH}" fill="url(#${id}-navy)"/>
         <path d="${guilloche(14, 108, .0115, .0042, 0)}" fill="none" stroke="#5fd0ff" stroke-opacity=".1" stroke-width="1"/>
         <path d="${guilloche(10, 70, .019, .006, 1.3)}" fill="none" stroke="#9fb5ff" stroke-opacity=".08" stroke-width="1"/>
-        <text x="30" y="266" font-family="${MONO}" font-size="7" letter-spacing="1.2" fill="#fff" fill-opacity=".28">${'VERISEAL · ORIGINAL · '.repeat(12)}</text>
       </g>
       <path d="${OUTLINE}" fill="none" stroke="#fff" stroke-opacity=".16" stroke-width="2"/>
       <rect x="12" y="12" width="976" height="256" rx="15" fill="none" stroke="#03adf9" stroke-opacity=".38" stroke-width="1.2"/>
       <g class="holo">
-        <circle cx="150" cy="140" r="94" fill="url(#${id}-holo)"/>
-        <path d="${rosette(150, 140, 50, 20, 7, 8)}" fill="none" stroke="#fff" stroke-opacity=".38" stroke-width=".8"/>
-        <circle class="holo-shine" cx="150" cy="140" r="94" fill="url(#${id}-shine)" opacity=".5"/>
-        <circle cx="150" cy="140" r="94" fill="none" stroke="#fff" stroke-opacity=".7" stroke-width="1.5"/>
-        <text font-family="${MONO}" font-size="10.5" font-weight="600" letter-spacing="2.1" fill="#062a63" fill-opacity=".72"><textPath href="#${id}-ring">VERISEAL • PRODUTO ORIGINAL • VERISEAL • PRODUTO ORIGINAL •</textPath></text>
-        <use href="#vs-mark" x="104" y="115" width="92" height="49.4" style="--lg-ink:#062a63;--lg-accent:#0a76c4"/>
+        <circle cx="${HX}" cy="${HY}" r="${HR}" fill="url(#${id}-holo)"/>
+        <path d="${rosette(HX, HY, 50, 20, 7, 8)}" fill="none" stroke="#fff" stroke-opacity=".38" stroke-width=".8"/>
+        <circle class="holo-shine" cx="${HX}" cy="${HY}" r="${HR}" fill="url(#${id}-shine)" opacity=".5"/>
+        <circle cx="${HX}" cy="${HY}" r="${HR}" fill="none" stroke="#fff" stroke-opacity=".7" stroke-width="1.5"/>
+        <g transform="rotate(-90 ${HX} ${HY})">
+          <text font-family="${MONO}" font-size="10.5" font-weight="600" letter-spacing="2.1" fill="#062a63" fill-opacity=".72"><textPath href="#${id}-ring">VERISEAL • PRODUTO ORIGINAL • VERISEAL • PRODUTO ORIGINAL •</textPath></text>
+          <use href="#vs-mark" x="${HX - 46}" y="${HY - 24.7}" width="92" height="49.4" style="--lg-ink:#062a63;--lg-accent:#0a76c4"/>
+        </g>
       </g>
-      <use href="#vs-wordmark" x="290" y="74" width="330" height="54.4" style="--lg-ink:#fff;--lg-accent:#03adf9"/>
-      <rect x="290" y="156" width="40" height="2.5" rx="1" fill="#03adf9"/>
-      <text x="290" y="193" font-family="${MONO}" font-size="15" font-weight="500" letter-spacing="3.2" fill="#fff" fill-opacity=".8">PRODUTO ORIGINAL</text>
-      <text x="290" y="220" font-family="${MONO}" font-size="12" letter-spacing="2.4" fill="#fff" fill-opacity=".5">LACRE INTELIGENTE · NFC</text>
+      <use href="#vs-wordmark" x="${WMX}" y="${WMY.toFixed(1)}" width="${WMW}" height="${WMH.toFixed(1)}" style="--lg-ink:#fff;--lg-accent:#03adf9"/>
       ${tearMarkup(.55)}
       <text transform="translate(641 140) rotate(-90)" text-anchor="middle" font-family="${MONO}" font-size="9" letter-spacing="2" fill="#fff" fill-opacity=".55">ROMPE AO ABRIR</text>
-      ${contactless(706, 94, 66, '#fff', 5)}
-      <text x="774" y="88" font-family="${SANS}" font-size="22" font-weight="700" letter-spacing=".3" fill="#fff">APROXIME O</text>
-      <text x="774" y="114" font-family="${SANS}" font-size="22" font-weight="700" letter-spacing=".3" fill="#fff">CELULAR</text>
-      <rect x="700" y="144" width="262" height="1" fill="#fff" fill-opacity=".18"/>
-      <text x="700" y="176" font-family="${MONO}" font-size="12" letter-spacing="2.4" fill="#fff" fill-opacity=".55">Nº DE SÉRIE</text>
-      <text class="serial" x="700" y="212" font-family="${MONO}" font-size="30" font-weight="600" letter-spacing="3" fill="#fff">A7F3K9B21</text>
-      <text x="700" y="245" font-family="${SANS}" font-size="13" letter-spacing=".2" fill="#fff" fill-opacity=".62">Verifique a autenticidade</text>
+      <g transform="${UPRIGHT}">
+        ${contactless(SH / 2, CTA_V, 128, '#fff')}
+        <g text-anchor="middle" font-family="${SANS}" font-size="34" font-weight="700" letter-spacing=".7" fill="#fff">
+          <text x="${SH / 2}" y="${CTA_V + 117}">APROXIME</text><text x="${SH / 2}" y="${CTA_V + 158}">O CELULAR</text>
+        </g>
+      </g>
     </svg>`;
   }
   function filmSVG(inner, fill, stroke) {
@@ -156,8 +161,8 @@
       <path d="${OUTLINE}" fill="#020c1d"/>
       <g clip-path="url(#xr-clip)"><path d="${grid}" stroke="#03adf9" stroke-opacity=".08" stroke-width="1"/></g>
       <path d="${OUTLINE}" fill="none" stroke="#03adf9" stroke-opacity=".45" stroke-width="1.5"/>
-      <circle cx="150" cy="140" r="94" fill="none" stroke="#5fd0ff" stroke-opacity=".22" stroke-dasharray="3 5"/>
-      <use href="#vs-wordmark" x="290" y="74" width="330" height="54.4" style="--lg-ink:rgba(95,208,255,.13);--lg-accent:rgba(95,208,255,.2)"/>
+      <circle cx="${HX}" cy="${HY}" r="${HR}" fill="none" stroke="#5fd0ff" stroke-opacity=".22" stroke-dasharray="3 5"/>
+      <use href="#vs-wordmark" x="${WMX}" y="${WMY.toFixed(1)}" width="${WMW}" height="${WMH.toFixed(1)}" style="--lg-ink:rgba(95,208,255,.13);--lg-accent:rgba(95,208,255,.2)"/>
       <path d="${DIECUTS}" fill="none" stroke="#9fe6ff" stroke-opacity=".12" stroke-width="1.1"/>
       ${loopMarkup(true, false)}${tearMarkup(.5)}${coilMarkup(true, false)}${chipMarkup()}
       ${label(70, 66, 'CIRCUITO DE RUPTURA')}${label(632, 140, 'LINHA DE RUPTURA', true)}${label(796, 130, 'ANTENA NFC')}${label(664, 182, 'CHIP')}
@@ -242,7 +247,6 @@
     // marcadores: um ponto na ponta direita (rótulos no desktop) e um no topo (rótulos no celular)
     order.forEach(k => layers[k].insertAdjacentHTML('beforeend', '<i class="mk" style="position:absolute;left:100%;top:50%;width:0;height:0"></i><i class="mk-t" style="position:absolute;left:50%;top:0;width:0;height:0"></i>'));
     const holoGrad = $('.holo-grad', layers.print), holoShine = $('.holo-shine', layers.print), glare = $('.seal-glare', layers.print);
-    const serial = $('.serial', layers.print);
     const loupe = $('#loupe'), loupeView = $('.loupe-view', loupe);
     loupeView.insertAdjacentHTML('afterbegin', xraySVG());
     const xsvg = loupeView.querySelector('svg');
@@ -272,21 +276,11 @@
     // entrada orquestrada
     if (!reduce) {
       section.classList.add('is-intro');
-      setTimeout(() => scramble(serial, 'A7F3K9B21', 900), 1900);
       setTimeout(() => section.classList.remove('is-intro'), 4200);
-    }
-    function scramble(el, final, ms) {
-      const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZ0123456789', t0 = performance.now();
-      const step = now => {
-        const k = clamp((now - t0) / ms, 0, 1), lock = Math.floor(k * final.length);
-        el.textContent = final.split('').map((c, i) => i < lock ? c : chars[(Math.random() * chars.length) | 0]).join('');
-        if (k < 1) requestAnimationFrame(step); else el.textContent = final;
-      };
-      requestAnimationFrame(step);
     }
     function ping() {
       const p = document.createElement('i'); p.className = 'nfc-ping';
-      p.style.left = '70.6%'; p.style.top = '33.6%';
+      p.style.left = (CTA_V / SW * 100) + '%'; p.style.top = '50%';
       layers.print.appendChild(p);
       const a = p.animate([{ transform: 'translate(-50%,-50%) scale(.2)', opacity: .9 }, { transform: 'translate(-50%,-50%) scale(2.6)', opacity: 0 }], { duration: 1700, easing: 'cubic-bezier(.22,.61,.36,1)' });
       a.onfinish = () => p.remove();
@@ -342,7 +336,7 @@
       if (!quiet || quietTick % 2 === 0) {
         glare.style.setProperty('--gx', (50 + tiltY * 4).toFixed(1) + '%');
         glare.style.setProperty('--gy', (30 - tiltX * 5).toFixed(1) + '%');
-        holoGrad.setAttribute('gradientTransform', `rotate(${(tiltY * 9 - tiltX * 6 + t * 6).toFixed(1)} 150 140)`);
+        holoGrad.setAttribute('gradientTransform', `rotate(${(tiltY * 9 - tiltX * 6 + t * 6).toFixed(1)} ${HX} ${HY})`);
         holoShine.setAttribute('opacity', (0.35 + 0.3 * Math.abs(Math.sin(tiltY * 0.25 + t * 0.3))).toFixed(3));
       }
 
@@ -361,7 +355,7 @@
       // ondas de aproximação saindo do símbolo do celular (algumas vezes, e quando a lupa passa por ali)
       if (!reduce && p < 0.05) {
         nextPing -= dt;
-        const nearNfc = Math.abs(lu - 0.72) < 0.1 && Math.abs(lv - 0.33) < 0.25;
+        const nearNfc = Math.abs(lu - CTA_V / SW) < 0.1 && Math.abs(lv - 0.5) < 0.3;
         if (nextPing <= 0 && (pings < 3 || nearNfc)) { ping(); pings++; nextPing = nearNfc ? 1.2 : 2.6; }
       }
 
