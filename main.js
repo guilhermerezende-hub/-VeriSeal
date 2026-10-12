@@ -517,6 +517,7 @@
   /* the smart seal, as on the reference: a tamper strip that crosses the cap, runs down its side and bonds to the neck.
      Opening the cap tears it; the NFC inlay is laminated inside the strip. */
   const STRIP_W = 0.28, RC = 0.357;
+  const CTA_Y = 5.22 - 0.21;   // altura do centro do símbolo de aproximação no gargalo (os balões e as ondas saem dali)
   function buildStrip() {
     // path: up the back of the neck and cap, over the rim, across the top, over the front rim, down the front
     const rows = [];
