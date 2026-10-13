@@ -591,7 +591,7 @@
       drawLogo(g, WM, -lw / 2, -lw * WM.h / WM.w / 2, lw, '#ffffff', '#03adf9');
       g.restore();
       // gargalo: símbolo de aproximação e chamada, de pé (as mesmas proporções do lacre do topo da página)
-      const yc = yN + CTA_PX * k;
+      const yc = yN + yAt(5.22 - CTA_Y);
       drawContactless(g, W / 2, yc, 234 * k, '#ffffff');
       g.save(); g.textBaseline = 'alphabetic'; g.fillStyle = '#fff'; ls(`${1.3 * k}px`); g.font = `700 ${62 * k}px ${SANS}`;
       g.fillText('APROXIME', W / 2, yc + 214 * k); g.fillText('O CELULAR', W / 2, yc + 289 * k);
@@ -676,8 +676,8 @@
   const hudSvg = document.getElementById('hud-svg');
   const callouts = {
     tear: { pos: new THREE.Vector3(0.0, 5.22, 0.365) },
-    nfc: { pos: new THREE.Vector3(0.0, 5.05, 0.345) },
-    code: { pos: new THREE.Vector3(0.0, 4.85, 0.34) },
+    nfc: { pos: new THREE.Vector3(0.0, CTA_Y, 0.345) },
+    cta: { pos: new THREE.Vector3(0.0, CTA_Y - 0.125, 0.34) },
     top: { pos: new THREE.Vector3(0.0, 5.63, -0.02), up: true },
   };
   for (const id in callouts) {
@@ -910,7 +910,7 @@
     syncShadow();
     renderer.render(scene, camera);
     // onde o símbolo de aproximação do lacre está na tela (as ondas saem dali)
-    bottle.localToWorld(tmp.set(0, 5.05, 0.345)); tmp.project(camera);
+    bottle.localToWorld(tmp.set(0, CTA_Y, 0.345)); tmp.project(camera);
     howScene.style.setProperty('--nfc-x', ((tmp.x * 0.5 + 0.5) * W).toFixed(1) + 'px');
     howScene.style.setProperty('--nfc-y', ((-tmp.y * 0.5 + 0.5) * H).toFixed(1) + 'px');
   }
