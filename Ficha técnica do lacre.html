@@ -86,10 +86,14 @@
     section { padding: 18px 16px 20px; }
     .drawing svg { min-width: 640px; }
   }
+  @page { size: A4; margin: 12mm; }
   @media print {
     body { background: #fff; }
-    .sheet { padding: 0; gap: 16px; }
+    .sheet { max-width: none; padding: 0; gap: 14px; }
     section { break-inside: avoid; }
+    .drawing { overflow: visible; }
+    .drawing svg { min-width: 0; }
+    .tb, .meta, .foot { break-inside: avoid; }
   }
 </style>
 </head>
