@@ -259,6 +259,7 @@
     $$('.h-hero .w', section).forEach((w, i) => w.style.setProperty('--i', i));
 
     let sw = 1000, sh = 280, zoom = 1.8, ld = 220, narrow = false;
+    let es = 0.64, ey = 0;                                     // escala e deslocamento da vista explodida
     let tx = 0, ty = 0, tiltX = 0, tiltY = 0;                 // inclinação suavizada
     let pX = 0, pY = 0, hover = false, dragging = false, lastInput = -1e9;
     let lu = 0.73, lv = 0.42, tu = 0.73, tv = 0.42;           // posição da lupa (normalizada no lacre)
@@ -271,6 +272,14 @@
       zoom = narrow ? 2.3 : 1.8;
       loupe.style.setProperty('--ld', ld + 'px');
       xsvg.setAttribute('width', sw * zoom); xsvg.setAttribute('height', sh * zoom);
+      // vista explodida: a pilha das quatro camadas ocupa ~1,16 x (escala x largura) de altura na tela. No computador ela
+      // encolhe para caber inteira entre o título e a borda de baixo, centrada nessa faixa (antes a última camada saía da tela)
+      if (narrow) { es = 0.94; ey = sh * 0.62; }
+      else {
+        const top = navH + vh * 0.15, bottom = vh * 0.965;
+        es = Math.min(0.64, (bottom - top) / (1.2 * sw));
+        ey = (top + bottom) / 2 - (navH + vh * 0.56);       // o lacre parado fica centrado em nav + 56% da tela
+      }
     }
 
     // entrada orquestrada
@@ -324,9 +333,9 @@
       const targX = (fine ? -pY * 7 : 0) + idle * Math.sin(t * 0.5) * 2.2;
       const targY = (fine ? pX * 11 : 0) + idle * Math.sin(t * 0.37 + 1) * 3.5;
       tiltX = damp(tiltX, reduce ? 0 : targX, 5, dt); tiltY = damp(tiltY, reduce ? 0 : targY, 5, dt);
-      const ex = narrow ? 58 : 57, ez = narrow ? 0 : -24, es = narrow ? 0.94 : 0.64;
-      const ox = narrow ? 0 : sw * 0.03, oy = narrow ? sh * 0.62 : sh * 0.55;
-      tx = ox * k; ty = oy * k;
+      const ex = narrow ? 58 : 57, ez = narrow ? 0 : -24;
+      const ox = narrow ? 0 : sw * 0.03;
+      tx = ox * k; ty = ey * k;
       const s = lerp(1, es, k) * (1 - 0.06 * settle);
       seal.style.transform = `translate3d(${tx.toFixed(1)}px,${ty.toFixed(1)}px,0) rotateX(${lerp(tiltX, ex, k).toFixed(2)}deg) rotateY(${lerp(tiltY, 0, k).toFixed(2)}deg) rotateZ(${(ez * k).toFixed(2)}deg) scale(${s.toFixed(4)})`;
       const gap = sw * (narrow ? 0.34 : 0.2);
