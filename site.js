@@ -276,8 +276,8 @@
       // encolhe para caber inteira entre o título e a borda de baixo, centrada nessa faixa (antes a última camada saía da tela)
       if (narrow) { es = 0.94; ey = sh * 0.62; }
       else {
-        const top = navH + vh * 0.15, bottom = vh * 0.965;
-        es = Math.min(0.64, (bottom - top) / (1.2 * sw));
+        const top = navH + vh * 0.18, bottom = vh * 0.965;
+        es = Math.min(0.64, (bottom - top) / (1.16 * sw));
         ey = (top + bottom) / 2 - (navH + vh * 0.56);       // o lacre parado fica centrado em nav + 56% da tela
       }
     }
@@ -338,7 +338,7 @@
       tx = ox * k; ty = ey * k;
       const s = lerp(1, es, k) * (1 - 0.06 * settle);
       seal.style.transform = `translate3d(${tx.toFixed(1)}px,${ty.toFixed(1)}px,0) rotateX(${lerp(tiltX, ex, k).toFixed(2)}deg) rotateY(${lerp(tiltY, 0, k).toFixed(2)}deg) rotateZ(${(ez * k).toFixed(2)}deg) scale(${s.toFixed(4)})`;
-      const gap = sw * (narrow ? 0.34 : 0.2);
+      const gap = sw * (narrow ? 0.34 : 0.2 * es / 0.64);   // scale() não encolhe o eixo Z: o vão acompanha a escala
       order.forEach((key, i) => { layers[key].style.transform = `translateZ(${((i - 1.5) * gap * k + i * 0.8).toFixed(1)}px)`; });
 
       // reflexo e holograma respondem à inclinação. Cada mudança repinta o lacre inteiro: parado, a cada dois quadros basta

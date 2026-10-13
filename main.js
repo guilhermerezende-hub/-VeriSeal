@@ -111,8 +111,8 @@
   /* ---------- scroll choreography (p = 0..1 along the track) ---------- */
   const K = {
     rot: kf([[0, 0], [0.12, 0.25 * PI], [0.5, 2.4 * PI], [0.72, 3.7 * PI], [0.85, 4 * PI], [0.93, 4.08 * PI], [1, 4.25 * PI]]),
-    dist: kf([[0, 13.5], [0.14, 13.2], [0.2, 12.5], [0.4, 12.5], [0.48, 7.8], [0.64, 6.4], [0.72, 4.4], [0.85, 2.6], [1, 2.35]]),
-    ty: kf([[0, 2.95], [0.4, 2.95], [0.48, 3.4], [0.64, 3.9], [0.72, 4.7], [0.85, 5.16], [1, 5.18]]),
+    dist: kf([[0, 13.5], [0.14, 13.2], [0.2, 12.5], [0.4, 12.5], [0.48, 7.8], [0.64, 6.4], [0.72, 4.4], [0.85, 2.15], [1, 2.0]]),
+    ty: kf([[0, 2.95], [0.4, 2.95], [0.48, 3.4], [0.64, 3.9], [0.72, 4.7], [0.85, 5.24], [1, 5.25]]),
     el: kf([[0, 0.08], [0.5, 0.12], [0.72, 0.24], [0.85, 0.36], [1, 0.42]]),
     // lateral lens shift in world units at the target depth (negative = bottle to the right of the text)
     offx: kf([[0, -1.6], [0.14, -1.6], [0.2, 1.8], [0.4, 1.8], [0.46, -1.3], [0.64, -1.1], [0.72, 0], [0.88, 0], [1, -0.3]]),
@@ -672,7 +672,7 @@
   const callouts = {
     tear: { pos: new THREE.Vector3(0.0, 5.22, 0.365) },
     nfc: { pos: NFC_AT },
-    cta: { pos: sealPoint(906, 32, 0.008) },   // à direita da chamada "Aproxime o celular", sem cobrir o texto
+    cta: { pos: sealPoint(964, 140, 0.008) },   // logo abaixo da chamada "Aproxime o celular", sem cobrir o texto
     top: { pos: sealPoint(HX, HY, 0.01) },
   };
   for (const id in callouts) {
