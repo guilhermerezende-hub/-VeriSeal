@@ -17,13 +17,15 @@
     const s = w / L.w; g.save(); g.translate(x, y); g.scale(s, s);
     g.fillStyle = ink; g.fill(L.ink); g.fillStyle = acc; g.fill(L.acc); g.restore();
   }
-  // símbolo de aproximação, o mesmo do lacre em site.js: quatro arcos de um mesmo centro, cada um mais aberto.
-  // (x, y) é o centro do desenho e h a altura; os arcos abrem para a direita
-  function drawContactless(g, x, y, h, color) {
-    const ro = h / 1.052, cx = x - 0.684 * ro;
-    g.save(); g.strokeStyle = color; g.lineWidth = 0.11 * ro; g.lineCap = 'round';
-    [[0.396, 21.7], [0.597, 24.8], [0.799, 26.9], [1, 28.1]].forEach(([k, deg]) => { const a = deg * Math.PI / 180; g.beginPath(); g.arc(cx, y, ro * k, -a, a); g.stroke(); });
-    g.restore();
+  // símbolo de aproximação, o mesmo do lacre em site.js (#vs-nfc no sprite): o oval com as ondas e a mão com o celular.
+  // (x, y) é o centro do desenho e h a altura
+  const NFC = (() => {
+    const sym = document.getElementById('vs-nfc'), [, , w, h] = sym.getAttribute('viewBox').split(' ').map(Number);
+    return { w, h, path: new Path2D([...sym.querySelectorAll('path')].map(p => p.getAttribute('d')).join('')) };
+  })();
+  function drawNfc(g, x, y, h, color) {
+    const s = h / NFC.h;
+    g.save(); g.translate(x - NFC.w * s / 2, y - h / 2); g.scale(s, s); g.fillStyle = color; g.fill(NFC.path, 'evenodd'); g.restore();
   }
   const SANS = 'Inter, "Segoe UI", Roboto, sans-serif', MONO = '"JetBrains Mono", Consolas, monospace';
 
@@ -314,9 +316,9 @@
     ls('16px'); g.font = `700 34px ${SANS}`; g.fillText('PRODUTO ORIGINAL', 508, 1068);
     // chamada: símbolo + frase numa linha só
     ls('3px'); g.font = `500 26px ${SANS}`; g.fillStyle = 'rgba(255,255,255,.88)';
-    const t = 'Aproxime o celular do lacre', tw = g.measureText(t).width, sw = 62, gx = 500 - (sw + 18 + tw) / 2;
-    drawContactless(g, gx + sw / 2, 1192, sw / 0.705, '#ffffff');
-    g.textAlign = 'left'; g.fillText(t, gx + sw + 18, 1201);
+    const t = 'Aproxime o celular do lacre', tw = g.measureText(t).width, sh = 70, sw = sh * NFC.w / NFC.h, gx = 500 - (sw + 20 + tw) / 2;
+    drawNfc(g, gx + sw / 2, 1192, sh, '#ffffff');
+    g.textAlign = 'left'; g.fillText(t, gx + sw + 20, 1201);
     g.textAlign = 'center'; g.fillStyle = 'rgba(255,255,255,.55)'; g.fillRect(380, 1290, 240, 1.5);
     ls('8px'); g.font = `600 32px ${MONO}`; g.fillStyle = 'rgba(255,255,255,.9)'; g.fillText('Nº A7F3K9B21', 504, 1392);
     ls('0px');
@@ -330,7 +332,7 @@
     capsTitle(g, 'COMO VERIFICAR', 400, 262, 20, 8, 'rgba(255,255,255,.8)');
     g.textAlign = 'center'; g.textBaseline = 'alphabetic'; g.fillStyle = '#ffffff'; ls('0px'); g.font = `700 42px ${SANS}`;
     g.fillText('Esta garrafa tem', 400, 360); g.fillText('identidade digital.', 400, 410);
-    drawContactless(g, 400, 535, 150, '#03adf9');
+    drawNfc(g, 400, 535, 150, '#03adf9');
     g.font = `500 30px ${SANS}`; g.fillStyle = 'rgba(255,255,255,.86)';
     g.fillText('Aproxime o celular do lacre', 400, 670); g.fillText('para confirmar a autenticidade.', 400, 712);
     g.fillStyle = 'rgba(255,255,255,.5)'; g.fillRect(300, 760, 200, 1.5);
@@ -548,7 +550,7 @@
     return g;
   }
   const sealGeo = buildSeal();
-  const NFC_AT = sealPoint(781, 140, 0.008);   // centro do símbolo de aproximação: os balões e as ondas da demonstração saem dali
+  const NFC_AT = sealPoint(767.3, 183.3, 0.008);   // centro do oval do símbolo de aproximação (NFC_PING em site.js): os balões e as ondas da demonstração saem dali
   // a arte, desenhada como o printSVG de site.js: o holograma e a ponta de baixo ficam de pé na garrafa (girados no desenho),
   // a logo VeriSeal corre deitada ao longo do lacre
   const SEAL_OUTLINE = new Path2D('M24 0H644L655 13L666 0H976A24 24 0 0 1 1000 24V256A24 24 0 0 1 976 280H666L655 267L644 280H24A24 24 0 0 1 0 256V24A24 24 0 0 1 24 0Z');
@@ -610,9 +612,9 @@
     ls('2px'); g.fillText('ROMPE AO ABRIR', 0, 0); g.restore();
     // ponta de baixo: símbolo de aproximação e chamada, de pé na garrafa
     g.save(); g.translate(0, 280); g.rotate(-PI / 2);
-    drawContactless(g, 140, 781, 128, '#ffffff');
+    drawNfc(g, 140, 770, 112, '#ffffff');                   // como CTA_V/NFC_H em site.js
     g.fillStyle = '#fff'; g.font = `700 34px ${SANS}`; g.textAlign = 'center'; g.textBaseline = 'alphabetic'; ls('0.7px');
-    g.fillText('APROXIME', 140, 898); g.fillText('O CELULAR', 140, 939);
+    g.fillText('APROXIME', 140, 885); g.fillText('O CELULAR', 140, 926);
     g.restore();
   }
   await idle();

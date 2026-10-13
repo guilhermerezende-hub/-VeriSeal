@@ -28,7 +28,7 @@
   const SW = 1000, SH = 280, R = 24, NX = 655;
   const HX = 142, HY = 140, HR = 94;                                   // holograma
   const WMW = 352, WMH = WMW * 100 / 833.41, WMX = 435 - WMW / 2, WMY = SH / 2 - WMH / 2;   // logo VeriSeal, entre o holograma e "ROMPE AO ABRIR"
-  const CTA_V = 781;                                                   // centro do símbolo de aproximação, ao longo da tira
+  const CTA_V = 770, NFC_H = 112;                                      // símbolo de aproximação: centro ao longo da tira e altura
   const UPRIGHT = `translate(0 ${SH}) rotate(-90)`;                    // (u atravessando a tira, v ao longo dela) → de pé na garrafa
   const OUTLINE = `M${R} 0H${NX - 11}L${NX} 13L${NX + 11} 0H${SW - R}A${R} ${R} 0 0 1 ${SW} ${R}V${SH - R}A${R} ${R} 0 0 1 ${SW - R} ${SH}H${NX + 11}L${NX} ${SH - 13}L${NX - 11} ${SH}H${R}A${R} ${R} 0 0 1 0 ${SH - R}V${R}A${R} ${R} 0 0 1 ${R} 0Z`;
   const SANS = `Inter, -apple-system, 'Segoe UI', Roboto, sans-serif`;
@@ -57,15 +57,19 @@
     }
     return d;
   }
-  // símbolo de aproximação, como o dos cartões por aproximação: quatro arcos de um mesmo centro, cada um mais aberto.
-  // (x, y) é o centro do desenho e h a altura; os arcos abrem para a direita
-  function contactless(x, y, h, stroke) {
-    const ro = h / 1.052, cx = x - 0.684 * ro;
-    const arcs = [[0.396, 21.7], [0.597, 24.8], [0.799, 26.9], [1, 28.1]].map(([k, deg], i) => {
-      const r = ro * k, a = deg * Math.PI / 180, ax = (cx + r * Math.cos(a)).toFixed(1);
-      return `<path class="cl-arc" style="--k:${i}" d="M${ax} ${(y - r * Math.sin(a)).toFixed(1)}A${r.toFixed(1)} ${r.toFixed(1)} 0 0 1 ${ax} ${(y + r * Math.sin(a)).toFixed(1)}"/>`;
-    }).join('');
-    return `<g fill="none" stroke="${stroke}" stroke-width="${(0.11 * ro).toFixed(1)}" stroke-linecap="round">${arcs}</g>`;
+  // símbolo de aproximação: o oval com as ondas e a mão com o celular (#vs-nfc no sprite da página, também usado em main.js).
+  // (x, y) é o centro do desenho e h a altura; as ondas ficam em paths próprios para acenderem uma a uma
+  const NFC = (() => {
+    const sym = $('#vs-nfc'), [, , w, h] = sym.getAttribute('viewBox').split(' ').map(Number);
+    return { w, h, body: $('.nfc-body', sym).getAttribute('d'), waves: $$('.nfc-wave', sym).map(p => p.getAttribute('d')) };
+  })();
+  const NFC_OVAL = [0.292, 0.476];   // centro do oval (de onde saem as ondas), em fração da largura e da altura do símbolo
+  // o mesmo ponto no desenho do lacre deitado (lá o símbolo está girado: ao longo da tira = x, atravessado = y)
+  const NFC_PING = [CTA_V + (NFC_OVAL[1] - 0.5) * NFC_H, SH / 2 - (NFC_OVAL[0] - 0.5) * NFC_H * NFC.w / NFC.h];
+  function nfcSymbol(x, y, h, fill) {
+    const s = h / NFC.h, w = NFC.w * s;
+    const waves = NFC.waves.map((d, i) => `<path class="cl-arc" style="--k:${i}" d="${d}"/>`).join('');
+    return `<g transform="translate(${(x - w / 2).toFixed(1)} ${(y - h / 2).toFixed(1)}) scale(${s.toFixed(4)})" fill="${fill}" fill-rule="evenodd"><path d="${NFC.body}"/>${waves}</g>`;
   }
   // antena: espiral retangular em volta da zona do celular
   function spiral(x0, y0, x1, y1, n, p) {
@@ -137,9 +141,9 @@
       ${tearMarkup(.55)}
       <text transform="translate(641 140) rotate(-90)" text-anchor="middle" font-family="${MONO}" font-size="9" letter-spacing="2" fill="#fff" fill-opacity=".55">ROMPE AO ABRIR</text>
       <g transform="${UPRIGHT}">
-        ${contactless(SH / 2, CTA_V, 128, '#fff')}
+        ${nfcSymbol(SH / 2, CTA_V, NFC_H, '#fff')}
         <g text-anchor="middle" font-family="${SANS}" font-size="34" font-weight="700" letter-spacing=".7" fill="#fff">
-          <text x="${SH / 2}" y="${CTA_V + 117}">APROXIME</text><text x="${SH / 2}" y="${CTA_V + 158}">O CELULAR</text>
+          <text x="${SH / 2}" y="${CTA_V + 115}">APROXIME</text><text x="${SH / 2}" y="${CTA_V + 156}">O CELULAR</text>
         </g>
       </g>
     </svg>`;
@@ -289,7 +293,7 @@
     }
     function ping() {
       const p = document.createElement('i'); p.className = 'nfc-ping';
-      p.style.left = (CTA_V / SW * 100) + '%'; p.style.top = '50%';
+      p.style.left = (NFC_PING[0] / SW * 100) + '%'; p.style.top = (NFC_PING[1] / SH * 100) + '%';
       layers.print.appendChild(p);
       const a = p.animate([{ transform: 'translate(-50%,-50%) scale(.2)', opacity: .9 }, { transform: 'translate(-50%,-50%) scale(2.6)', opacity: 0 }], { duration: 1700, easing: 'cubic-bezier(.22,.61,.36,1)' });
       a.onfinish = () => p.remove();
@@ -364,7 +368,7 @@
       // ondas de aproximação saindo do símbolo do celular (algumas vezes, e quando a lupa passa por ali)
       if (!reduce && p < 0.05) {
         nextPing -= dt;
-        const nearNfc = Math.abs(lu - CTA_V / SW) < 0.1 && Math.abs(lv - 0.5) < 0.3;
+        const nearNfc = Math.abs(lu - NFC_PING[0] / SW) < 0.1 && Math.abs(lv - NFC_PING[1] / SH) < 0.3;
         if (nextPing <= 0 && (pings < 3 || nearNfc)) { ping(); pings++; nextPing = nearNfc ? 1.2 : 2.6; }
       }
 
