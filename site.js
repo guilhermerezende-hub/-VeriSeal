@@ -273,7 +273,7 @@
       loupe.style.setProperty('--ld', ld + 'px');
       xsvg.setAttribute('width', sw * zoom); xsvg.setAttribute('height', sh * zoom);
       // vista explodida: a pilha das quatro camadas ocupa ~1,16 x (escala x largura) de altura na tela. No computador ela
-      // encolhe para caber inteira entre o título e a borda de baixo, centrada nessa faixa (antes a última camada saía da tela)
+      // encolhe para caber inteira entre o título e a borda de baixo, centrada nessa faixa
       if (narrow) { es = 0.94; ey = sh * 0.62; }
       else {
         const top = navH + vh * 0.18, bottom = vh * 0.965;

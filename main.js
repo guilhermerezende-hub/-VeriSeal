@@ -110,7 +110,8 @@
 
   /* ---------- scroll choreography (p = 0..1 along the track) ---------- */
   const K = {
-    rot: kf([[0, 0], [0.12, 0.25 * PI], [0.5, 2.4 * PI], [0.72, 3.7 * PI], [0.85, 4 * PI], [0.93, 4.08 * PI], [1, 4.25 * PI]]),
+    // o lacre fica só na frente: no fim a garrafa gira pouco, para ele continuar à vista
+    rot: kf([[0, 0], [0.12, 0.25 * PI], [0.5, 2.4 * PI], [0.72, 3.7 * PI], [0.85, 4 * PI], [0.93, 4.06 * PI], [1, 4.13 * PI]]),
     dist: kf([[0, 13.5], [0.14, 13.2], [0.2, 12.5], [0.4, 12.5], [0.48, 7.8], [0.64, 6.4], [0.72, 4.4], [0.85, 2.15], [1, 2.0]]),
     ty: kf([[0, 2.95], [0.4, 2.95], [0.48, 3.4], [0.64, 3.9], [0.72, 4.7], [0.85, 5.24], [1, 5.25]]),
     el: kf([[0, 0.08], [0.5, 0.12], [0.72, 0.24], [0.85, 0.36], [1, 0.42]]),
@@ -338,7 +339,7 @@
   }
   // as texturas usam Inter e JetBrains Mono: desenha uma vez só, depois que os pesos usados no canvas carregaram.
   // Se as fontes demorarem mais de 3 s, desenha com a fonte do sistema e redesenha quando elas chegarem.
-  const fontsReady = document.fonts ? Promise.all([`500 42px Inter`, `600 26px Inter`, `700 42px Inter`, `500 26px "JetBrains Mono"`, `600 26px "JetBrains Mono"`].map(f => document.fonts.load(f))).catch(() => { }) : Promise.resolve();
+  const fontsReady = document.fonts ? Promise.all([`500 42px Inter`, `600 26px Inter`, `700 42px Inter`, `400 26px "JetBrains Mono"`, `500 26px "JetBrains Mono"`, `600 26px "JetBrains Mono"`].map(f => document.fonts.load(f))).catch(() => { }) : Promise.resolve();
   const fontsLoaded = await Promise.race([fontsReady.then(() => true), new Promise(r => setTimeout(() => r(false), 3000))]);
   // 1024 px de largura já sobram para o maior tamanho em que o rótulo aparece (o de 1400 custava o dobro para desenhar e enviar)
   const labelTex = canvasTex(1024, 1582, drawLabel);
@@ -669,11 +670,12 @@
 
   /* ---------- overlay: chapters and the callouts anchored to the seal ---------- */
   const hudSvg = document.getElementById('hud-svg');
+  // os pontos ficam nas bordas do lacre, do lado do balão: as linhas não cruzam o lacre e nada da arte fica coberto
   const callouts = {
-    tear: { pos: new THREE.Vector3(0.0, 5.22, 0.365) },
-    nfc: { pos: NFC_AT },
-    cta: { pos: sealPoint(964, 140, 0.008) },   // logo abaixo da chamada "Aproxime o celular", sem cobrir o texto
-    top: { pos: sealPoint(HX, HY, 0.01) },
+    tear: { pos: sealPoint(655, 268, 0.008) },   // borda esquerda, na linha de ruptura
+    nfc: { pos: sealPoint(805, 268, 0.008) },    // borda esquerda, junto do símbolo (a antena fica embaixo dele)
+    cta: { pos: sealPoint(781, 12, 0.008) },     // borda direita, ao lado do símbolo de aproximação
+    top: { pos: sealPoint(HX, 12, 0.01) },       // borda direita, ao lado do holograma
   };
   for (const id in callouts) {
     const c = callouts[id];
