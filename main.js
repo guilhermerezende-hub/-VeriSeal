@@ -11,7 +11,7 @@
 
   // logos da marca: os mesmos paths do sprite SVG da página, desenhados no canvas das texturas
   const logoPath = (id, part) => new Path2D(document.querySelector(`#${id} .lg-${part}`).getAttribute('d'));
-  const WM = { w: 977, h: 161, ink: logoPath('vs-wordmark', 'ink'), acc: logoPath('vs-wordmark', 'accent') };
+  const WM = { w: 833.41, h: 100, ink: logoPath('vs-wordmark', 'ink'), acc: logoPath('vs-wordmark', 'accent') };
   const MK = { w: 668, h: 359, ink: logoPath('vs-mark', 'ink'), acc: logoPath('vs-mark', 'accent') };
   function drawLogo(g, L, x, y, w, ink, acc) {
     const s = w / L.w; g.save(); g.translate(x, y); g.scale(s, s);
@@ -308,7 +308,7 @@
     labelBase(g, 1000, 1545);
     capsTitle(g, 'IDENTIDADE DIGITAL', 500, 150, 24, 10, 'rgba(255,255,255,.82)');
     drawHolo(g, 500, 505, 245, 'VERISEAL • PRODUTO ORIGINAL • VERISEAL • PRODUTO ORIGINAL • ');
-    drawLogo(g, WM, 180, 820, 640, '#ffffff', '#03adf9');
+    drawLogo(g, WM, 150, 873 - 700 * WM.h / WM.w / 2, 700, '#ffffff', '#03adf9');
     g.fillStyle = '#03adf9'; g.fillRect(460, 975, 80, 4);
     g.textAlign = 'center'; g.textBaseline = 'alphabetic'; g.fillStyle = '#ffffff';
     ls('16px'); g.font = `700 34px ${SANS}`; g.fillText('PRODUTO ORIGINAL', 508, 1068);
@@ -326,7 +326,7 @@
     const g = c.getContext('2d'), s = c.width / 800, ls = lsOf(g);
     g.setTransform(s, 0, 0, s, 0, 0);
     labelBase(g, 800, 900);
-    drawLogo(g, WM, 200, 104, 400, '#ffffff', '#03adf9');
+    drawLogo(g, WM, 170, 137 - 460 * WM.h / WM.w / 2, 460, '#ffffff', '#03adf9');
     capsTitle(g, 'COMO VERIFICAR', 400, 262, 20, 8, 'rgba(255,255,255,.8)');
     g.textAlign = 'center'; g.textBaseline = 'alphabetic'; g.fillStyle = '#ffffff'; ls('0px'); g.font = `700 42px ${SANS}`;
     g.fillText('Esta garrafa tem', 400, 360); g.fillText('identidade digital.', 400, 410);
@@ -603,7 +603,7 @@
     drawLogo(g, MK, -46, -24.7, 92, '#062a63', '#0a76c4');
     g.restore();
     // logo VeriSeal deitada
-    drawLogo(g, WM, 263, 140 - 344 * WM.h / WM.w / 2, 344, '#ffffff', '#03adf9');
+    drawLogo(g, WM, 435 - 352 / 2, 140 - 352 * WM.h / WM.w / 2, 352, '#ffffff', '#03adf9');   // como WMW/WMX em site.js
     // linha de ruptura e o aviso ao lado dela
     g.save(); g.setLineDash([5, 6]); g.strokeStyle = 'rgba(255,255,255,.55)'; g.lineWidth = 1.6; g.beginPath(); g.moveTo(655, 18); g.lineTo(655, 262); g.stroke(); g.restore();
     g.save(); g.translate(641, 140); g.rotate(-PI / 2); g.fillStyle = 'rgba(255,255,255,.55)'; g.font = `400 9px ${MONO}`; g.textAlign = 'center'; g.textBaseline = 'alphabetic';

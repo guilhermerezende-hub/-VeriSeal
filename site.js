@@ -27,7 +27,7 @@
      ============================================================ */
   const SW = 1000, SH = 280, R = 24, NX = 655;
   const HX = 142, HY = 140, HR = 94;                                   // holograma
-  const WMW = 344, WMH = WMW * 161 / 977, WMX = 435 - WMW / 2, WMY = SH / 2 - WMH / 2;   // logo VeriSeal
+  const WMW = 352, WMH = WMW * 100 / 833.41, WMX = 435 - WMW / 2, WMY = SH / 2 - WMH / 2;   // logo VeriSeal, entre o holograma e "ROMPE AO ABRIR"
   const CTA_V = 781;                                                   // centro do símbolo de aproximação, ao longo da tira
   const UPRIGHT = `translate(0 ${SH}) rotate(-90)`;                    // (u atravessando a tira, v ao longo dela) → de pé na garrafa
   const OUTLINE = `M${R} 0H${NX - 11}L${NX} 13L${NX + 11} 0H${SW - R}A${R} ${R} 0 0 1 ${SW} ${R}V${SH - R}A${R} ${R} 0 0 1 ${SW - R} ${SH}H${NX + 11}L${NX} ${SH - 13}L${NX - 11} ${SH}H${R}A${R} ${R} 0 0 1 0 ${SH - R}V${R}A${R} ${R} 0 0 1 ${R} 0Z`;

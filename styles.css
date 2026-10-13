@@ -375,9 +375,9 @@ p {
 }
 
 .nav-logo svg {
-  height: 21px;
+  height: 16px;
   width: auto;
-  aspect-ratio: 977/161
+  aspect-ratio: 833.41/100
 }
 
 .nav-links {
@@ -2592,9 +2592,9 @@ p {
 }
 
 .wb-logo {
-  height: 5cqi;
+  height: 3.7cqi;
   width: auto;
-  aspect-ratio: 977/161;
+  aspect-ratio: 833.41/100;
   margin: 6cqi auto 0;
   --lg-ink: var(--navy)
 }
@@ -3512,9 +3512,9 @@ p {
 }
 
 .foot-logo svg {
-  height: 24px;
+  height: 18px;
   width: auto;
-  aspect-ratio: 977/161
+  aspect-ratio: 833.41/100
 }
 
 .foot-tag {
