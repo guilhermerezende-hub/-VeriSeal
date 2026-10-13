@@ -1,11 +1,21 @@
-Skills Claude
+# Tudo o que não é usado pelo site (o site usa só index.html, styles.css, site.js, main.js e os favicons)
 
+# ferramentas e anotações
+Skills Claude/
 Resumo - VeriSeal.txt
 
+# telas de resultado avulsas
 tela-adulterado.html
 tela-autentico.html
 
+# arquivos de marca (o site usa os vetores embutidos no index.html)
+Logos Veriseal/
+Logo clara.jpeg
+Logo curta clara.jpeg
+Logo curta escura.jpeg
+logo escura.jpeg
+
+# documentos de produção do lacre
 Ficha técnica do lacre.html
 Ficha técnica do lacre.pdf
 Lacre VeriSeal - resumo técnico.png
-
