@@ -708,17 +708,11 @@
   })();
 
   /* ============================================================
-     8 · IDENTIDADE DIGITAL — cartão 3D que entra em perspectiva, vira sozinho uma vez para mostrar a jornada,
-     e depois vira com um toque; inclina com o ponteiro
+     8 · IDENTIDADE DIGITAL — cartão 3D que entra em perspectiva e inclina com o ponteiro
      ============================================================ */
   const passport = (() => {
-    const box = $('#pass'), card = $('#passCard'), flipBtn = $('#passFlip'), holo = $('.pc-holo', card), sec = $('#identidade');
-    $$('.journey li', card).forEach((li, k) => li.style.setProperty('--k', k));
-    let shown = false, enter = 0, flip = 0, flipT = 0, rx = 0, ry = 0, mx = 0, my = 0, autoT = 0, auto = reduce ? 2 : 0;
-    function setFlip(back) { flipT = back ? 180 : 0; card.classList.toggle('is-back', back); flipBtn.textContent = back ? 'Ver a identidade' : 'Ver a jornada'; }
-    const toggle = () => { auto = 2; setFlip(flipT === 0); };
-    flipBtn.addEventListener('click', toggle);
-    card.addEventListener('click', toggle);
+    const box = $('#pass'), card = $('#passCard'), holo = $('.pc-holo', card), sec = $('#identidade');
+    let shown = false, enter = 0, rx = 0, ry = 0, mx = 0, my = 0;
     if (fine) box.addEventListener('pointermove', e => { const r = card.getBoundingClientRect(); mx = clamp(((e.clientX - r.left) / r.width) * 2 - 1, -1, 1); my = clamp(((e.clientY - r.top) / r.height) * 2 - 1, -1, 1); });
     box.addEventListener('pointerleave', () => { mx = my = 0; });
     new IntersectionObserver(es => es.forEach(e => { if (e.isIntersecting) shown = true; }), { threshold: 0.35 }).observe(box);
@@ -726,13 +720,10 @@
     function update(dt, t) {
       if (!shown) return;
       enter = reduce ? 1 : damp(enter, 1, 2.4, dt);
-      if (auto === 0) { autoT += dt; if (autoT > 2.6) { setFlip(true); auto = 1; autoT = 0; } }
-      else if (auto === 1) { autoT += dt; if (autoT > 6.5) { setFlip(false); auto = 2; } }
-      flip = reduce ? flipT : damp(flip, flipT, 4, dt);
       const idle = reduce ? 0 : 1;
       rx = damp(rx, -my * 8 + idle * Math.sin(t * 0.7) * 2, 5, dt); ry = damp(ry, mx * 12 + idle * Math.sin(t * 0.5) * 4, 5, dt);
       card.style.opacity = Math.min(1, enter * 1.4).toFixed(3);
-      card.style.transform = 'translateY(' + ((1 - enter) * 70).toFixed(1) + 'px) rotateX(' + (rx + (1 - enter) * 40).toFixed(2) + 'deg) rotateY(' + (ry + flip).toFixed(2) + 'deg)';
+      card.style.transform = 'translateY(' + ((1 - enter) * 70).toFixed(1) + 'px) rotateX(' + (rx + (1 - enter) * 40).toFixed(2) + 'deg) rotateY(' + ry.toFixed(2) + 'deg)';
       holo.style.setProperty('--ha', (ry * 6 + t * 18).toFixed(1) + 'deg');
       card.style.setProperty('--gx', (50 + ry * 3).toFixed(1) + '%'); card.style.setProperty('--gy', (25 - rx * 3).toFixed(1) + '%');
     }

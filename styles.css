@@ -2859,7 +2859,7 @@ p {
   filter: drop-shadow(0 6px 14px rgba(48, 209, 88, .45))
 }
 
-.pass-card:not(.is-back) .pc-auth-ic {
+.pass-card .pc-auth-ic {
   animation: authPop .8s var(--spring) .6s both
 }
 
@@ -3145,10 +3145,6 @@ p {
   background: radial-gradient(circle at var(--gx, 30%) var(--gy, 20%), rgba(255, 255, 255, .18), transparent 45%)
 }
 
-.pc-back {
-  transform: rotateY(180deg)
-}
-
 .pc-head {
   display: flex;
   align-items: center;
@@ -3235,75 +3231,6 @@ p {
   mix-blend-mode: screen;
   -webkit-mask: radial-gradient(circle, transparent 46%, #000 47%, #000 63%, transparent 64%);
   mask: radial-gradient(circle, transparent 46%, #000 47%, #000 63%, transparent 64%)
-}
-
-.pc-title {
-  font-size: 24px;
-  font-weight: 700;
-  letter-spacing: -.02em
-}
-
-.journey {
-  list-style: none;
-  margin: 26px 0 0;
-  padding: 0 0 0 30px;
-  position: relative;
-  display: grid;
-  gap: 24px
-}
-
-.journey::before {
-  content: "";
-  position: absolute;
-  left: 8px;
-  top: 8px;
-  bottom: 8px;
-  width: 2px;
-  background: linear-gradient(var(--cyan), rgba(48, 209, 88, .8))
-}
-
-.journey li {
-  position: relative;
-  opacity: 0;
-  transform: translateX(14px);
-  transition: opacity .5s ease, transform .6s var(--ease);
-  transition-delay: calc(var(--k, 0) * 160ms + 350ms)
-}
-
-.journey li::before {
-  content: "";
-  position: absolute;
-  left: -30px;
-  top: 4px;
-  width: 18px;
-  height: 18px;
-  border-radius: 50%;
-  background: #062a63;
-  border: 2px solid var(--cyan)
-}
-
-.journey li.now::before {
-  background: var(--ok);
-  border-color: var(--ok);
-  box-shadow: 0 0 0 6px rgba(48, 209, 88, .22)
-}
-
-.pass-card.is-back .journey li {
-  opacity: 1;
-  transform: none
-}
-
-.journey b {
-  display: block;
-  font-size: 19px;
-  font-weight: 700
-}
-
-.journey span {
-  display: block;
-  font-size: 14px;
-  color: rgba(255, 255, 255, .72);
-  margin-top: 2px
 }
 
 .pass-note {
@@ -4462,7 +4389,7 @@ p {
   margin-top: 6px
 }
 
-.pass-card:not(.is-back) .pc-auth-ic {
+.pass-card .pc-auth-ic {
   animation: authPop .8s var(--spring) .6s both
 }
 
