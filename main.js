@@ -987,6 +987,7 @@
       const [ly, d, el] = o.cam || [2.98, 13.4, 0.05];
       camera.position.set(0, ly + d * Math.sin(el), d * Math.cos(el)); camera.lookAt(0, ly, 0);
       bottle.rotation.set(0, o.rot ?? 0.42, 0);
+      floor.visible = o.floor !== false;   // sem a sombra no chão (ela seria cortada na borda da foto)
       renderer.setViewport(0, 0, w, h);
       scene.background.set(o.bg);
       for (const k in glowPlanes) glowPlanes[k].visible = false;
@@ -1003,6 +1004,7 @@
     });
     renderer.setDrawingBufferSize(prev.size.x, prev.size.y, prev.pr);
     shadowAt.y = 1e9;   // a próxima cena refaz a sombra na pose dela
+    floor.visible = true;
     scene.background.copy(prev.bg); backdrop.visible = prev.bd; causticPivot.visible = true;
     for (const k in glowPlanes) glowPlanes[k].visible = false;
     bottle.rotation.copy(prev.rot); capGroup.rotation.y = prev.cap; capGroup.position.y = prev.capY;
@@ -1064,7 +1066,7 @@
   const cardShots = () => cards || (cards = renderBottles([
     { bad: false, w: 400, h: 280, pr: 2, bg: CARD_BG, cam: CAP_CAM, rot: 0.2 }, { bad: true, w: 400, h: 280, pr: 2, bg: CARD_BG, cam: CAP_CAM, rot: 0.2 },
     { bad: false, w: 400, h: 280, pr: 2, bg: CARD_BG }, { bad: true, w: 400, h: 280, pr: 2, bg: CARD_BG },
-    { bad: false, w: 200, h: 280, pr: 2, bg: CARD_BG },
+    { bad: false, w: 200, h: 280, pr: 2, bg: CARD_BG, floor: false },
   ]).then(([capOk, capBad, ok, bad, narrow]) => ({ capOk, capBad, ok, bad, narrow })));
   window.VeriSeal3D = { bottleShots, cardShots };
   await (document.fonts ? document.fonts.ready : Promise.resolve());

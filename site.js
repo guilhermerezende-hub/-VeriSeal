@@ -643,7 +643,7 @@
       // a tampa de perto: o lacre íntegro, depois rompido (a tampa foi girada), e o alerta
       adulteracao: {
         imgs: ['capOk', 'capBad'], chip: ['Lacre rompido', ''],
-        over: verdict('bad', 170, 32, 17, 'verdict'),
+        over: verdict('bad', 36, 34, 17, 'verdict'),
         steps: [['', 1600], ['swap', 1100], ['verdict', 3200], ['out', 450]],
       },
       // duas garrafas idênticas: o celular lê as duas; só a original responde
