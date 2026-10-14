@@ -676,7 +676,7 @@
   const callouts = {
     tear: { pos: sealPoint(655, 268, 0.008) },   // borda esquerda, na linha de ruptura
     nfc: { pos: sealPoint(805, 268, 0.008) },    // borda esquerda, junto do símbolo (a antena fica embaixo dele)
-    cta: { pos: sealPoint(781, 12, 0.008) },     // borda direita, ao lado do símbolo de aproximação
+    cta: { pos: sealPoint(770, 12, 0.008) },     // borda direita, ao lado do símbolo de aproximação
     top: { pos: sealPoint(HX, 12, 0.01) },       // borda direita, ao lado do holograma
   };
   for (const id in callouts) {
