@@ -1757,7 +1757,6 @@ p {
 
 /* ---------------- 4 · PARA QUE SERVE ---------------- */
 .threats,
-.benefits,
 .story {
   padding: clamp(100px, 15vh, 180px) 0
 }
@@ -2885,83 +2884,6 @@ p {
   color: var(--bad-ink)
 }
 
-/* ---------------- 7 · BENEFÍCIOS ---------------- */
-.tabs {
-  position: relative;
-  display: inline-grid;
-  grid-template-columns: 1fr 1fr;
-  margin-top: clamp(28px, 4vh, 44px);
-  padding: 4px;
-  border-radius: 999px;
-  background: rgba(15, 26, 46, .07);
-  isolation: isolate
-}
-
-.tabs button {
-  position: relative;
-  z-index: 1;
-  min-height: 44px;
-  padding: 0 22px;
-  border: 0;
-  background: none;
-  border-radius: 999px;
-  font-size: 15px;
-  font-weight: 600;
-  color: var(--ink-2);
-  cursor: pointer;
-  white-space: nowrap;
-  transition: color .25s
-}
-
-.tabs button[aria-selected="true"] {
-  color: var(--ink)
-}
-
-.tabs-thumb {
-  position: absolute;
-  z-index: 0;
-  top: 4px;
-  bottom: 4px;
-  left: 4px;
-  width: calc(50% - 4px);
-  border-radius: 999px;
-  background: #fff;
-  box-shadow: 0 2px 10px rgba(15, 26, 46, .14);
-  transition: transform .5s var(--spring)
-}
-
-.tabs.is-second .tabs-thumb {
-  transform: translateX(100%)
-}
-
-.panels {
-  position: relative
-}
-
-.panel {
-  margin-top: clamp(24px, 4vh, 36px)
-}
-
-.panel[hidden] {
-  display: none
-}
-
-.panel.is-entering .tile {
-  animation: tileIn .7s var(--ease) both;
-  animation-delay: calc(var(--k, 0) * 70ms)
-}
-
-.panel.is-entering .lead {
-  animation: fadeUp .6s var(--ease) both
-}
-
-@keyframes tileIn {
-  from {
-    opacity: 0;
-    transform: translateY(24px) scale(.97)
-  }
-}
-
 /* ---------------- 8 · IDENTIDADE DIGITAL (consumidor) ---------------- */
 .passport {
   padding: clamp(100px, 15vh, 180px) 0;
@@ -3629,16 +3551,6 @@ p {
     display: none
   }
 
-  .tabs {
-    display: grid;
-    width: 100%
-  }
-
-  .tabs button {
-    padding: 0 10px;
-    font-size: 14px
-  }
-
   .foot-in {
     grid-template-columns: 1fr
   }
@@ -4167,7 +4079,6 @@ p {
 
 .story,
 .threats,
-.benefits,
 .band {
   overflow: hidden
 }
@@ -4764,3 +4675,4 @@ p {
     font-size: 19px
   }
 }
+

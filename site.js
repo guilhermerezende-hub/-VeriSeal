@@ -664,14 +664,6 @@
         <rect x="6.5" y="3.4" width="5" height="1.6" rx=".8" fill="#0f1a2e"/>
       </g>`;
     const pour = '<rect class="pour" x="99" y="0" width="2" height="64" rx="1" fill="#e9b866"/>';
-    const star = (cx, cy, R) => {
-      let d = '';
-      for (let i = 0; i < 10; i++) {
-        const a = -Math.PI / 2 + i * Math.PI / 5, r = i % 2 ? R * 0.47 : R;
-        d += (i ? 'L' : 'M') + (cx + r * Math.cos(a)).toFixed(2) + ' ' + (cy + r * Math.sin(a)).toFixed(2);
-      }
-      return d + 'Z';
-    };
     const SCENES = {
       adulteracao: {
         svg: () => pour + bottle() + verdict('bad', 158, 58, 17, 'verdict'),
@@ -689,22 +681,6 @@
           + '<path d="M168 58a10 10 0 1 1-2.93-7.07"/><path d="M160.15 50.06L165.07 50.93L164.2 46.01"/></g>'
           + verdict('bad', 158, 58, 17, 'verdict'),
         steps: [['', 800], ['open', 750], ['drain', 1300], ['refill', 1600], ['close', 750], ['verdict', 2900], ['out', 450]],
-      },
-      procedencia: {
-        svg: () => bottle()
-          + `<g class="q" data-off="verdict"><circle cx="158" cy="58" r="16" fill="#fff" stroke="#9aa8bc" stroke-width="1.5" stroke-dasharray="3 3.5"/>
-             <text x="158" y="64.6" text-anchor="middle" font-family="${SANS}" font-size="19" font-weight="700" fill="#7d8aa0">?</text></g>`
-          + phone(54, 20, 'r', 'scan', 'verdict') + verdict('ok', 158, 58, 17, 'verdict'),
-        steps: [['', 1400], ['scan', 1200], ['verdict', 2900], ['out', 450]],
-      },
-      confianca: {
-        svg: () => `<g class="rv">
-            <rect x="34" y="30" width="132" height="82" rx="12" fill="#fff"/>
-            <circle cx="56" cy="52" r="10" fill="#dfe8f5"/><circle cx="56" cy="49.5" r="3.6" fill="#8aa0bf"/><path d="M49.6 59.4a6.4 6 0 0 1 12.8 0" fill="#8aa0bf"/>
-            <rect x="72" y="45" width="58" height="6" rx="3" fill="#dfe5ee"/><rect x="72" y="55" width="38" height="5" rx="2.5" fill="#e9edf3"/>
-            ${[0, 1, 2, 3, 4].map(k => `<path class="star" style="--k:${k}" d="${star(56 + k * 22, 88, 8)}" stroke-width="1.6" stroke-linejoin="round"/>`).join('')}
-          </g>` + verdict('ok', 162, 32, 13, 'restore'),
-        steps: [['', 1000], ['drop', 1700], ['restore', 2900], ['out', 450]],
       },
     };
     $$('.scene[data-scene]').forEach(el => {
@@ -820,33 +796,6 @@
   })();
 
   /* ============================================================
-     7 · BENEFÍCIOS — abas com controle segmentado
-     ============================================================ */
-  (() => {
-    const tabs = $$('.tabs [role="tab"]'), wrap = $('.tabs');
-    function select(i, focus) {
-      tabs.forEach((t, j) => {
-        const on = i === j; t.setAttribute('aria-selected', on); t.tabIndex = on ? 0 : -1;
-        const panel = $('#' + t.getAttribute('aria-controls'));
-        panel.hidden = !on;
-        if (on && !reduce) {
-          $$('.tile', panel).forEach((tile, k) => tile.style.setProperty('--k', k));
-          panel.classList.remove('is-entering'); void panel.offsetWidth; panel.classList.add('is-entering');
-          setTimeout(() => panel.classList.remove('is-entering'), 1100);
-        }
-      });
-      wrap.classList.toggle('is-second', i === 1);
-      if (focus) tabs[i].focus();
-    }
-    tabs.forEach((t, i) => {
-      t.addEventListener('click', () => select(i));
-      t.addEventListener('keydown', e => {
-        if (e.key === 'ArrowRight' || e.key === 'ArrowLeft') { e.preventDefault(); select((i + 1) % tabs.length, true); }
-      });
-    });
-  })();
-
-  /* ============================================================
      8 · IDENTIDADE DIGITAL — cartão 3D que entra em perspectiva e inclina com o ponteiro
      ============================================================ */
   const passport = (() => {
@@ -933,7 +882,6 @@
     if (e.target.classList.contains('tile')) setTimeout(() => e.target.classList.add('tilt-ready'), 1300);
   }), { rootMargin: '0px 0px -12% 0px', threshold: 0.12 });
   $$('[data-reveal], #storyMark').forEach(el => io.observe(el));
-  $$('.panel .tile').forEach(t => t.classList.add('tilt-ready'));
 
   if (fine && !reduce) {
     $$('.tile').forEach(tile => {
