@@ -631,65 +631,64 @@
       <path class="vd-ring" d="M50 1.2a48.8 48.8 0 1 1 0 97.6a48.8 48.8 0 1 1 0-97.6" pathLength="1"/>${VD_MARK[kind]}</g>`;
 
   /* ============================================================
-     4 · PARA QUE SERVE — em cada cartão, a fraude acontece numa cena curta e o lacre denuncia
-     A garrafa é desenhada sempre em cx = 100 (o recorte #ill-body do sprite depende disso) e movida por um grupo.
-     O líquido nunca muda de cor: por fora, a garrafa adulterada é idêntica; só o lacre mostra a diferença.
+     4 · PARA QUE SERVE — em cada cartão, a fraude acontece numa cena curta e o lacre denuncia.
+     As fotos são da própria garrafa 3D (VeriSeal3D.cardShots, fundo da cor do cartão): o close da tampa e a garrafa
+     inteira, com o lacre íntegro e rompido. Por fora, a garrafa adulterada é idêntica; só o lacre mostra a diferença.
+     Por cima de cada foto, num SVG de 200 x 140 (a proporção da cena), ficam as ondas da leitura e o selo do resultado.
      ============================================================ */
   (() => {
-    const BODY = 'M92 32V48C92 56 74 57 74 70V123Q74 130 81 130H119Q126 130 126 123V70C126 57 108 56 108 48V32Z';
-    // vidro, líquido, rótulo com o VS e a tampa com o lacre: a parte de cima da tira vai com a tampa, a de baixo fica no
-    // gargalo, e a ruptura é a junção das duas (y = 32)
-    const bottle = () => `
-      <ellipse cx="100" cy="131" rx="31" ry="3.5" fill="#0f1a2e" fill-opacity=".08"/>
-      <path d="${BODY}" fill="#fff" fill-opacity=".8"/>
-      <g clip-path="url(#ill-body)"><rect class="liq" x="70" y="60" width="60" height="72" fill="url(#ill-liq)"/></g>
-      <path d="${BODY}" fill="none" stroke="#a9b8cc" stroke-width="1.5"/>
-      <path d="M79.5 77V119" stroke="#fff" stroke-opacity=".55" stroke-width="3" stroke-linecap="round"/>
-      <rect x="82" y="88" width="36" height="26" rx="3" fill="#042555"/>
-      <svg x="89" y="95.6" width="22" height="11.8" viewBox="0 0 668 359"><use href="#vs-mark" style="--lg-ink:#fff"/></svg>
-      <rect x="97.4" y="32" width="5.2" height="13" rx="1" fill="#03adf9"/>
-      <path class="tear" d="M94.5 33l2.2-2.2 2.2 2.2 2.2-2.2 2.2 2.2 2.2-2.2" fill="none" stroke="#d93025" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/>
-      <g class="cap">
-        <rect x="90" y="12" width="20" height="20.5" rx="3" fill="#0b1d3d"/>
-        <path d="M93.5 15.5v13.5M106.5 15.5v13.5" stroke="#fff" stroke-opacity=".14" stroke-width="1.2"/>
-        <rect class="seal-up" x="97.4" y="11" width="5.2" height="21.5" rx="1" fill="#03adf9"/>
-      </g>`;
-    const at = (x, s, inner) => `<g transform="translate(${x} 132) scale(${s}) translate(-100 -132)">${inner}</g>`;
-    // celular que encosta no lacre; as ondas saem do lado indicado (l = esquerda, r = direita)
-    const phone = (x, y, side, on, off) => `<g class="ph" style="--x:${x}px;--y:${y}px" data-on="${on}"${off ? ` data-off="${off}"` : ''}>
-        <g class="ph-arcs" fill="none" stroke="#03adf9" stroke-width="1.6" stroke-linecap="round"${side === 'r' ? ' transform="matrix(-1 0 0 1 18 0)"' : ''}>
-          <path style="--k:0" d="M-4 11a7 7 0 0 0 0 10"/><path style="--k:1" d="M-8.5 7.5a12 12 0 0 0 0 17"/><path style="--k:2" d="M-13 4a17 17 0 0 0 0 24"/>
-        </g>
-        <rect width="18" height="32" rx="4" fill="#0f1a2e"/><rect x="1.6" y="1.6" width="14.8" height="28.8" rx="2.8" fill="#1f3f72"/>
-        <rect x="6.5" y="3.4" width="5" height="1.6" rx=".8" fill="#0f1a2e"/>
-      </g>`;
-    const pour = '<rect class="pour" x="99" y="0" width="2" height="64" rx="1" fill="#e9b866"/>';
+    const ping = (x, y, on, off) => `<g class="ping" data-on="${on}" data-off="${off}">${[0, 1, 2].map(k =>
+      `<circle style="--k:${k}" cx="${x}" cy="${y}" r="14"/>`).join('')}</g>`;
     const SCENES = {
+      // a tampa de perto: o lacre íntegro, depois rompido (a tampa foi girada), e o alerta
       adulteracao: {
-        svg: () => pour + bottle() + verdict('bad', 158, 58, 17, 'verdict'),
-        steps: [['', 900], ['open', 800], ['pour', 1300], ['close', 750], ['verdict', 2900], ['out', 450]],
+        imgs: ['capOk', 'capBad'], chip: ['Lacre rompido', ''],
+        over: verdict('bad', 170, 32, 17, 'verdict'),
+        steps: [['', 1600], ['swap', 1100], ['verdict', 3200], ['out', 450]],
       },
+      // duas garrafas idênticas: o celular lê as duas; só a original responde
       falsificacao: {
-        svg: () => at(58, 0.8, bottle()) + at(142, 0.8, bottle())
-          + phone(78, 30, 'l', 'scanA', 'okA') + phone(164, 30, 'l', 'scanB', 'badB')
-          + verdict('ok', 58, 17, 12, 'okA') + verdict('no', 142, 17, 12, 'badB'),
-        steps: [['', 900], ['scanA', 1000], ['okA', 900], ['scanB', 1000], ['badB', 2900], ['out', 450]],
+        imgs: ['narrow', 'narrow'], pair: true,
+        over: ping(50, 24, 'scanA', 'okA') + ping(150, 24, 'scanB', 'badB') + verdict('ok', 76, 30, 11, 'okA') + verdict('no', 176, 30, 11, 'badB'),
+        steps: [['', 1000], ['scanA', 1200], ['okA', 900], ['scanB', 1200], ['badB', 3200], ['out', 450]],
       },
+      // a garrafa inteira: foi aberta (e pode ter sido reabastecida); o lacre não volta a fechar
       reutilizacao: {
-        svg: () => pour + bottle()
-          + '<g class="rf" data-on="drain" data-off="close" fill="none" stroke="#7d8aa0" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">'
-          + '<path d="M168 58a10 10 0 1 1-2.93-7.07"/><path d="M160.15 50.06L165.07 50.93L164.2 46.01"/></g>'
-          + verdict('bad', 158, 58, 17, 'verdict'),
-        steps: [['', 800], ['open', 750], ['drain', 1300], ['refill', 1600], ['close', 750], ['verdict', 2900], ['out', 450]],
+        imgs: ['ok', 'bad'], chip: ['Já foi aberta', 'warn'],
+        over: verdict('bad', 132, 34, 15, 'verdict'),
+        steps: [['', 1600], ['swap', 1100], ['verdict', 3200], ['out', 450]],
       },
     };
-    $$('.scene[data-scene]').forEach(el => {
-      const sc = SCENES[el.dataset.scene];
-      if (!sc) return;
+    const scenes = $$('.scene[data-scene]').map(el => ({ el, sc: SCENES[el.dataset.scene] })).filter(o => o.sc);
+    scenes.forEach(({ el, sc }) => {
       el.classList.add('sc-' + el.dataset.scene);
-      el.innerHTML = `<svg viewBox="0 0 200 140" xmlns="http://www.w3.org/2000/svg">${sc.svg()}</svg>`;
-      loopScene(el, sc.steps);
+      el.innerHTML = `<div class="sc-img${sc.pair ? ' pair' : ''}">${sc.imgs.map((k, i) => `<img class="${sc.pair ? '' : i ? 'sc-b' : 'sc-a'}" alt="">`).join('')}</div>
+        <svg class="sc-over" viewBox="0 0 200 140" xmlns="http://www.w3.org/2000/svg">${sc.over}</svg>
+        ${sc.chip ? `<span class="sc-chip ${sc.chip[1]}" data-on="verdict">${sc.chip[0]}</span>` : ''}`;
     });
+    let has3d = false, started = false;
+    function show(shots, flat) {
+      scenes.forEach(({ el, sc }) => {
+        $$('.sc-img img', el).forEach((img, i) => { img.src = shots[sc.imgs[i]]; });
+        el.classList.toggle('is-flat', flat);
+      });
+      if (started) return;
+      started = true;
+      scenes.forEach(({ el, sc }) => loopScene(el, sc.steps));
+    }
+    async function load() {
+      if (has3d || !window.VeriSeal3D || !window.VeriSeal3D.cardShots) return;
+      try { const s = await window.VeriSeal3D.cardShots(); if (s && s.capOk) { has3d = true; show(s, false); } } catch (e) { /* fica o desenho */ }
+    }
+    // sem a cena 3D: o desenho simples da garrafa (o mesmo do jogo), trocado pelas fotos se elas chegarem depois
+    const flatShots = () => { const ok = game.fallback(false), bad = game.fallback(true); return { capOk: ok, capBad: bad, ok, bad, narrow: ok }; };
+    let near = false;
+    addEventListener('veriseal:3d', () => { if (near) load(); });
+    if (scenes.length) new IntersectionObserver((es, o) => es.forEach(e => {
+      if (!e.isIntersecting) return;
+      near = true; o.disconnect(); load();
+      setTimeout(() => { if (!has3d && !started) show(flatShots(), true); }, 2500);
+    }), { rootMargin: '120% 0px' }).observe(scenes[0].el);
     // a chamada: o lacre de verdade (do topo da tampa até a ponta da frente), flutuando
     const ts = $('#tsSeal');
     if (ts) {

@@ -979,12 +979,14 @@
     const bw = Math.max(...sizes.map(s => s[0])), bh = Math.max(...sizes.map(s => s[1]));
     renderer.setDrawingBufferSize(bw, bh, 1);
     backdrop.visible = false; causticPivot.visible = false;
-    bottle.rotation.set(0, 0.42, 0);
     liquidUniforms.uTilt.value.set(0, 0); liquidUniforms.uSym.value = 0; liquidUniforms.uRip.value = 0.0004; liquidUniforms.uSwirl.value = 0;
     camera.clearViewOffset();
-    const d = 13.4; camera.position.set(0, 2.98 + d * Math.sin(0.05), d * Math.cos(0.05)); camera.lookAt(0, 2.98, 0);
     const urls = list.map((o, i) => {
       const [w, h] = sizes[i];
+      // enquadramento: a garrafa inteira, ou o que a foto pedir em cam = [altura do alvo, distância, elevação] (o close da tampa)
+      const [ly, d, el] = o.cam || [2.98, 13.4, 0.05];
+      camera.position.set(0, ly + d * Math.sin(el), d * Math.cos(el)); camera.lookAt(0, ly, 0);
+      bottle.rotation.set(0, o.rot ?? 0.42, 0);
       renderer.setViewport(0, 0, w, h);
       scene.background.set(o.bg);
       for (const k in glowPlanes) glowPlanes[k].visible = false;
@@ -1055,7 +1057,16 @@
   // alvos de renderização agora, para o primeiro quadro visível não travar a rolagem
   await idle();
   if (!visible) { renderer.shadowMap.needsUpdate = true; renderer.render(scene, camera); shadowAt.y = 1e9; }
-  window.VeriSeal3D = { bottleShots };
+  // as fotos dos cartões de "Para que serve" (fundo claro, como o cartão): o close da tampa e a garrafa inteira,
+  // íntegra e rompida, e uma garrafa estreita (as duas idênticas da falsificação). Feitas só quando a seção se aproxima
+  const CARD_BG = 0xedf2f8, CAP_CAM = [5.1, 2.9, 0.2];
+  let cards = null;
+  const cardShots = () => cards || (cards = renderBottles([
+    { bad: false, w: 400, h: 280, pr: 2, bg: CARD_BG, cam: CAP_CAM, rot: 0.2 }, { bad: true, w: 400, h: 280, pr: 2, bg: CARD_BG, cam: CAP_CAM, rot: 0.2 },
+    { bad: false, w: 400, h: 280, pr: 2, bg: CARD_BG }, { bad: true, w: 400, h: 280, pr: 2, bg: CARD_BG },
+    { bad: false, w: 200, h: 280, pr: 2, bg: CARD_BG },
+  ]).then(([capOk, capBad, ok, bad, narrow]) => ({ capOk, capBad, ok, bad, narrow })));
+  window.VeriSeal3D = { bottleShots, cardShots };
   await (document.fonts ? document.fonts.ready : Promise.resolve());
   dispatchEvent(new Event('veriseal:3d'));
   // as fotos da garrafa ficam prontas num momento ocioso, antes de a pessoa chegar ao jogo e à demonstração
