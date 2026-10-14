@@ -1969,7 +1969,11 @@ p {
   background: linear-gradient(100deg, #03adf9, #9fb5ff);
   -webkit-background-clip: text;
   background-clip: text;
-  color: transparent
+  color: transparent;
+  /* o degradê só pinta dentro da caixa da palavra: estende para baixo (e um pouco nas laterais)
+     para não cortar as descendentes (g, p, ç) — as margens negativas mantêm o espaçamento */
+  padding: 0 .05em .2em;
+  margin: 0 -.05em -.2em
 }
 
 .idea-sub {

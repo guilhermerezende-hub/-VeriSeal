@@ -590,7 +590,8 @@
     const sec = $('#ideia'), text = $('#ideaText'), sub = $('#ideaSub');
     const words = text.textContent.trim().split(/\s+/);
     const full = text.textContent.trim();
-    text.innerHTML = '<span class="sr-only">' + full + '</span>' + words.map((w, i) => '<span class="iw' + (i >= words.length - 2 ? ' hl' : '') + '" aria-hidden="true" style="--i:' + i + '">' + w + '</span>').join(' ');
+    const HL = ['NFC', 'proteger', 'saúde', 'reputação'];   // palavras destacadas com o degradê, além de "da marca"
+    text.innerHTML = '<span class="sr-only">' + full + '</span>' + words.map((w, i) => '<span class="iw' + (i >= words.length - 2 || HL.includes(w.replace(/[.,]/g, '')) ? ' hl' : '') + '" aria-hidden="true" style="--i:' + i + '">' + w + '</span>').join(' ');
     sub.style.setProperty('--sd', (words.length * 0.085 + 0.5).toFixed(2) + 's');
     new IntersectionObserver((es, o) => es.forEach(e => { if (e.isIntersecting) { sec.classList.add('is-on'); o.disconnect(); } }), { threshold: 0.4 }).observe(sec);
   })();
