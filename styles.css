@@ -29,7 +29,8 @@
   --ease: cubic-bezier(.22, .61, .36, 1);
   --ease-io: cubic-bezier(.65, 0, .35, 1);
   --spring: cubic-bezier(.34, 1.4, .64, 1);
-  --sw: min(1040px, 84vw, calc((100svh - 400px) * 3.4));
+  /* largura do lacre do topo: a tira inteira (verso + topo da tampa + frente) é 2612 x 280 */
+  --sw: min(1360px, 92vw);
 }
 
 *,
@@ -574,7 +575,7 @@ p {
   left: 50%;
   top: calc(var(--nav-h) + 56%);
   width: var(--sw);
-  height: calc(var(--sw) * .28);
+  height: calc(var(--sw) * .1072);
   transform: translate(-50%, -50%);
   perspective: 2000px;
   z-index: 2
@@ -616,7 +617,7 @@ p {
 .seal-glare {
   position: absolute;
   inset: 0;
-  border-radius: calc(var(--sw) * .026);
+  border-radius: calc(var(--sw) * .0092);
   pointer-events: none;
   background: radial-gradient(circle at var(--gx, 30%) var(--gy, 10%), rgba(255, 255, 255, .2), rgba(255, 255, 255, 0) 38%);
   mix-blend-mode: screen;
@@ -638,7 +639,7 @@ p {
 
 .nfc-ping {
   position: absolute;
-  width: 12%;
+  width: 4.6%;
   aspect-ratio: 1;
   border-radius: 50%;
   border: 2px solid rgba(95, 208, 255, .7);
@@ -3607,7 +3608,7 @@ p {
 
 @media (max-width:719px) {
   :root {
-    --sw: calc(100vw - 24px);
+    --sw: calc(100vw - 16px);
     --nav-h: 52px
   }
 
@@ -3925,9 +3926,9 @@ p {
 /* lacre 3D flutuante na chamada final */
 .cta-seal {
   position: relative;
-  width: min(620px, 86vw);
-  aspect-ratio: 1000/280;
-  margin: clamp(40px, 7vh, 72px) auto 0;
+  width: min(1040px, 88vw);
+  aspect-ratio: 2612/280;
+  margin: clamp(64px, 10vh, 112px) auto clamp(24px, 4vh, 48px);
   perspective: 1400px
 }
 
@@ -4025,7 +4026,7 @@ p {
 
 @media (max-width:719px) {
   .cta-seal {
-    width: 92vw
+    width: 94vw
   }
 }
 
@@ -4415,8 +4416,9 @@ p {
 }
 
 @media (max-width:719px) {
+  /* a tira é fina: fica no meio do espaço entre o texto e os botões */
   .seal-stage {
-    top: 50%
+    top: 55%
   }
 
   .hero-foot {

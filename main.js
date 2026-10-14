@@ -62,6 +62,11 @@
      half width 0.85 → 1.7 wide, 5.95 tall to the top of the cap (width/height ≈ 0.29) */
   const HW = 0.85, C = 0.24, WALL = 0.07, RN = 0.30;      // half width, corner chamfer, glass wall, neck radius
   const Y0 = 3.5, Y1 = 4.6;                                // shoulder from body top to neck base
+  // tampa alta, na proporção do lacre que passa por cima dela (lateral de 35 mm e Ø 31 mm para uma tira de 15 mm):
+  // o topo do lacre (612 no desenho) vai de uma borda à outra e a lateral reta tem a altura da arte até a ruptura (655)
+  const CAP_R = 0.35, CAP_RIM = 0.045, YJ = 5.1;                       // raio, borda arredondada, junção tampa/gargalo
+  const SEAL_K = (2 * (CAP_R - CAP_RIM) + PI * CAP_RIM) / 612;          // unidades do mundo por unidade do desenho do lacre
+  const YS = YJ + 655 * SEAL_K, YT = YS + CAP_RIM;                      // fim da lateral reta e topo da tampa
   const HWI = HW - WALL - 0.005, RNI = RN - WALL - 0.005;  // liquid cavity
   const CI = C + 0.586 * (WALL + 0.005);                   // chamfer of the inward-offset octagon
   const FILL = 3.62;                                       // fill line just into the shoulder, like a sealed bottle
@@ -114,9 +119,10 @@
   const K = {
     // o lacre fica só na frente: no fim a garrafa gira pouco, para ele continuar à vista
     rot: kf([[0, 0], [0.12, 0.25 * PI], [0.5, 2.4 * PI], [0.72, 3.7 * PI], [0.85, 4 * PI], [0.93, 4.06 * PI], [1, 4.13 * PI]]),
-    dist: kf([[0, 13.5], [0.14, 13.2], [0.2, 12.5], [0.4, 12.5], [0.48, 7.8], [0.64, 6.4], [0.72, 4.4], [0.85, 2.15], [1, 2.0]]),
-    ty: kf([[0, 2.95], [0.4, 2.95], [0.48, 3.4], [0.64, 3.9], [0.72, 4.7], [0.85, 5.24], [1, 5.25]]),
-    el: kf([[0, 0.08], [0.5, 0.12], [0.72, 0.24], [0.85, 0.36], [1, 0.42]]),
+    // no fim, a câmera enquadra o lacre inteiro (do gargalo ao topo da tampa) e sobe o bastante para ver o holograma no topo
+    dist: kf([[0, 13.5], [0.14, 13.2], [0.2, 12.5], [0.4, 12.5], [0.48, 7.8], [0.64, 6.7], [0.72, 4.9], [0.85, 3.55], [1, 3.4]]),
+    ty: kf([[0, 2.95], [0.4, 2.95], [0.48, 3.95], [0.64, 4.42], [0.72, 4.85], [0.85, 5.3], [1, 5.32]]),
+    el: kf([[0, 0.08], [0.5, 0.12], [0.72, 0.28], [0.85, 0.5], [1, 0.55]]),
     // lateral lens shift in world units at the target depth (negative = bottle to the right of the text)
     offx: kf([[0, -1.6], [0.14, -1.6], [0.2, 1.8], [0.4, 1.8], [0.46, -1.3], [0.64, -1.1], [0.72, 0], [0.88, 0], [1, -0.3]]),
     hud: kf([[0, 0], [0.79, 0], [0.83, 1], [0.88, 1], [0.905, 0], [1, 0]]),   // balões só no capítulo "Lacre"
@@ -449,7 +455,7 @@
   const glassRings = [
     pole(0), sq(0, HW - 0.12), sq(0.06, HW - 0.03), sq(0.16, HW), sq(Y0, HW),
     ...shoulderRings(HW, RN, C, true),
-    rd(Y1, RN), rd(4.98, RN), rd(5.02, RN + 0.025), rd(5.12, RN + 0.025), rd(5.16, RN), rd(5.36, RN), rd(5.36, RN - WALL), // neck with its glass bead
+    rd(Y1, RN), rd(5.16, RN), rd(5.2, RN + 0.025), rd(5.3, RN + 0.025), rd(5.34, RN), rd(5.5, RN), rd(5.5, RN - WALL), // neck; its glass bead hides under the cap
     rd(Y1, RN - WALL), ...shoulderRings(HW - WALL, RN - WALL, C + 0.586 * WALL, false),
     sq(Y0, HW - WALL, C + 0.586 * WALL), sq(0.42, HW - WALL, C + 0.586 * WALL), sq(0.36, HW - WALL - 0.06, C + 0.586 * WALL), rd(0.40, 0.35), pole(0.55),
   ];
@@ -479,7 +485,7 @@
   // it casts, so the shadow is one continuous shape instead of a cut-out of the liquid with the cap floating apart
   const silhouette = new THREE.Mesh(ringMesh([
     pole(0.04), sq(0.04, HW - 0.1), sq(0.16, HW), sq(Y0, HW), ...shoulderRings(HW, RN, C, true), rd(Y1, RN),
-    rd(5.02, RN), rd(5.02, RN + 0.025), rd(5.12, RN + 0.025), rd(5.16, RN), rd(5.22, RN), rd(5.22, 0.35), rd(5.575, 0.35), rd(5.62, 0.30), pole(5.62),
+    rd(YJ, RN), rd(YJ, CAP_R), rd(YS, CAP_R), rd(YT, CAP_R - CAP_RIM), pole(YT),
   ]), new THREE.MeshBasicMaterial({ colorWrite: false, depthWrite: false }));
   silhouette.castShadow = true; silhouette.renderOrder = -1; bottle.add(silhouette);
 
@@ -500,47 +506,62 @@
     new THREE.MeshPhysicalMaterial({ map: backTex, roughness: 0.5, metalness: 0, envMapIntensity: 0.6, clearcoat: 0.4, clearcoatRoughness: 0.25, transmission: 0.001, thickness: 0 }));
   backLabel.position.set(0, 2.0, -(HW + 0.004)); backLabel.rotation.y = PI; bottle.add(backLabel);
 
-  // tampa de rosca curta, azul-marinho quase preto, com frisos e um filete ciano acima da saia.
+  // tampa de rosca alta, azul-marinho quase preto, com frisos e um filete ciano acima da saia.
   // Fica num grupo próprio: no modo "lacre adulterado" ela gira e sobe, levando junto a parte de cima do lacre.
   const capGroup = new THREE.Group(); bottle.add(capGroup);
-  const capBody = new THREE.Mesh(new THREE.LatheGeometry([V2(0, 5.22), V2(0.35, 5.22), V2(0.35, 5.575), V2(0.335, 5.61), V2(0.30, 5.62), V2(0, 5.62)], 128),
+  const capProfile = [V2(0, YJ), V2(CAP_R, YJ), V2(CAP_R, YS)];
+  for (let i = 1; i <= 8; i++) { const a = i / 8 * PI / 2; capProfile.push(V2(CAP_R - CAP_RIM + CAP_RIM * Math.cos(a), YS + CAP_RIM * Math.sin(a))); }
+  capProfile.push(V2(0, YT));
+  const capBody = new THREE.Mesh(new THREE.LatheGeometry(capProfile, 128),
     new THREE.MeshPhysicalMaterial({ color: 0x07142e, roughness: 0.34, metalness: 0.1, clearcoat: 0.6, clearcoatRoughness: 0.2, envMapIntensity: 1.0 }));
   capGroup.add(capBody);
-  const capSkinTex = canvasTex(64, 512, c => {
-    const g = c.getContext('2d'); g.fillStyle = '#0a1a3a'; g.fillRect(0, 0, 64, 512);
-    for (let y = 2; y < 440; y += 4) { g.fillStyle = (y >> 2) % 2 ? '#050d20' : '#163066'; g.fillRect(0, y, 64, 1.5); }
-    g.fillStyle = '#03adf9'; g.fillRect(0, 446, 64, 9);
-    g.fillStyle = '#061128'; g.fillRect(0, 462, 64, 50);
+  const capSkinTex = canvasTex(64, 1024, c => {
+    const g = c.getContext('2d'); g.fillStyle = '#0a1a3a'; g.fillRect(0, 0, 64, 1024);
+    for (let y = 2; y < 952; y += 4) { g.fillStyle = (y >> 2) % 2 ? '#050d20' : '#163066'; g.fillRect(0, y, 64, 1.5); }
+    g.fillStyle = '#03adf9'; g.fillRect(0, 960, 64, 9);
+    g.fillStyle = '#061128'; g.fillRect(0, 976, 64, 48);
   });
   capSkinTex.anisotropy = maxAniso;
-  const capSkin = new THREE.Mesh(new THREE.CylinderGeometry(0.352, 0.352, 0.35, 128, 1, true),
+  const capSkin = new THREE.Mesh(new THREE.CylinderGeometry(CAP_R + 0.002, CAP_R + 0.002, YS - YJ, 128, 1, true),
     new THREE.MeshPhysicalMaterial({ map: capSkinTex, roughness: 0.4, metalness: 0.2, clearcoat: 0.5, clearcoatRoughness: 0.25, envMapIntensity: 1.0 }));
-  capSkin.position.y = 5.395; capGroup.add(capSkin); // 5.22 → 5.57, below the rounded rim
+  capSkin.position.y = (YJ + YS) / 2; capGroup.add(capSkin); // a lateral reta, embaixo da borda arredondada
 
-  /* o lacre inteligente: uma peça só, de um lado da garrafa (o da frente), exatamente o lacre do topo da página
-     (printSVG em site.js, o mesmo desenho de 1000 x 280). Fica de pé: a ponta do holograma em cima, na lateral da tampa,
-     dobrando de leve a borda; a linha de ruptura na junção tampa/gargalo; a ponta do símbolo de aproximação no gargalo.
-     Abrir a tampa rasga o lacre na linha de ruptura; o chip NFC e a antena ficam laminados dentro dele. */
-  const SEAL_W = 0.16, SEAL_L = SEAL_W * 1000 / 280, RC = 0.357, YJ = 5.22;
-  const sealS = x => SEAL_L * (0.655 - x / 1000);     // ponto x do desenho → distância acima da junção, ao longo da superfície
-  // a superfície por onde o lacre passa: s > 0 sobe pela lateral da tampa e dobra a borda arredondada; s < 0 desce o gargalo
-  function sealSurface(s) {
-    const side = 5.574 - YJ;
-    if (s < 0) { const y = YJ + s; return { y, r: y > 5.02 ? lerp(0.336, RC, (y - 5.02) / (YJ - 5.02)) : 0.336 - (5.02 - y) * 0.03 }; }
-    if (s <= side) return { y: YJ + s, r: RC };
-    const a = (s - side) / 0.0535;                     // borda da tampa: arco de raios 0,057 x 0,05
-    return { y: 5.574 + Math.sin(a) * 0.05, r: 0.30 + Math.cos(a) * 0.057 };
+  /* o lacre inteligente: uma tira só, exatamente o lacre do topo da página (printSVG em site.js, 2612 x 280):
+     verso (1000) + topo da tampa (612) + frente (1000). Sobe pelo gargalo atrás, cruza a junção tampa/gargalo (a ruptura
+     do verso), sobe a lateral da tampa, passa por cima dela com o holograma no centro, desce a lateral da frente e cruza a
+     junção de novo até o gargalo. Abrir a tampa rasga a tira nas duas linhas de ruptura; o chip NFC e a antena ficam
+     laminados na ponta da frente. */
+  const SEAL_LEN = 2612, SEAL_MID = 1306, SEAL_FX = 1612, SEAL_NB = 345, SEAL_NF = 2267;   // como SW, MID, FX, NB e NF em site.js
+  const LIFT = 0.006;                                                  // a tira fica um fio acima da tampa e do vidro
+  // caminho do eixo da tira no perfil, medido a partir do centro do topo (s ≥ 0; igual na frente e no verso):
+  // topo plano → borda arredondada → lateral reta → degrau da tampa até o vidro do gargalo.
+  // Devolve o raio e a altura do eixo e quanto a tira já abraça o cilindro (b: 0 no topo, 1 na lateral)
+  const A0 = CAP_R - CAP_RIM, A1 = A0 + PI * CAP_RIM / 2, A2 = A1 + 655 * SEAL_K;
+  function sealPath(s, lift) {
+    const L = LIFT + lift;
+    if (s <= A0) return { r: s, y: YT + L, b: 0 };
+    if (s <= A1) { const a = (s - A0) / CAP_RIM; return { r: A0 + (CAP_RIM + L) * Math.sin(a), y: YS + (CAP_RIM + L) * Math.cos(a), b: smoothstep(0, PI / 2, a) }; }
+    if (s <= A2) return { r: CAP_R + L, y: YS - (s - A1), b: 1 };
+    const d = s - A2;
+    return { r: lerp(CAP_R + L, RN + L - 0.002, smoothstep(0, 0.06, d)), y: YJ - d, b: 1 };
   }
-  // um ponto do desenho (x ao longo, y atravessado, como no SVG) na garrafa, um pouco acima da superfície
+  // um ponto do desenho (x ao longo da tira, y atravessado, como no SVG) na garrafa; lift afasta da superfície.
+  // A borda de cima do desenho (y = 0) fica do lado +x, na frente e no verso
   function sealPoint(x, y, lift = 0) {
-    const { y: h, r } = sealSurface(sealS(x)), th = SEAL_W * (0.5 - y / 280) / r;
-    return new THREE.Vector3(Math.sin(th) * (r + lift), h, Math.cos(th) * (r + lift));
+    const L = LIFT + lift, { r, y: h, b } = sealPath(Math.abs(x - SEAL_MID) * SEAL_K, lift), u = (140 - y) * SEAL_K;
+    let px = u, pz = r, py = h;
+    if (b > 0) { px = lerp(u, r * Math.sin(u / r), b); pz = lerp(r, r * Math.cos(u / r), b); }   // enrolada no cilindro
+    if (b < 1) {                                       // no topo e na borda, os cantos da tira assentam na curva da tampa
+      let rr = Math.hypot(px, pz);
+      if (rr > CAP_R + L) { px *= (CAP_R + L) / rr; pz *= (CAP_R + L) / rr; rr = CAP_R + L; }
+      if (rr > A0) py = Math.min(py, YS + Math.sqrt(Math.max(0, (CAP_RIM + L) ** 2 - (rr - A0) ** 2)));
+    }
+    return new THREE.Vector3(px, py, x >= SEAL_MID ? pz : -pz);
   }
   function buildSeal() {
-    const nA = 120, nW = 10, pos = [], uv = [], idx = [];
+    const nA = 560, nW = 14, pos = [], uv = [], idx = [];
     for (let i = 0; i <= nA; i++) {
-      const { y, r } = sealSurface(sealS(i / nA * 1000));
-      for (let j = 0; j <= nW; j++) { const th = SEAL_W * (j / nW - 0.5) / r; pos.push(Math.sin(th) * r, y, Math.cos(th) * r); uv.push(i / nA, j / nW); }
+      for (let j = 0; j <= nW; j++) { const p = sealPoint(i / nA * SEAL_LEN, 280 * (1 - j / nW)); pos.push(p.x, p.y, p.z); uv.push(i / nA, j / nW); }
     }
     for (let i = 0; i < nA; i++) for (let j = 0; j < nW; j++) { const a = i * (nW + 1) + j, b = a + nW + 1; idx.push(a, b, a + 1, a + 1, b, b + 1); }
     const g = new THREE.BufferGeometry();
@@ -550,21 +571,37 @@
     return g;
   }
   const sealGeo = buildSeal();
-  const NFC_AT = sealPoint(767.3, 183.3, 0.008);   // centro do oval do símbolo de aproximação (NFC_PING em site.js): os balões e as ondas da demonstração saem dali
-  // a arte, desenhada como o printSVG de site.js: o holograma e a ponta de baixo ficam de pé na garrafa (girados no desenho),
-  // a logo VeriSeal corre deitada ao longo do lacre
-  const SEAL_OUTLINE = new Path2D('M24 0H644L655 13L666 0H976A24 24 0 0 1 1000 24V256A24 24 0 0 1 976 280H666L655 267L644 280H24A24 24 0 0 1 0 256V24A24 24 0 0 1 24 0Z');
-  const HX = 142, HY = 140, HR = 94;
+  const NFC_AT = sealPoint(SEAL_FX + 767.3, 183.3, 0.008);   // centro do oval do símbolo da frente (NFC_PING em site.js): os balões e as ondas da demonstração saem dali
+  // a arte, desenhada como o printSVG de site.js. Cada ponta: logo VeriSeal deitada, aviso da ruptura e o símbolo de
+  // aproximação com a chamada, de pé na garrafa (girados no desenho); o verso é a frente girada 180°.
+  // No topo, o holograma com o VS deitado ao longo da tira
+  const notch = x => [`H${x - 11}L${x} 13L${x + 11} 0`, `H${x + 11}L${x} 267L${x - 11} 280`];
+  const SEAL_OUTLINE = new Path2D(`M24 0${notch(SEAL_NB)[0]}${notch(SEAL_NF)[0]}H${SEAL_LEN - 24}A24 24 0 0 1 ${SEAL_LEN} 24V256A24 24 0 0 1 ${SEAL_LEN - 24} 280${notch(SEAL_NF)[1]}${notch(SEAL_NB)[1]}H24A24 24 0 0 1 0 256V24A24 24 0 0 1 24 0Z`);
+  const HX = 142, HY = 140, HR = 94, HK = 1.12;              // holograma no desenho de origem, ampliado HK no topo (como em site.js)
+  const atHolo = g => { g.translate(SEAL_MID, HY); g.scale(HK, HK); g.translate(-HX, -HY); };
+  function drawSealEnd(g, ls) {
+    drawLogo(g, WM, 20, 140 - 598 * WM.h / WM.w / 2, 598, '#ffffff', '#03adf9');   // como WMX/WMW em site.js
+    g.save(); g.translate(641, 140); g.rotate(-PI / 2); g.fillStyle = 'rgba(255,255,255,.55)'; g.font = `400 9px ${MONO}`; g.textAlign = 'center'; g.textBaseline = 'alphabetic';
+    ls('2px'); g.fillText('ROMPE AO ABRIR', 0, 0); g.restore();
+    g.save(); g.translate(0, 280); g.rotate(-PI / 2);
+    drawNfc(g, 140, 770, 112, '#ffffff');                   // como CTA_V/NFC_H em site.js
+    g.fillStyle = '#fff'; g.font = `700 34px ${SANS}`; g.textAlign = 'center'; g.textBaseline = 'alphabetic'; ls('0.7px');
+    g.fillText('APROXIME', 140, 885); g.fillText('O CELULAR', 140, 926);
+    g.restore();
+  }
   function drawSeal(c, orm) {
-    const g = c.getContext('2d'), s = c.width / 1000, ls = lsOf(g), rr = rrectOf(g);
-    g.setTransform(s, 0, 0, s, 0, 0); g.clearRect(0, 0, 1000, 280);
+    const g = c.getContext('2d'), s = c.width / SEAL_LEN, ls = lsOf(g), rr = rrectOf(g);
+    g.setTransform(s, 0, 0, s, 0, 0); g.clearRect(0, 0, SEAL_LEN, 280);
     if (orm) {                                               // R = iridescência, G = rugosidade, B = metal
       g.fillStyle = 'rgb(0,115,0)'; g.fill(SEAL_OUTLINE);
+      g.save(); atHolo(g);
       g.fillStyle = 'rgb(255,58,255)'; g.beginPath(); g.arc(HX, HY, HR, 0, PI * 2); g.fill();
-      g.save(); g.translate(HX, HY); g.rotate(-PI / 2); drawLogo(g, MK, -46, -24.7, 92, 'rgb(40,110,0)', 'rgb(40,110,0)'); g.restore();
+      drawLogo(g, MK, HX - 46, HY - 24.7, 92, 'rgb(40,110,0)', 'rgb(40,110,0)'); g.restore();
       return;
     }
-    const navy = g.createLinearGradient(0, 0, 1000, 280); navy.addColorStop(0, '#0d3a80'); navy.addColorStop(0.45, '#062a63'); navy.addColorStop(1, '#021a42');
+    // azul-marinho mais claro no meio (o topo da tampa), escurecendo para as duas pontas
+    const navy = g.createLinearGradient(0, 0, SEAL_LEN, 0);
+    [[0, '#021a42'], [0.275, '#062a63'], [0.5, '#0d3a80'], [0.725, '#062a63'], [1, '#021a42']].forEach(([o, col]) => navy.addColorStop(o, col));
     g.fillStyle = navy; g.fill(SEAL_OUTLINE);
     // guilhoché
     g.save(); g.clip(SEAL_OUTLINE); g.lineWidth = 1;
@@ -572,14 +609,15 @@
       g.strokeStyle = col; g.beginPath();
       for (let i = 0; i < n; i++) {
         const ph = ph0 + i * 0.42;
-        for (let x = -10; x <= 1010; x += 8) { const y = 140 + amp * Math.sin(x * f1 + ph) * (0.62 + 0.38 * Math.sin(x * f2 - ph * 0.7)); x < 0 ? g.moveTo(x, y) : g.lineTo(x, y); }
+        for (let x = -10; x <= SEAL_LEN + 10; x += 8) { const y = 140 + amp * Math.sin(x * f1 + ph) * (0.62 + 0.38 * Math.sin(x * f2 - ph * 0.7)); x < 0 ? g.moveTo(x, y) : g.lineTo(x, y); }
       }
       g.stroke();
     });
     g.restore();
     g.strokeStyle = 'rgba(255,255,255,.16)'; g.lineWidth = 2; g.stroke(SEAL_OUTLINE);
-    g.strokeStyle = 'rgba(3,173,249,.38)'; g.lineWidth = 1.2; rr(12, 12, 976, 256, 15); g.stroke();
-    // holograma: degradê, roseta de segurança, brilho e aro
+    g.strokeStyle = 'rgba(3,173,249,.38)'; g.lineWidth = 1.2; rr(12, 12, SEAL_LEN - 24, 256, 15); g.stroke();
+    // holograma no topo: degradê, roseta de segurança, brilho, aro, microtexto e monograma deitado
+    g.save(); atHolo(g);
     const holo = g.createLinearGradient(HX - HR, HY - HR, HX + HR, HY + HR);
     [[0, '#8fe3ff'], [0.18, '#b9a9ff'], [0.36, '#ffc4e5'], [0.52, '#fff1b0'], [0.7, '#b3ffd8'], [0.86, '#8fe3ff'], [1, '#c8b8ff']].forEach(([o, col]) => holo.addColorStop(o, col));
     g.fillStyle = holo; g.beginPath(); g.arc(HX, HY, HR, 0, PI * 2); g.fill();
@@ -593,8 +631,7 @@
     sh.addColorStop(0, 'rgba(255,255,255,.85)'); sh.addColorStop(0.35, 'rgba(255,255,255,.1)'); sh.addColorStop(1, 'rgba(255,255,255,0)');
     g.save(); g.globalAlpha = 0.5; g.fillStyle = sh; g.beginPath(); g.arc(HX, HY, HR, 0, PI * 2); g.fill(); g.restore();
     g.strokeStyle = 'rgba(255,255,255,.7)'; g.lineWidth = 1.5; g.beginPath(); g.arc(HX, HY, HR, 0, PI * 2); g.stroke();
-    // microtexto em volta e monograma, de pé na garrafa
-    g.save(); g.translate(HX, HY); g.rotate(-PI / 2);
+    g.translate(HX, HY);
     g.fillStyle = 'rgba(6,42,99,.72)'; g.font = `600 10.5px ${MONO}`; g.textAlign = 'center'; g.textBaseline = 'alphabetic';
     let d = 0;
     for (const ch of 'VERISEAL • PRODUTO ORIGINAL • VERISEAL • PRODUTO ORIGINAL •') {
@@ -604,22 +641,16 @@
     }
     drawLogo(g, MK, -46, -24.7, 92, '#062a63', '#0a76c4');
     g.restore();
-    // logo VeriSeal deitada
-    drawLogo(g, WM, 435 - 352 / 2, 140 - 352 * WM.h / WM.w / 2, 352, '#ffffff', '#03adf9');   // como WMW/WMX em site.js
-    // linha de ruptura e o aviso ao lado dela
-    g.save(); g.setLineDash([5, 6]); g.strokeStyle = 'rgba(255,255,255,.55)'; g.lineWidth = 1.6; g.beginPath(); g.moveTo(655, 18); g.lineTo(655, 262); g.stroke(); g.restore();
-    g.save(); g.translate(641, 140); g.rotate(-PI / 2); g.fillStyle = 'rgba(255,255,255,.55)'; g.font = `400 9px ${MONO}`; g.textAlign = 'center'; g.textBaseline = 'alphabetic';
-    ls('2px'); g.fillText('ROMPE AO ABRIR', 0, 0); g.restore();
-    // ponta de baixo: símbolo de aproximação e chamada, de pé na garrafa
-    g.save(); g.translate(0, 280); g.rotate(-PI / 2);
-    drawNfc(g, 140, 770, 112, '#ffffff');                   // como CTA_V/NFC_H em site.js
-    g.fillStyle = '#fff'; g.font = `700 34px ${SANS}`; g.textAlign = 'center'; g.textBaseline = 'alphabetic'; ls('0.7px');
-    g.fillText('APROXIME', 140, 885); g.fillText('O CELULAR', 140, 926);
-    g.restore();
+    // linhas de ruptura
+    g.save(); g.setLineDash([5, 6]); g.strokeStyle = 'rgba(255,255,255,.55)'; g.lineWidth = 1.6; g.beginPath();
+    [SEAL_NB, SEAL_NF].forEach(x => { g.moveTo(x, 18); g.lineTo(x, 262); }); g.stroke(); g.restore();
+    // as duas pontas: a frente como está, o verso girado 180°
+    g.save(); g.translate(SEAL_FX, 0); drawSealEnd(g, ls); g.restore();
+    g.save(); g.translate(1000, 280); g.rotate(PI); drawSealEnd(g, ls); g.restore();
   }
   await idle();
-  const sealTex = canvasTex(2048, 574, c => drawSeal(c, false));
-  const sealOrm = canvasTex(1024, 287, c => drawSeal(c, true));
+  const sealTex = canvasTex(4096, 439, c => drawSeal(c, false));
+  const sealOrm = canvasTex(2048, 220, c => drawSeal(c, true));
   await idle();
   sealOrm.colorSpace = THREE.NoColorSpace;
   sealTex.anisotropy = maxAniso; lateRedraw.push(sealTex);
@@ -629,10 +660,10 @@
     clearcoat: 0.5, clearcoatRoughness: 0.2, envMapIntensity: 1.1, side: THREE.DoubleSide, alphaTest: 0.5,
     polygonOffset: true, polygonOffsetFactor: -2, polygonOffsetUnits: -2, // the seal always wins the depth tie against the cap it sits on
   });
-  // o lacre é uma peça só, desenhada duas vezes com planos de corte na junção: a parte de cima vai com a tampa.
-  // Girar a tampa ("lacre adulterado") separa as duas partes na linha de ruptura.
+  // o lacre é uma peça só, desenhada duas vezes com planos de corte na junção: a parte de cima (laterais e topo) vai com
+  // a tampa, as duas pontas ficam no gargalo. Girar a tampa ("lacre adulterado") separa as partes nas duas linhas de ruptura.
   // O corte é feito no próprio shader (e não com clippingPlanes) para o programa poder ser pré-compilado em segundo plano.
-  const SPLIT_Y = 5.222;
+  const SPLIT_Y = YJ + 0.002;
   const clipTop = new THREE.Plane(), clipBot = new THREE.Plane();
   const localUp = new THREE.Plane(new THREE.Vector3(0, 1, 0), -SPLIT_Y), localDown = new THREE.Plane(new THREE.Vector3(0, -1, 0), SPLIT_Y);
   const cutTop = new THREE.Vector4(), cutBot = new THREE.Vector4();
@@ -674,10 +705,10 @@
   const hudSvg = document.getElementById('hud-svg');
   // os pontos ficam nas bordas do lacre, do lado do balão: as linhas não cruzam o lacre e nada da arte fica coberto
   const callouts = {
-    tear: { pos: sealPoint(655, 268, 0.008) },   // borda esquerda, na linha de ruptura
-    nfc: { pos: sealPoint(805, 268, 0.008) },    // borda esquerda, junto do símbolo (a antena fica embaixo dele)
-    cta: { pos: sealPoint(770, 12, 0.008) },     // borda direita, ao lado do símbolo de aproximação
-    top: { pos: sealPoint(HX, 12, 0.01) },       // borda direita, ao lado do holograma
+    tear: { pos: sealPoint(SEAL_NF, 268, 0.008) },          // borda esquerda, na linha de ruptura da frente
+    nfc: { pos: sealPoint(SEAL_FX + 805, 268, 0.008) },     // borda esquerda, junto do símbolo (a antena fica embaixo dele)
+    cta: { pos: sealPoint(SEAL_FX + 770, 12, 0.008) },      // borda direita, ao lado do símbolo de aproximação
+    top: { pos: sealPoint(SEAL_MID, 12, 0.01), up: true },  // borda direita, ao lado do holograma, em cima da tampa
   };
   for (const id in callouts) {
     const c = callouts[id];
@@ -868,7 +899,7 @@
 
     // camera: a dolly toward the cap. The bottle is moved across the frame with a lens shift (no keystone), and on
     // narrow screens it is kept whole in frame and lifted above the text.
-    const distScale = aspect < 1 ? Math.pow(clamp(1 / aspect, 1, 2.4), 0.8) : (aspect < 1.4 ? 1.1 : 1);
+    const distScale = aspect < 1 ? Math.pow(clamp(1 / aspect, 1, 2.4), 0.8) * (1 + (W >= 700 ? 0.5 : 0.14) * smoothstep(0.72, 0.85, pS)) : (aspect < 1.4 ? 1.1 : 1);   // em tela em pé, o close final afasta: no celular a tampa alta não encosta no botão de pular; no tablet ela cabe entre os balões
     const offFactor = aspect < 1 ? 0.1 : (aspect < 1.4 ? 0.55 : 1);
     const dist = K.dist(pS) * distScale, ty = K.ty(pS), el = K.el(pS), ox = K.offx(pS) * offFactor;
     pxS += (px - pxS) * (1 - Math.exp(-dt * 3)); pyS += (py - pyS) * (1 - Math.exp(-dt * 3));
@@ -898,7 +929,7 @@
     const spinTarget = turnBase + look + dragSpin + (reduceMotion ? 0 : 0.07 * Math.sin(t * 0.6));
     updatePhysics(dt, t, spinTarget, 0, 1);
     const narrow = aspect < 0.9;
-    const dist = narrow ? 7.6 : 6.3, ty = narrow ? 4.3 : 4.5, el = 0.12, ox = narrow ? 0.35 : 1.1;
+    const dist = narrow ? 7.6 : 6.3, ty = narrow ? 4.6 : 4.82, el = 0.12, ox = narrow ? 0.35 : 1.1;
     pxS += (px - pxS) * (1 - Math.exp(-dt * 3)); pyS += (py - pyS) * (1 - Math.exp(-dt * 3));
     const par = reduceMotion ? 0 : 0.18;
     camera.position.set(pxS * par, ty + dist * Math.sin(el) - pyS * 0.1, dist * Math.cos(el));

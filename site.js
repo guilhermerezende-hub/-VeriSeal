@@ -19,18 +19,24 @@
   let vw = innerWidth, vh = innerHeight, navH = 56;
 
   /* ============================================================
-     O LACRE EM SVG — gerado aqui para ser reutilizado nas camadas, na lupa e no lacre 3D da chamada final
-     espaço de desenho 1000 x 280; a linha de ruptura fica em x = 655.
-     Na garrafa o lacre fica de pé, com a ponta do holograma em cima: o holograma e a ponta de baixo (símbolo de
-     aproximação e chamada) são desenhados de pé para quem olha a garrafa, ou seja, girados 90° aqui.
-     A logo VeriSeal corre deitada ao longo da tira.
+     O LACRE EM SVG — gerado aqui para ser reutilizado nas camadas, na lupa e no lacre da chamada final.
+     Uma tira só, que passa por cima da tampa: verso (1000) + topo da tampa (612) + frente (1000) = 2612 x 280,
+     ou 140 x 15 mm ("Lacres png/Lacre VeriSeal esticado.svg"). Cada ponta é o lacre deitado de antes, só que com a logo
+     VeriSeal esticada antes da linha de ruptura; o verso é a frente girada 180°, para ficar de pé depois de dobrado.
+     No meio, em cima da tampa, fica o holograma, com o VS deitado ao longo da tira, como a logo.
+     O símbolo de aproximação e a chamada das pontas ficam de pé para quem olha a garrafa (girados 90° aqui).
      ============================================================ */
-  const SW = 1000, SH = 280, R = 24, NX = 655;
-  const HX = 142, HY = 140, HR = 94;                                   // holograma
-  const WMW = 352, WMH = WMW * 100 / 833.41, WMX = 435 - WMW / 2, WMY = SH / 2 - WMH / 2;   // logo VeriSeal, entre o holograma e "ROMPE AO ABRIR"
-  const CTA_V = 770, NFC_H = 112;                                      // símbolo de aproximação: centro ao longo da tira e altura
+  const PL = 1000, SH = 280, R = 24, NX = 655;                        // uma ponta: x = 0 na borda da tampa, ruptura em 655
+  const TOPW = 612, SW = 2 * PL + TOPW, MID = SW / 2;                 // a tira inteira e o meio dela (o centro do topo da tampa)
+  const FX = PL + TOPW, NB = PL - NX, NF = FX + NX;                   // onde começa a frente; rupturas do verso e da frente
+  const FRONT = `translate(${FX} 0)`, BACK = `translate(${PL} ${SH}) rotate(180)`;   // desenho de uma ponta → frente / verso
+  const HX = 142, HY = 140, HR = 94, HK = 1.12;                       // holograma no desenho de origem, ampliado HK no topo
+  const HOLO_AT = `translate(${MID} ${HY}) scale(${HK}) translate(${-HX} ${-HY})`;
+  const WMX = 20, WMW = 598, WMH = WMW * 100 / 833.41, WMY = SH / 2 - WMH / 2;   // logo VeriSeal, da borda da tampa até "ROMPE AO ABRIR"
+  const CTA_V = 770, NFC_H = 112;                                      // símbolo de aproximação: centro ao longo da ponta e altura
   const UPRIGHT = `translate(0 ${SH}) rotate(-90)`;                    // (u atravessando a tira, v ao longo dela) → de pé na garrafa
-  const OUTLINE = `M${R} 0H${NX - 11}L${NX} 13L${NX + 11} 0H${SW - R}A${R} ${R} 0 0 1 ${SW} ${R}V${SH - R}A${R} ${R} 0 0 1 ${SW - R} ${SH}H${NX + 11}L${NX} ${SH - 13}L${NX - 11} ${SH}H${R}A${R} ${R} 0 0 1 0 ${SH - R}V${R}A${R} ${R} 0 0 1 ${R} 0Z`;
+  const notch = x => [`H${x - 11}L${x} 13L${x + 11} 0`, `H${x + 11}L${x} ${SH - 13}L${x - 11} ${SH}`];
+  const OUTLINE = `M${R} 0${notch(NB)[0]}${notch(NF)[0]}H${SW - R}A${R} ${R} 0 0 1 ${SW} ${R}V${SH - R}A${R} ${R} 0 0 1 ${SW - R} ${SH}${notch(NF)[1]}${notch(NB)[1]}H${R}A${R} ${R} 0 0 1 0 ${SH - R}V${R}A${R} ${R} 0 0 1 ${R} 0Z`;
   const SANS = `Inter, -apple-system, 'Segoe UI', Roboto, sans-serif`;
   const MONO = `'JetBrains Mono', ui-monospace, Menlo, Consolas, monospace`;
 
@@ -64,14 +70,14 @@
     return { w, h, body: $('.nfc-body', sym).getAttribute('d'), waves: $$('.nfc-wave', sym).map(p => p.getAttribute('d')) };
   })();
   const NFC_OVAL = [0.292, 0.476];   // centro do oval (de onde saem as ondas), em fração da largura e da altura do símbolo
-  // o mesmo ponto no desenho do lacre deitado (lá o símbolo está girado: ao longo da tira = x, atravessado = y)
-  const NFC_PING = [CTA_V + (NFC_OVAL[1] - 0.5) * NFC_H, SH / 2 - (NFC_OVAL[0] - 0.5) * NFC_H * NFC.w / NFC.h];
+  // o mesmo ponto na tira deitada, na ponta da frente (a antena fica embaixo dela; o símbolo está girado: ao longo = x)
+  const NFC_PING = [FX + CTA_V + (NFC_OVAL[1] - 0.5) * NFC_H, SH / 2 - (NFC_OVAL[0] - 0.5) * NFC_H * NFC.w / NFC.h];
   function nfcSymbol(x, y, h, fill) {
     const s = h / NFC.h, w = NFC.w * s;
     const waves = NFC.waves.map((d, i) => `<path class="cl-arc" style="--k:${i}" d="${d}"/>`).join('');
     return `<g transform="translate(${(x - w / 2).toFixed(1)} ${(y - h / 2).toFixed(1)}) scale(${s.toFixed(4)})" fill="${fill}" fill-rule="evenodd"><path d="${NFC.body}"/>${waves}</g>`;
   }
-  // antena: espiral retangular em volta da zona do celular
+  // antena: espiral retangular embaixo do símbolo da frente (coordenadas de uma ponta)
   function spiral(x0, y0, x1, y1, n, p) {
     const mid = (y0 + y1) / 2;
     let d = `M${x0} ${mid}`;
@@ -79,7 +85,15 @@
     return d;
   }
   const COIL = spiral(718, 34, 968, 246, 6, 10);
-  const LOOP = 'M684 128H600C584 128 576 120 576 104V64C576 50 568 42 554 42H66C52 42 44 50 44 64V216C44 230 52 238 66 238H554C568 238 576 230 576 216V176C576 160 584 152 600 152H684';
+  // circuito de ruptura: sai do chip, na ponta da frente, atravessa a ruptura da frente, corre a tira inteira, atravessa a
+  // ruptura do verso e volta. Abrir a tampa rompe o circuito dos dois lados
+  const LOOP = `M${NF + 29} 128H${NF - 55}C${NF - 71} 128 ${NF - 79} 120 ${NF - 79} 104V64C${NF - 79} 50 ${NF - 87} 42 ${NF - 101} 42`
+    + `H${NB + 101}C${NB + 87} 42 ${NB + 79} 50 ${NB + 79} 64V104C${NB + 79} 120 ${NB + 71} 128 ${NB + 55} 128`
+    + `H${NB - 55}C${NB - 71} 128 ${NB - 79} 120 ${NB - 79} 104V64C${NB - 79} 50 ${NB - 87} 42 ${NB - 101} 42`
+    + `H66C52 42 44 50 44 64V216C44 230 52 238 66 238H${NB - 101}C${NB - 87} 238 ${NB - 79} 230 ${NB - 79} 216`
+    + `V176C${NB - 79} 160 ${NB - 71} 152 ${NB - 55} 152H${NB + 55}C${NB + 71} 152 ${NB + 79} 160 ${NB + 79} 176`
+    + `V216C${NB + 79} 230 ${NB + 87} 238 ${NB + 101} 238H${NF - 101}C${NF - 87} 238 ${NF - 79} 230 ${NF - 79} 216`
+    + `V176C${NF - 79} 160 ${NF - 71} 152 ${NF - 55} 152H${NF + 29}`;
   function dieCuts() {
     let d = '';
     for (let y = 26, row = 0; y < SH - 10; y += 30, row++) for (let x = 24 + (row % 2) * 15; x < SW - 10; x += 30) {
@@ -90,13 +104,13 @@
   }
   const DIECUTS = dieCuts();
 
-  const coilMarkup = (bright, anim) => `
+  const coilMarkup = (bright, anim) => `<g transform="${FRONT}">
     <path d="${COIL}M702 140H718" fill="none" stroke="#03adf9" stroke-opacity="${bright ? .28 : .16}" stroke-width="8" stroke-linejoin="round"/>
     <path class="${anim ? 'trace' : ''}" style="--td:.5s" pathLength="1" d="${COIL}" fill="none" stroke="${bright ? '#9fe6ff' : '#6fd3ff'}" stroke-width="2.4" stroke-linejoin="round"/>
     <path d="M702 140H718M778 140V156H700" fill="none" stroke="${bright ? '#9fe6ff' : '#6fd3ff'}" stroke-width="2.4" stroke-linejoin="round"/>
-    <rect x="712" y="150" width="72" height="11" rx="3" fill="#06142c" stroke="#03adf9" stroke-opacity=".6"/>`;
+    <rect x="712" y="150" width="72" height="11" rx="3" fill="#06142c" stroke="#03adf9" stroke-opacity=".6"/></g>`;
   const chipMarkup = () => `
-    <g class="chip">
+    <g class="chip" transform="${FRONT}">
       <rect x="664" y="122" width="38" height="38" rx="5" fill="#081a36" stroke="#9fe6ff" stroke-width="1.6"/>
       <rect x="672" y="130" width="22" height="22" rx="2" fill="#03adf9" fill-opacity=".25" stroke="#03adf9" stroke-opacity=".8"/>
       <path d="M668 122v-5M676 122v-5M684 122v-5M692 122v-5M698 122v-5M668 160v5M676 160v5M684 160v5M692 160v5M698 160v5" stroke="#9fe6ff" stroke-width="1.4"/>
@@ -104,16 +118,27 @@
   const loopMarkup = (bright, anim) => `
     <path d="${LOOP}" fill="none" stroke="#03adf9" stroke-opacity="${bright ? .3 : .16}" stroke-width="8" stroke-linejoin="round" stroke-linecap="round"/>
     <path class="${anim ? 'trace' : ''}" style="--td:.2s" pathLength="1" d="${LOOP}" fill="none" stroke="${bright ? '#9fe6ff' : '#6fd3ff'}" stroke-width="2.4" stroke-linejoin="round" stroke-linecap="round"/>
-    <circle cx="684" cy="128" r="4" fill="#9fe6ff"/><circle cx="684" cy="152" r="4" fill="#9fe6ff"/>
-    <g fill="none" stroke="#ff7a70" stroke-width="2"><circle cx="${NX}" cy="128" r="8"/><circle cx="${NX}" cy="152" r="8"/></g>`;
-  const tearMarkup = (op) => `<path d="M${NX} 18V262" stroke="#fff" stroke-opacity="${op}" stroke-width="1.6" stroke-dasharray="5 6"/>`;
+    <circle cx="${NF + 29}" cy="128" r="4" fill="#9fe6ff"/><circle cx="${NF + 29}" cy="152" r="4" fill="#9fe6ff"/>
+    <g fill="none" stroke="#ff7a70" stroke-width="2">${[NB, NF].map(x => `<circle cx="${x}" cy="128" r="8"/><circle cx="${x}" cy="152" r="8"/>`).join('')}</g>`;
+  const tearMarkup = (op) => `<path d="M${NB} 18V262M${NF} 18V262" stroke="#fff" stroke-opacity="${op}" stroke-width="1.6" stroke-dasharray="5 6"/>`;
+
+  // uma ponta impressa (no desenho da frente; o verso é a mesma, girada): logo VeriSeal, aviso da ruptura e a ponta de baixo
+  const endMarkup = () => `
+      <use href="#vs-wordmark" x="${WMX}" y="${WMY.toFixed(1)}" width="${WMW}" height="${WMH.toFixed(1)}" style="--lg-ink:#fff;--lg-accent:#03adf9"/>
+      <text transform="translate(641 140) rotate(-90)" text-anchor="middle" font-family="${MONO}" font-size="9" letter-spacing="2" fill="#fff" fill-opacity=".55">ROMPE AO ABRIR</text>
+      <g transform="${UPRIGHT}">
+        ${nfcSymbol(SH / 2, CTA_V, NFC_H, '#fff')}
+        <g text-anchor="middle" font-family="${SANS}" font-size="34" font-weight="700" letter-spacing=".7" fill="#fff">
+          <text x="${SH / 2}" y="${CTA_V + 115}">APROXIME</text><text x="${SH / 2}" y="${CTA_V + 156}">O CELULAR</text>
+        </g>
+      </g>`;
 
   // camada impressa (a face do lacre)
   function printSVG(id) {
     return `<svg viewBox="0 0 ${SW} ${SH}" xmlns="http://www.w3.org/2000/svg">
       <defs>
         <clipPath id="${id}-clip"><path d="${OUTLINE}"/></clipPath>
-        <linearGradient id="${id}-navy" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#0d3a80"/><stop offset=".45" stop-color="#062a63"/><stop offset="1" stop-color="#021a42"/></linearGradient>
+        <linearGradient id="${id}-navy" gradientUnits="userSpaceOnUse" x1="${MID}" y1="0" x2="${SW}" y2="0" spreadMethod="reflect"><stop offset="0" stop-color="#0d3a80"/><stop offset=".45" stop-color="#062a63"/><stop offset="1" stop-color="#021a42"/></linearGradient>
         <linearGradient id="${id}-holo" class="holo-grad" gradientUnits="userSpaceOnUse" x1="${HX - HR}" y1="${HY - HR}" x2="${HX + HR}" y2="${HY + HR}">
           <stop offset="0" stop-color="#8fe3ff"/><stop offset=".18" stop-color="#b9a9ff"/><stop offset=".36" stop-color="#ffc4e5"/><stop offset=".52" stop-color="#fff1b0"/><stop offset=".7" stop-color="#b3ffd8"/><stop offset=".86" stop-color="#8fe3ff"/><stop offset="1" stop-color="#c8b8ff"/>
         </linearGradient>
@@ -126,26 +151,18 @@
         <path d="${guilloche(10, 70, .019, .006, 1.3)}" fill="none" stroke="#9fb5ff" stroke-opacity=".08" stroke-width="1"/>
       </g>
       <path d="${OUTLINE}" fill="none" stroke="#fff" stroke-opacity=".16" stroke-width="2"/>
-      <rect x="12" y="12" width="976" height="256" rx="15" fill="none" stroke="#03adf9" stroke-opacity=".38" stroke-width="1.2"/>
-      <g class="holo">
+      <rect x="12" y="12" width="${SW - 24}" height="${SH - 24}" rx="15" fill="none" stroke="#03adf9" stroke-opacity=".38" stroke-width="1.2"/>
+      <g class="holo" transform="${HOLO_AT}">
         <circle cx="${HX}" cy="${HY}" r="${HR}" fill="url(#${id}-holo)"/>
         <path d="${rosette(HX, HY, 50, 20, 7, 8)}" fill="none" stroke="#fff" stroke-opacity=".38" stroke-width=".8"/>
         <circle class="holo-shine" cx="${HX}" cy="${HY}" r="${HR}" fill="url(#${id}-shine)" opacity=".5"/>
         <circle cx="${HX}" cy="${HY}" r="${HR}" fill="none" stroke="#fff" stroke-opacity=".7" stroke-width="1.5"/>
-        <g transform="rotate(-90 ${HX} ${HY})">
-          <text font-family="${MONO}" font-size="10.5" font-weight="600" letter-spacing="2.1" fill="#062a63" fill-opacity=".72"><textPath href="#${id}-ring">VERISEAL • PRODUTO ORIGINAL • VERISEAL • PRODUTO ORIGINAL •</textPath></text>
-          <use href="#vs-mark" x="${HX - 46}" y="${HY - 24.7}" width="92" height="49.4" style="--lg-ink:#062a63;--lg-accent:#0a76c4"/>
-        </g>
+        <text font-family="${MONO}" font-size="10.5" font-weight="600" letter-spacing="2.1" fill="#062a63" fill-opacity=".72"><textPath href="#${id}-ring">VERISEAL • PRODUTO ORIGINAL • VERISEAL • PRODUTO ORIGINAL •</textPath></text>
+        <use href="#vs-mark" x="${HX - 46}" y="${HY - 24.7}" width="92" height="49.4" style="--lg-ink:#062a63;--lg-accent:#0a76c4"/>
       </g>
-      <use href="#vs-wordmark" x="${WMX}" y="${WMY.toFixed(1)}" width="${WMW}" height="${WMH.toFixed(1)}" style="--lg-ink:#fff;--lg-accent:#03adf9"/>
       ${tearMarkup(.55)}
-      <text transform="translate(641 140) rotate(-90)" text-anchor="middle" font-family="${MONO}" font-size="9" letter-spacing="2" fill="#fff" fill-opacity=".55">ROMPE AO ABRIR</text>
-      <g transform="${UPRIGHT}">
-        ${nfcSymbol(SH / 2, CTA_V, NFC_H, '#fff')}
-        <g text-anchor="middle" font-family="${SANS}" font-size="34" font-weight="700" letter-spacing=".7" fill="#fff">
-          <text x="${SH / 2}" y="${CTA_V + 115}">APROXIME</text><text x="${SH / 2}" y="${CTA_V + 156}">O CELULAR</text>
-        </g>
-      </g>
+      <g transform="${BACK}">${endMarkup()}</g>
+      <g transform="${FRONT}">${endMarkup()}</g>
     </svg>`;
   }
   function filmSVG(inner, fill, stroke) {
@@ -160,17 +177,20 @@
     for (let x = 20; x < SW; x += 20) grid += `M${x} 0V${SH}`;
     for (let y = 20; y < SH; y += 20) grid += `M0 ${y}H${SW}`;
     const label = (x, y, t, rot) => `<text ${rot ? `transform="translate(${x} ${y}) rotate(-90)" text-anchor="middle"` : `x="${x}" y="${y}"`} font-family="${MONO}" font-size="11" font-weight="600" letter-spacing="1.6" fill="#9fe6ff">${t}</text>`;
+    const ghost = `<use href="#vs-wordmark" x="${WMX}" y="${WMY.toFixed(1)}" width="${WMW}" height="${WMH.toFixed(1)}" style="--lg-ink:rgba(95,208,255,.13);--lg-accent:rgba(95,208,255,.2)"/>`;
     return `<svg viewBox="0 0 ${SW} ${SH}" xmlns="http://www.w3.org/2000/svg">
       <defs><clipPath id="xr-clip"><path d="${OUTLINE}"/></clipPath></defs>
       <path d="${OUTLINE}" fill="#020c1d"/>
       <g clip-path="url(#xr-clip)"><path d="${grid}" stroke="#03adf9" stroke-opacity=".08" stroke-width="1"/></g>
       <path d="${OUTLINE}" fill="none" stroke="#03adf9" stroke-opacity=".45" stroke-width="1.5"/>
-      <circle cx="${HX}" cy="${HY}" r="${HR}" fill="none" stroke="#5fd0ff" stroke-opacity=".22" stroke-dasharray="3 5"/>
-      <use href="#vs-wordmark" x="${WMX}" y="${WMY.toFixed(1)}" width="${WMW}" height="${WMH.toFixed(1)}" style="--lg-ink:rgba(95,208,255,.13);--lg-accent:rgba(95,208,255,.2)"/>
+      <circle cx="${MID}" cy="${HY}" r="${HR * HK}" fill="none" stroke="#5fd0ff" stroke-opacity=".45" stroke-dasharray="3 5"/>
+      <g transform="${BACK}">${ghost}</g><g transform="${FRONT}">${ghost}</g>
       <path d="${DIECUTS}" fill="none" stroke="#9fe6ff" stroke-opacity=".12" stroke-width="1.1"/>
       ${loopMarkup(true, false)}${tearMarkup(.5)}${coilMarkup(true, false)}${chipMarkup()}
-      ${label(70, 66, 'CIRCUITO DE RUPTURA')}${label(632, 140, 'LINHA DE RUPTURA', true)}${label(796, 130, 'ANTENA NFC')}${label(664, 182, 'CHIP')}
-      ${label(70, 222, 'ROMPE AO ABRIR A TAMPA')}
+      ${label(FX + 70, 66, 'CIRCUITO DE RUPTURA')}${label(NF - 23, 140, 'LINHA DE RUPTURA', true)}${label(NB + 34, 140, 'LINHA DE RUPTURA', true)}
+      ${label(FX + 796, 130, 'ANTENA NFC')}${label(FX + 664, 182, 'CHIP')}${label(FX + 70, 222, 'ROMPE AO ABRIR A TAMPA')}
+      <path d="M${PL} 14V266M${FX} 14V266" stroke="#5fd0ff" stroke-opacity=".35" stroke-width="1.2" stroke-dasharray="2 6"/>
+      ${label(PL + 40, 66, 'TOPO DA TAMPA')}${label(PL - 14, 140, 'BORDA DA TAMPA', true)}${label(FX + 26, 140, 'BORDA DA TAMPA', true)}
     </svg>`;
   }
 
@@ -263,26 +283,43 @@
     $$('.h-hero .w', section).forEach((w, i) => w.style.setProperty('--i', i));
 
     let sw = 1000, sh = 280, zoom = 1.8, ld = 220, narrow = false;
-    let es = 0.64, ey = 0;                                     // escala e deslocamento da vista explodida
+    let es = 0.64, ey = 0, ox = 0, ex = 50, ez = -20, gap = 160; // vista explodida: escala, deslocamento, giro e vão entre camadas
     let tx = 0, ty = 0, tiltX = 0, tiltY = 0;                 // inclinação suavizada
     let pX = 0, pY = 0, hover = false, dragging = false, lastInput = -1e9;
-    let lu = 0.73, lv = 0.42, tu = 0.73, tv = 0.42;           // posição da lupa (normalizada no lacre)
+    const LU0 = (FX + 790) / SW, LV0 = 0.42;                  // parada, a lupa fica sobre a antena (ponta da frente)
+    let lu = LU0, lv = LV0, tu = LU0, tv = LV0;               // posição da lupa (normalizada no lacre)
     let pings = 0, nextPing = 3.2;
 
     function layout() {
       narrow = narrowMQ.matches;
       sw = stage.offsetWidth; sh = stage.offsetHeight;
-      ld = narrow ? Math.max(120, Math.min(160, sw * 0.42)) : clamp(sw * 0.22, 170, 240);
-      zoom = narrow ? 2.3 : 1.8;
+      // a tira é fina (2612 x 280): a lente passa um pouco das bordas dela, e o aumento faz a altura inteira da tira caber
+      // nela (o circuito de ruptura corre rente às bordas)
+      ld = narrow ? clamp(sh * 2.9, 104, 136) : clamp(sh * 1.55, 150, 230);
+      zoom = ld / (0.95 * sh);
       loupe.style.setProperty('--ld', ld + 'px');
       xsvg.setAttribute('width', sw * zoom); xsvg.setAttribute('height', sh * zoom);
-      // vista explodida: a pilha das quatro camadas ocupa ~1,16 x (escala x largura) de altura na tela. No computador ela
-      // encolhe para caber inteira entre o título e a borda de baixo, centrada nessa faixa
-      if (narrow) { es = 0.94; ey = sh * 0.62; }
-      else {
-        const top = navH + vh * 0.18, bottom = vh * 0.965;
-        es = Math.min(0.64, (bottom - top) / (1.16 * sw));
+      // vista explodida. A tira é comprida e fina: cada camada vira uma faixa diagonal (giro ez no plano, inclinada ex para
+      // trás) e a pilha cabe entre o título e a borda de baixo, à esquerda dos rótulos. No celular as camadas ficam retas,
+      // com o rótulo em cima de cada uma
+      const rad = Math.PI / 180, aspect = sh / sw;
+      if (narrow) {
+        ex = 40; ez = 0; ox = 0; es = 0.82;                  // a camada de cima chega mais perto (perspectiva): sobra margem dos lados
+        const top = navH + vh * 0.2, bottom = vh * 0.94, step = (bottom - top) / 4;
+        gap = step / Math.sin(ex * rad);
+        ey = (top + bottom) / 2 + step * 0.12 - vh * 0.55;  // o lacre parado fica a 55% da tela; o rótulo vai em cima de cada camada
+      } else {
+        ex = 50; ez = -20;
+        const top = navH + vh * 0.2, bottom = vh * 0.965;
+        const hx = Math.cos(ez * rad) + aspect * Math.sin(-ez * rad);                       // largura da faixa na tela / (escala x largura)
+        const vy = (Math.sin(-ez * rad) + aspect * Math.cos(ez * rad)) * Math.cos(ex * rad); // altura de uma faixa na tela / (escala x largura)
+        const spanW = Math.min(vw * 0.62, vw - 2 * 48 - 360);                             // à direita ficam os rótulos (~360 px)
+        es = Math.min(0.8, spanW / (sw * hx), (bottom - top - 3 * 90) / (sw * vy));
+        const stepY = clamp((bottom - top - es * sw * vy) / 3, 90, 170);
+        gap = stepY / Math.sin(ex * rad);
         ey = (top + bottom) / 2 - (navH + vh * 0.56);       // o lacre parado fica centrado em nav + 56% da tela
+        const w = es * sw * hx;                             // a camada de cima, mais perto da câmera, sai ~10% maior
+        ox = Math.max(48 + w * 0.1, vw - 400 - w) + w / 2 - vw / 2;                        // pilha encostada nos rótulos
       }
     }
 
@@ -337,12 +374,10 @@
       const targX = (fine ? -pY * 7 : 0) + idle * Math.sin(t * 0.5) * 2.2;
       const targY = (fine ? pX * 11 : 0) + idle * Math.sin(t * 0.37 + 1) * 3.5;
       tiltX = damp(tiltX, reduce ? 0 : targX, 5, dt); tiltY = damp(tiltY, reduce ? 0 : targY, 5, dt);
-      const ex = narrow ? 58 : 57, ez = narrow ? 0 : -24;
-      const ox = narrow ? 0 : sw * 0.03;
       tx = ox * k; ty = ey * k;
       const s = lerp(1, es, k) * (1 - 0.06 * settle);
       seal.style.transform = `translate3d(${tx.toFixed(1)}px,${ty.toFixed(1)}px,0) rotateX(${lerp(tiltX, ex, k).toFixed(2)}deg) rotateY(${lerp(tiltY, 0, k).toFixed(2)}deg) rotateZ(${(ez * k).toFixed(2)}deg) scale(${s.toFixed(4)})`;
-      const gap = sw * (narrow ? 0.34 : 0.2 * es / 0.64);   // scale() não encolhe o eixo Z: o vão acompanha a escala
+      // (scale() não encolhe o eixo Z: o vão já é medido na tela, em layout)
       order.forEach((key, i) => { layers[key].style.transform = `translateZ(${((i - 1.5) * gap * k + i * 0.8).toFixed(1)}px)`; });
 
       // reflexo e holograma respondem à inclinação. Cada mudança repinta o lacre inteiro: parado, a cada dois quadros basta
@@ -358,9 +393,9 @@
       loupe.style.setProperty('--lo', lo.toFixed(3));
       if (lo > 0.001) {
         const now = performance.now(), active = hover || dragging || now - lastInput < 2500;
-        if (!active) { if (reduce) { tu = 0.73; tv = 0.42; } else { tu = 0.5 + 0.42 * Math.sin(t * 0.33); tv = 0.5 + 0.2 * Math.sin(t * 0.71); } }
+        if (!active) { if (reduce) { tu = LU0; tv = LV0; } else { tu = 0.5 + 0.42 * Math.sin(t * 0.33); tv = 0.5 + 0.2 * Math.sin(t * 0.71); } }
         lu = damp(lu, tu, active ? 10 : 2.4, dt); lv = damp(lv, tv, active ? 10 : 2.4, dt);
-        const x = lu * sw, y = lv * sh;
+        const sl = (vw - sw) / 2, x = clamp(lu * sw, ld / 2 + 6 - sl, vw - ld / 2 - 6 - sl), y = lv * sh;   // a lente nunca sai da tela
         loupe.style.setProperty('--lx', x.toFixed(1) + 'px'); loupe.style.setProperty('--ly', y.toFixed(1) + 'px');
         xsvg.style.transform = `translate(${(ld / 2 - x * zoom).toFixed(1)}px,${(ld / 2 - y * zoom).toFixed(1)}px)`;
       }
@@ -368,7 +403,7 @@
       // ondas de aproximação saindo do símbolo do celular (algumas vezes, e quando a lupa passa por ali)
       if (!reduce && p < 0.05) {
         nextPing -= dt;
-        const nearNfc = Math.abs(lu - NFC_PING[0] / SW) < 0.1 && Math.abs(lv - NFC_PING[1] / SH) < 0.3;
+        const nearNfc = Math.abs(lu - NFC_PING[0] / SW) < 0.05 && Math.abs(lv - NFC_PING[1] / SH) < 0.3;
         if (nextPing <= 0 && (pings < 3 || nearNfc)) { ping(); pings++; nextPing = nearNfc ? 1.2 : 2.6; }
       }
 
@@ -715,7 +750,8 @@
     if (fine) $('#contato').addEventListener('pointermove', e => { mx = (e.clientX / vw) * 2 - 1; my = (e.clientY / vh) * 2 - 1; });
     function update(y, dt, t) {
       const b = at['#ctaSeal'], p = clamp((y + vh - b.top) / (vh + b.bottom - b.top), 0, 1);
-      const try_ = reduce ? -12 : lerp(-38, 22, p) + mx * 14 + Math.sin(t * 0.6) * 3;
+      // a tira é comprida: giros menores, para as pontas não subirem até o título
+      const try_ = reduce ? -10 : lerp(-26, 16, p) + mx * 10 + Math.sin(t * 0.6) * 2.5;
       const trx = reduce ? 12 : lerp(24, 6, p) - my * 8 + Math.sin(t * 0.8) * 2;
       ry = damp(ry, try_, 4, dt); rx = damp(rx, trx, 4, dt);
       const tf = `rotateX(${rx.toFixed(2)}deg) rotateY(${ry.toFixed(2)}deg) rotateZ(-4deg)`;
