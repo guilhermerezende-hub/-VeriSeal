@@ -29,7 +29,7 @@
   --ease: cubic-bezier(.22, .61, .36, 1);
   --ease-io: cubic-bezier(.65, 0, .35, 1);
   --spring: cubic-bezier(.34, 1.4, .64, 1);
-  /* largura do lacre do topo: a tira inteira (verso + topo da tampa + frente) é 2612 x 280 */
+  /* largura do lacre do topo: a tira inteira (verso + topo da tampa + frente) é 2372 x 280 */
   --sw: min(1360px, 92vw);
 }
 
@@ -575,7 +575,7 @@ p {
   left: 50%;
   top: calc(var(--nav-h) + 56%);
   width: var(--sw);
-  height: calc(var(--sw) * .1072);
+  height: calc(var(--sw) * .118);
   transform: translate(-50%, -50%);
   perspective: 2000px;
   z-index: 2
@@ -617,7 +617,7 @@ p {
 .seal-glare {
   position: absolute;
   inset: 0;
-  border-radius: calc(var(--sw) * .0092);
+  border-radius: calc(var(--sw) * .0101);
   pointer-events: none;
   background: radial-gradient(circle at var(--gx, 30%) var(--gy, 10%), rgba(255, 255, 255, .2), rgba(255, 255, 255, 0) 38%);
   mix-blend-mode: screen;
@@ -639,7 +639,7 @@ p {
 
 .nfc-ping {
   position: absolute;
-  width: 4.6%;
+  width: 5%;
   aspect-ratio: 1;
   border-radius: 50%;
   border: 2px solid rgba(95, 208, 255, .7);
@@ -3927,7 +3927,7 @@ p {
 .cta-seal {
   position: relative;
   width: min(1040px, 88vw);
-  aspect-ratio: 2612/280;
+  aspect-ratio: 2372/280;
   margin: clamp(64px, 10vh, 112px) auto clamp(24px, 4vh, 48px);
   perspective: 1400px
 }

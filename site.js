@@ -20,20 +20,21 @@
 
   /* ============================================================
      O LACRE EM SVG — gerado aqui para ser reutilizado nas camadas, na lupa e no lacre da chamada final.
-     Uma tira só, que passa por cima da tampa: verso (1000) + topo da tampa (612) + frente (1000) = 2612 x 280,
-     ou 140 x 15 mm ("Lacres png/Lacre VeriSeal esticado.svg"). Cada ponta é o lacre deitado de antes, só que com a logo
-     VeriSeal esticada antes da linha de ruptura; o verso é a frente girada 180°, para ficar de pé depois de dobrado.
+     Uma tira só, que passa por cima da tampa: verso (880) + topo da tampa (612) + frente (880) = 2372 x 280,
+     ou 127 x 15 mm ("Lacres png/Lacre VeriSeal esticado.svg"), feita para uma tampa de rosca comum (Ø 31 x 24 mm).
+     Cada ponta: a logo VeriSeal na lateral da tampa, a linha de ruptura na junção com o gargalo e, abaixo dela, a ponta
+     que fica colada no gargalo; o verso é a frente girada 180°, para ficar de pé depois de dobrado.
      No meio, em cima da tampa, fica o holograma, com o VS deitado ao longo da tira, como a logo.
      O símbolo de aproximação e a chamada das pontas ficam de pé para quem olha a garrafa (girados 90° aqui).
      ============================================================ */
-  const PL = 1000, SH = 280, R = 24, NX = 655;                        // uma ponta: x = 0 na borda da tampa, ruptura em 655
+  const PL = 880, SH = 280, R = 24, NX = 420;                         // uma ponta: x = 0 na borda da tampa, ruptura em 420
   const TOPW = 612, SW = 2 * PL + TOPW, MID = SW / 2;                 // a tira inteira e o meio dela (o centro do topo da tampa)
   const FX = PL + TOPW, NB = PL - NX, NF = FX + NX;                   // onde começa a frente; rupturas do verso e da frente
   const FRONT = `translate(${FX} 0)`, BACK = `translate(${PL} ${SH}) rotate(180)`;   // desenho de uma ponta → frente / verso
   const HX = 142, HY = 140, HR = 94, HK = 1.12;                       // holograma no desenho de origem, ampliado HK no topo
   const HOLO_AT = `translate(${MID} ${HY}) scale(${HK}) translate(${-HX} ${-HY})`;
-  const WMX = 20, WMW = 598, WMH = WMW * 100 / 833.41, WMY = SH / 2 - WMH / 2;   // logo VeriSeal, da borda da tampa até "ROMPE AO ABRIR"
-  const CTA_V = 770, NFC_H = 112;                                      // símbolo de aproximação: centro ao longo da ponta e altura
+  const WMX = -4, WMW = 380, WMH = WMW * 100 / 833.41, WMY = SH / 2 - WMH / 2;   // logo VeriSeal: começa um fio acima da lateral (na curva da borda da tampa) e termina antes de "ROMPE AO ABRIR"
+  const CTA_V = 598, NFC_H = 112;                                      // símbolo de aproximação: centro ao longo da ponta e altura
   const UPRIGHT = `translate(0 ${SH}) rotate(-90)`;                    // (u atravessando a tira, v ao longo dela) → de pé na garrafa
   const notch = x => [`H${x - 11}L${x} 13L${x + 11} 0`, `H${x + 11}L${x} ${SH - 13}L${x - 11} ${SH}`];
   const OUTLINE = `M${R} 0${notch(NB)[0]}${notch(NF)[0]}H${SW - R}A${R} ${R} 0 0 1 ${SW} ${R}V${SH - R}A${R} ${R} 0 0 1 ${SW - R} ${SH}${notch(NF)[1]}${notch(NB)[1]}H${R}A${R} ${R} 0 0 1 0 ${SH - R}V${R}A${R} ${R} 0 0 1 ${R} 0Z`;
@@ -77,23 +78,35 @@
     const waves = NFC.waves.map((d, i) => `<path class="cl-arc" style="--k:${i}" d="${d}"/>`).join('');
     return `<g transform="translate(${(x - w / 2).toFixed(1)} ${(y - h / 2).toFixed(1)}) scale(${s.toFixed(4)})" fill="${fill}" fill-rule="evenodd"><path d="${NFC.body}"/>${waves}</g>`;
   }
-  // antena: espiral retangular embaixo do símbolo da frente (coordenadas de uma ponta)
-  function spiral(x0, y0, x1, y1, n, p) {
-    const mid = (y0 + y1) / 2;
-    let d = `M${x0} ${mid}`;
-    for (let t = 0; t < n; t++) { const o = t * p; d += `V${y0 + o}H${x1 - o}V${y1 - o}H${x0 + o + p}V${mid}`; }
+  /* o circuito, como no desenho técnico do lacre:
+     - a antena NFC de cobre corre a tira inteira, em duas bobinas (uma de cada lado do chip): o celular lê em qualquer ponto;
+     - o chip NTAG 424 DNA fica no meio da tira, embaixo do holograma (no topo da tampa);
+     - ao lado dele, o circuito de ruptura (TagTamper), separado da antena: ele se rompe e a antena continua respondendo,
+       para informar a adulteração */
+  const CU = { line: '#e8894a', bright: '#ffb27a', glow: '#d9772f' };   // cobre
+  const RED = { line: '#ff5b4f', bright: '#ff8a80', glow: '#ff3b30' };
+  const MOD = { l: MID - 96, r: MID + 96, t: 102, b: 178 };              // módulo do chip (blocos de contato + chip)
+  function antennaPath() {
+    const n = 5, p = 13, x0 = 30, y0 = 30, y1 = 250;
+    let d = '';
+    for (const sd of [1, -1]) {                // 1 = bobina do verso (à esquerda), -1 = a da frente, espelhada no meio
+      const X = x => +(sd > 0 ? x : SW - x).toFixed(1);
+      for (let k = 0; k < n; k++) {
+        // cada volta sai de um contato do módulo, sobe em 45°, contorna a ponta da tira e volta ao módulo por baixo;
+        // as voltas de dentro saem mais perto do centro do módulo e dobram mais longe dele, para nenhuma cruzar a outra
+        const top = y0 + k * p, bot = y1 - k * p, L = x0 + k * p, r = 16 - k * 2;
+        const padT = 110 + k * 4.5, padB = 170 - k * 4.5, xj = MID - 104 - k * 22.5;
+        d += `M${X(MOD.l)} ${padT}H${X(xj)}L${X(xj - (padT - top))} ${top}H${X(L + r)}`
+          + `Q${X(L)} ${top} ${X(L)} ${top + r}V${bot - r}Q${X(L)} ${bot} ${X(L + r)} ${bot}`
+          + `H${X(xj - (bot - padB))}L${X(xj)} ${padB}H${X(MOD.l)}`;
+      }
+    }
     return d;
   }
-  const COIL = spiral(718, 34, 968, 246, 6, 10);
-  // circuito de ruptura: sai do chip, na ponta da frente, atravessa a ruptura da frente, corre a tira inteira, atravessa a
-  // ruptura do verso e volta. Abrir a tampa rompe o circuito dos dois lados
-  const LOOP = `M${NF + 29} 128H${NF - 55}C${NF - 71} 128 ${NF - 79} 120 ${NF - 79} 104V64C${NF - 79} 50 ${NF - 87} 42 ${NF - 101} 42`
-    + `H${NB + 101}C${NB + 87} 42 ${NB + 79} 50 ${NB + 79} 64V104C${NB + 79} 120 ${NB + 71} 128 ${NB + 55} 128`
-    + `H${NB - 55}C${NB - 71} 128 ${NB - 79} 120 ${NB - 79} 104V64C${NB - 79} 50 ${NB - 87} 42 ${NB - 101} 42`
-    + `H66C52 42 44 50 44 64V216C44 230 52 238 66 238H${NB - 101}C${NB - 87} 238 ${NB - 79} 230 ${NB - 79} 216`
-    + `V176C${NB - 79} 160 ${NB - 71} 152 ${NB - 55} 152H${NB + 55}C${NB + 71} 152 ${NB + 79} 160 ${NB + 79} 176`
-    + `V216C${NB + 79} 230 ${NB + 87} 238 ${NB + 101} 238H${NF - 101}C${NF - 87} 238 ${NF - 79} 230 ${NF - 79} 216`
-    + `V176C${NF - 79} 160 ${NF - 71} 152 ${NF - 55} 152H${NF + 29}`;
+  const ANTENNA = antennaPath();
+  // TagTamper: um meandro no bloco à direita do chip, ligado ao chip por dois contatos próprios (não passa pela antena)
+  const TAMPER = `M${MID + 22} 126H${MID + 38}V160a5 5 0 0 0 10 0V120a5 5 0 0 1 10 0V160a5 5 0 0 0 10 0V120a5 5 0 0 1 10 0V160`
+    + `V170H${MID + 30}V154H${MID + 22}`;
   function dieCuts() {
     let d = '';
     for (let y = 26, row = 0; y < SH - 10; y += 30, row++) for (let x = 24 + (row % 2) * 15; x < SW - 10; x += 30) {
@@ -104,28 +117,31 @@
   }
   const DIECUTS = dieCuts();
 
-  const coilMarkup = (bright, anim) => `<g transform="${FRONT}">
-    <path d="${COIL}M702 140H718" fill="none" stroke="#03adf9" stroke-opacity="${bright ? .28 : .16}" stroke-width="8" stroke-linejoin="round"/>
-    <path class="${anim ? 'trace' : ''}" style="--td:.5s" pathLength="1" d="${COIL}" fill="none" stroke="${bright ? '#9fe6ff' : '#6fd3ff'}" stroke-width="2.4" stroke-linejoin="round"/>
-    <path d="M702 140H718M778 140V156H700" fill="none" stroke="${bright ? '#9fe6ff' : '#6fd3ff'}" stroke-width="2.4" stroke-linejoin="round"/>
-    <rect x="712" y="150" width="72" height="11" rx="3" fill="#06142c" stroke="#03adf9" stroke-opacity=".6"/></g>`;
-  const chipMarkup = () => `
-    <g class="chip" transform="${FRONT}">
-      <rect x="664" y="122" width="38" height="38" rx="5" fill="#081a36" stroke="#9fe6ff" stroke-width="1.6"/>
-      <rect x="672" y="130" width="22" height="22" rx="2" fill="#03adf9" fill-opacity=".25" stroke="#03adf9" stroke-opacity=".8"/>
-      <path d="M668 122v-5M676 122v-5M684 122v-5M692 122v-5M698 122v-5M668 160v5M676 160v5M684 160v5M692 160v5M698 160v5" stroke="#9fe6ff" stroke-width="1.4"/>
+  const antennaMarkup = (bright, anim) => `
+    <path d="${ANTENNA}" fill="none" stroke="${CU.glow}" stroke-opacity="${bright ? .3 : .2}" stroke-width="6" stroke-linejoin="round"/>
+    <path class="${anim ? 'trace' : ''}" style="--td:.35s" pathLength="1" d="${ANTENNA}" fill="none" stroke="${bright ? CU.bright : CU.line}" stroke-width="2.2" stroke-linejoin="round"/>`;
+  // o módulo: bloco de contatos, chip e o bloco do TagTamper. O grupo .chip tem uma animação de entrada com transform de CSS
+  const moduleMarkup = bright => `
+    <g class="chip">
+      <rect x="${MOD.l}" y="${MOD.t}" width="48" height="76" rx="5" fill="#8f98a4" stroke="#c9d1db" stroke-width="1"/>
+      <rect x="${MOD.l + 9}" y="${MOD.t + 13}" width="13" height="9" rx="1.5" fill="#5d6672"/><rect x="${MOD.l + 26}" y="${MOD.t + 40}" width="13" height="9" rx="1.5" fill="#5d6672"/>
+      <circle cx="${MOD.l + 16}" cy="${MOD.t + 54}" r="4" fill="none" stroke="#5d6672" stroke-width="1.6"/>
+      <rect x="${MID - 42}" y="108" width="64" height="64" rx="5" fill="#0b0d12" stroke="#2c3240" stroke-width="1.2"/>
+      <rect x="${MID - 34}" y="116" width="48" height="48" rx="3" fill="none" stroke="#1f2531" stroke-width="1"/>
+      <rect x="${MID + 28}" y="${MOD.t}" width="68" height="76" rx="5" fill="#8f98a4" stroke="#c9d1db" stroke-width="1"/>
+      <path d="M${MID - 48} 126H${MID - 42}M${MID - 48} 154H${MID - 42}" stroke="${bright ? CU.bright : CU.line}" stroke-width="2.4"/>
     </g>`;
-  const loopMarkup = (bright, anim) => `
-    <path d="${LOOP}" fill="none" stroke="#03adf9" stroke-opacity="${bright ? .3 : .16}" stroke-width="8" stroke-linejoin="round" stroke-linecap="round"/>
-    <path class="${anim ? 'trace' : ''}" style="--td:.2s" pathLength="1" d="${LOOP}" fill="none" stroke="${bright ? '#9fe6ff' : '#6fd3ff'}" stroke-width="2.4" stroke-linejoin="round" stroke-linecap="round"/>
-    <circle cx="${NF + 29}" cy="128" r="4" fill="#9fe6ff"/><circle cx="${NF + 29}" cy="152" r="4" fill="#9fe6ff"/>
-    <g fill="none" stroke="#ff7a70" stroke-width="2">${[NB, NF].map(x => `<circle cx="${x}" cy="128" r="8"/><circle cx="${x}" cy="152" r="8"/>`).join('')}</g>`;
+  const tamperMarkup = (bright, anim, box) => `
+    <path d="${TAMPER}" fill="none" stroke="${RED.glow}" stroke-opacity="${bright ? .3 : .22}" stroke-width="6" stroke-linejoin="round"/>
+    <path class="${anim ? 'trace' : ''}" style="--td:.9s" pathLength="1" d="${TAMPER}" fill="none" stroke="${bright ? RED.bright : RED.line}" stroke-width="2.2" stroke-linejoin="round"/>
+    <circle cx="${MID + 22}" cy="126" r="3" fill="${RED.bright}"/><circle cx="${MID + 22}" cy="154" r="3" fill="${RED.bright}"/>
+    ${box ? `<rect x="${MID + 30}" y="108" width="62" height="70" rx="4" fill="none" stroke="${RED.line}" stroke-opacity=".7" stroke-width="1.4" stroke-dasharray="4 4"/>` : ''}`;
   const tearMarkup = (op) => `<path d="M${NB} 18V262M${NF} 18V262" stroke="#fff" stroke-opacity="${op}" stroke-width="1.6" stroke-dasharray="5 6"/>`;
 
   // uma ponta impressa (no desenho da frente; o verso é a mesma, girada): logo VeriSeal, aviso da ruptura e a ponta de baixo
   const endMarkup = () => `
       <use href="#vs-wordmark" x="${WMX}" y="${WMY.toFixed(1)}" width="${WMW}" height="${WMH.toFixed(1)}" style="--lg-ink:#fff;--lg-accent:#03adf9"/>
-      <text transform="translate(641 140) rotate(-90)" text-anchor="middle" font-family="${MONO}" font-size="9" letter-spacing="2" fill="#fff" fill-opacity=".55">ROMPE AO ABRIR</text>
+      <text transform="translate(${NX - 14} 140) rotate(-90)" text-anchor="middle" font-family="${MONO}" font-size="9" letter-spacing="2" fill="#fff" fill-opacity=".55">ROMPE AO ABRIR</text>
       <g transform="${UPRIGHT}">
         ${nfcSymbol(SH / 2, CTA_V, NFC_H, '#fff')}
         <g text-anchor="middle" font-family="${SANS}" font-size="34" font-weight="700" letter-spacing=".7" fill="#fff">
@@ -168,15 +184,17 @@
   function filmSVG(inner, fill, stroke) {
     return `<svg viewBox="0 0 ${SW} ${SH}" xmlns="http://www.w3.org/2000/svg"><path d="${OUTLINE}" fill="${fill}" stroke="${stroke}" stroke-width="1.5"/>${inner}</svg>`;
   }
-  const inlaySVG = () => filmSVG(coilMarkup(false, true) + chipMarkup(), 'rgba(4,16,38,.88)', 'rgba(95,208,255,.4)');
-  const tamperSVG = () => filmSVG(`<path d="${DIECUTS}" fill="none" stroke="#fff" stroke-opacity=".13" stroke-width="1.1"/>${loopMarkup(false, true)}${tearMarkup(.4)}`, 'rgba(6,22,50,.82)', 'rgba(95,208,255,.3)');
+  // camadas internas: a antena com o chip; o TagTamper sozinho (com o contorno do chip, para se ver onde ele fica)
+  const inlaySVG = () => filmSVG(antennaMarkup(false, true) + moduleMarkup(false), 'rgba(4,16,38,.88)', 'rgba(232,137,74,.4)');
+  const tamperSVG = () => filmSVG(`<path d="${DIECUTS}" fill="none" stroke="#fff" stroke-opacity=".13" stroke-width="1.1"/>${tearMarkup(.4)}
+    <rect x="${MID - 42}" y="108" width="64" height="64" rx="5" fill="none" stroke="#fff" stroke-opacity=".28" stroke-dasharray="3 4"/>${tamperMarkup(false, true, true)}`, 'rgba(6,22,50,.82)', 'rgba(255,91,79,.3)');
   const adhesiveSVG = id => `<svg viewBox="0 0 ${SW} ${SH}" xmlns="http://www.w3.org/2000/svg"><defs><pattern id="${id}-dots" width="12" height="12" patternUnits="userSpaceOnUse"><circle cx="3" cy="3" r="1.3" fill="#fff" fill-opacity=".16"/></pattern></defs><path d="${OUTLINE}" fill="rgba(190,215,250,.12)" stroke="rgba(255,255,255,.3)" stroke-width="1.5"/><path d="${OUTLINE}" fill="url(#${id}-dots)"/></svg>`;
   // o que a lupa de raio-x mostra: o interior do lacre, com anotações
   function xraySVG() {
     let grid = '';
     for (let x = 20; x < SW; x += 20) grid += `M${x} 0V${SH}`;
     for (let y = 20; y < SH; y += 20) grid += `M0 ${y}H${SW}`;
-    const label = (x, y, t, rot) => `<text ${rot ? `transform="translate(${x} ${y}) rotate(-90)" text-anchor="middle"` : `x="${x}" y="${y}"`} font-family="${MONO}" font-size="11" font-weight="600" letter-spacing="1.6" fill="#9fe6ff">${t}</text>`;
+    const label = (x, y, t, rot, anchor = 'start', fill = '#9fe6ff') => `<text ${rot ? `transform="translate(${x} ${y}) rotate(-90)" text-anchor="middle"` : `x="${x}" y="${y}" text-anchor="${anchor}"`} font-family="${MONO}" font-size="11" font-weight="600" letter-spacing="1.6" fill="${fill}">${t}</text>`;
     const ghost = `<use href="#vs-wordmark" x="${WMX}" y="${WMY.toFixed(1)}" width="${WMW}" height="${WMH.toFixed(1)}" style="--lg-ink:rgba(95,208,255,.13);--lg-accent:rgba(95,208,255,.2)"/>`;
     return `<svg viewBox="0 0 ${SW} ${SH}" xmlns="http://www.w3.org/2000/svg">
       <defs><clipPath id="xr-clip"><path d="${OUTLINE}"/></clipPath></defs>
@@ -186,11 +204,12 @@
       <circle cx="${MID}" cy="${HY}" r="${HR * HK}" fill="none" stroke="#5fd0ff" stroke-opacity=".45" stroke-dasharray="3 5"/>
       <g transform="${BACK}">${ghost}</g><g transform="${FRONT}">${ghost}</g>
       <path d="${DIECUTS}" fill="none" stroke="#9fe6ff" stroke-opacity=".12" stroke-width="1.1"/>
-      ${loopMarkup(true, false)}${tearMarkup(.5)}${coilMarkup(true, false)}${chipMarkup()}
-      ${label(FX + 70, 66, 'CIRCUITO DE RUPTURA')}${label(NF - 23, 140, 'LINHA DE RUPTURA', true)}${label(NB + 34, 140, 'LINHA DE RUPTURA', true)}
-      ${label(FX + 796, 130, 'ANTENA NFC')}${label(FX + 664, 182, 'CHIP')}${label(FX + 70, 222, 'ROMPE AO ABRIR A TAMPA')}
+      ${tearMarkup(.5)}${antennaMarkup(true, false)}${moduleMarkup(true)}${tamperMarkup(true, false, true)}
       <path d="M${PL} 14V266M${FX} 14V266" stroke="#5fd0ff" stroke-opacity=".35" stroke-width="1.2" stroke-dasharray="2 6"/>
-      ${label(PL + 40, 66, 'TOPO DA TAMPA')}${label(PL - 14, 140, 'BORDA DA TAMPA', true)}${label(FX + 26, 140, 'BORDA DA TAMPA', true)}
+      ${label(110, 145, 'ANTENA NFC · LEITURA EM QUALQUER PONTO')}${label(NF + 40, 145, 'ANTENA NFC · LEITURA EM QUALQUER PONTO')}
+      ${label(MID, 94, 'CHIP NTAG 424 DNA', false, 'middle')}${label(MID + 61, 198, 'TAGTAMPER', false, 'middle', '#ff8a80')}
+      ${label(NF - 23, 140, 'LINHA DE RUPTURA', true)}${label(NB + 34, 140, 'LINHA DE RUPTURA', true)}
+      ${label(PL - 14, 140, 'BORDA DA TAMPA', true)}${label(FX + 26, 140, 'BORDA DA TAMPA', true)}
     </svg>`;
   }
 
@@ -286,14 +305,14 @@
     let es = 0.64, ey = 0, ox = 0, ex = 50, ez = -20, gap = 160; // vista explodida: escala, deslocamento, giro e vão entre camadas
     let tx = 0, ty = 0, tiltX = 0, tiltY = 0;                 // inclinação suavizada
     let pX = 0, pY = 0, hover = false, dragging = false, lastInput = -1e9;
-    const LU0 = (FX + 790) / SW, LV0 = 0.42;                  // parada, a lupa fica sobre a antena (ponta da frente)
+    const LU0 = (MID + 30) / SW, LV0 = 0.5;                         // parada, a lupa fica sobre o chip e o TagTamper
     let lu = LU0, lv = LV0, tu = LU0, tv = LV0;               // posição da lupa (normalizada no lacre)
     let pings = 0, nextPing = 3.2;
 
     function layout() {
       narrow = narrowMQ.matches;
       sw = stage.offsetWidth; sh = stage.offsetHeight;
-      // a tira é fina (2612 x 280): a lente passa um pouco das bordas dela, e o aumento faz a altura inteira da tira caber
+      // a tira é fina (2372 x 280): a lente passa um pouco das bordas dela, e o aumento faz a altura inteira da tira caber
       // nela (o circuito de ruptura corre rente às bordas)
       ld = narrow ? clamp(sh * 2.9, 104, 136) : clamp(sh * 1.55, 150, 230);
       zoom = ld / (0.95 * sh);
@@ -620,6 +639,18 @@
       segBtns[j].click(); segBtns[j].focus(); e.preventDefault();
     });
     new IntersectionObserver(es => es.forEach(e => { inView = e.isIntersecting; if (inView && !started) { started = true; go(0); } }), { threshold: 0.35 }).observe(scene);
+    // o relógio do celular mostra a hora de quem está vendo o site (no formato de 12 ou 24 h do aparelho, sem AM/PM, como
+    // na barra de status), e a saudação acompanha a hora. Atualiza na virada de cada minuto
+    const clocks = $$('.ph-time', scene), greet = $('.ph-greet', scene);
+    const h12 = /h1[12]/.test(new Intl.DateTimeFormat(undefined, { hour: 'numeric' }).resolvedOptions().hourCycle || '');
+    function tickClock() {
+      const d = new Date(), h = d.getHours(), hh = h12 ? (h % 12 || 12) : h;
+      const t = `${hh}:${String(d.getMinutes()).padStart(2, '0')}`;
+      clocks.forEach(el => { if (el.textContent !== t) el.textContent = t; });
+      if (greet) greet.textContent = h >= 5 && h < 12 ? 'Bom dia' : h >= 12 && h < 18 ? 'Boa tarde' : 'Boa noite';
+      setTimeout(tickClock, 60000 - (d.getSeconds() * 1000 + d.getMilliseconds()) + 50);
+    }
+    tickClock();
     let shots = false, shots3d = false, shooting = false;
     const takeShots = async () => {
       if (shots3d || shooting) return;

@@ -255,7 +255,7 @@
 
         <div class="seal-stage" id="sealStage">
           <div class="seal" id="seal" role="img"
-            aria-label="Lacre VeriSeal: uma faixa azul-marinho que passa por cima da tampa. No meio, o selo holográfico que fica no topo; dos dois lados, a logo VeriSeal, a linha de ruptura e o símbolo de aproximação com a frase “Aproxime o celular”. Por dentro, um chip NFC com antena e um circuito que se rompe ao abrir a garrafa.">
+            aria-label="Lacre VeriSeal: uma faixa azul-marinho que passa por cima da tampa. No meio, o selo holográfico que fica no topo; dos dois lados, a logo VeriSeal, a linha de ruptura e o símbolo de aproximação com a frase “Aproxime o celular”. Por dentro, uma antena NFC de cobre em todo o comprimento, o chip NTAG 424 DNA no meio e, ao lado dele, um circuito que se rompe ao abrir a garrafa.">
             <div class="seal-layer" data-layer="adhesive"></div>
             <div class="seal-layer" data-layer="tamper"></div>
             <div class="seal-layer" data-layer="inlay"></div>
@@ -269,9 +269,9 @@
           </div>
           <svg class="layer-lines" id="layerLines" aria-hidden="true"></svg>
           <ol class="layer-labels" id="layerLabels">
-            <li data-for="print"><b>Película impressa</b><span>Marca, holograma e símbolo de aproximação.</span></li>
-            <li data-for="inlay"><b>Chip NFC e antena</b><span>Respondem ao celular.</span></li>
-            <li data-for="tamper"><b>Circuito de ruptura</b><span>Abrir a garrafa rompe o circuito.</span></li>
+            <li data-for="print"><b>Película impressa</b><span>Laminada. Marca, holograma e símbolo de aproximação.</span></li>
+            <li data-for="inlay"><b>Antena NFC e chip</b><span>Cobre em todo o comprimento: lê em qualquer ponto.</span></li>
+            <li data-for="tamper"><b>Circuito de ruptura</b><span>Separado da antena. Rompe ao abrir, e o celular avisa.</span></li>
             <li data-for="adhesive"><b>Adesivo de alta aderência</b><span>Não sai inteiro.</span></li>
           </ol>
         </div>
@@ -354,8 +354,8 @@
               <div class="callout left" data-cal="tear" style="top:30%"><b><i class="cn">1</i>Linha de
                   ruptura</b><span>O lacre passa por cima da tampa e cruza a junção com o gargalo dos dois lados. Girar a
                   tampa rompe a tira e o circuito.</span></div>
-              <div class="callout left" data-cal="nfc" style="top:54%"><b><i class="cn">2</i>Chip e antena
-                  NFC</b><span>Laminados dentro do lacre. O celular lê a identidade da garrafa.</span></div>
+              <div class="callout left" data-cal="nfc" style="top:54%"><b><i class="cn">2</i>Antena e chip
+                  NFC</b><span>A antena corre o lacre inteiro e o celular lê em qualquer ponto. O chip fica no topo.</span></div>
               <div class="callout right" data-cal="top" style="top:24%"><b><i class="cn">3</i>Selo
                   holográfico</b><span>No topo da tampa. Difícil de copiar, fácil de reconhecer.</span></div>
               <div class="callout right" data-cal="cta" style="top:56%"><b><i class="cn">4</i>Aproxime o
@@ -447,11 +447,11 @@
 
           <div class="phone" id="phone" aria-hidden="true">
             <div class="phone-screen">
-              <div class="ph-status"><span>9:41</span><i class="ph-island"></i><span
+              <div class="ph-status"><span class="ph-time">9:41</span><i class="ph-island"></i><span
                   class="ph-icons"><i></i><i></i><i></i></span></div>
 
               <div class="ph-home">
-                <div class="ph-widget"><b>9:41</b><span>Boa noite</span></div>
+                <div class="ph-widget"><b class="ph-time">9:41</b><span class="ph-greet">Boa noite</span></div>
                 <div class="ph-grid">
                   <i class="ic g1"></i><i class="ic g2"></i><i class="ic g3"></i><i class="ic g4"></i>
                   <i class="ic g5"></i><i class="ic g6"></i><i class="ic g12"></i><i class="ic g7"></i>

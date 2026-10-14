@@ -59,14 +59,15 @@
   };
 
   /* ---------- bottle: square section with chamfered corners (the classic 700 ml whisky bottle) ----------
-     half width 0.85 → 1.7 wide, 5.95 tall to the top of the cap (width/height ≈ 0.29) */
-  const HW = 0.85, C = 0.24, WALL = 0.07, RN = 0.30;      // half width, corner chamfer, glass wall, neck radius
+     half width 0.85 → 1.7 wide, 5.65 tall to the top of the cap (width/height ≈ 0.3) */
+  const HW = 0.85, C = 0.24, WALL = 0.07, RN = 0.27;      // half width, corner chamfer, glass wall, neck radius
   const Y0 = 3.5, Y1 = 4.6;                                // shoulder from body top to neck base
-  // tampa alta, na proporção do lacre que passa por cima dela (lateral de 35 mm e Ø 31 mm para uma tira de 15 mm):
-  // o topo do lacre (612 no desenho) vai de uma borda à outra e a lateral reta tem a altura da arte até a ruptura (655)
-  const CAP_R = 0.35, CAP_RIM = 0.045, YJ = 5.1;                       // raio, borda arredondada, junção tampa/gargalo
+  // tampa de rosca comum, como as das garrafas de referência (Ø 31 x 24 mm numa garrafa de 29 cm), num gargalo mais fino e
+  // mais longo. O lacre passa por cima dela: o topo do desenho (612) vai de uma borda à outra e a lateral reta tem a altura
+  // da arte até a ruptura (420); abaixo da ruptura, a ponta (460) fica colada no gargalo
+  const CAP_R = 0.30, CAP_RIM = 0.035, YJ = 5.17;                      // raio, borda arredondada, junção tampa/gargalo
   const SEAL_K = (2 * (CAP_R - CAP_RIM) + PI * CAP_RIM) / 612;          // unidades do mundo por unidade do desenho do lacre
-  const YS = YJ + 655 * SEAL_K, YT = YS + CAP_RIM;                      // fim da lateral reta e topo da tampa
+  const YS = YJ + 420 * SEAL_K, YT = YS + CAP_RIM;                      // fim da lateral reta e topo da tampa
   const HWI = HW - WALL - 0.005, RNI = RN - WALL - 0.005;  // liquid cavity
   const CI = C + 0.586 * (WALL + 0.005);                   // chamfer of the inward-offset octagon
   const FILL = 3.62;                                       // fill line just into the shoulder, like a sealed bottle
@@ -120,8 +121,8 @@
     // o lacre fica só na frente: no fim a garrafa gira pouco, para ele continuar à vista
     rot: kf([[0, 0], [0.12, 0.25 * PI], [0.5, 2.4 * PI], [0.72, 3.7 * PI], [0.85, 4 * PI], [0.93, 4.06 * PI], [1, 4.13 * PI]]),
     // no fim, a câmera enquadra o lacre inteiro (do gargalo ao topo da tampa) e sobe o bastante para ver o holograma no topo
-    dist: kf([[0, 13.5], [0.14, 13.2], [0.2, 12.5], [0.4, 12.5], [0.48, 7.8], [0.64, 6.7], [0.72, 4.9], [0.85, 3.55], [1, 3.4]]),
-    ty: kf([[0, 2.95], [0.4, 2.95], [0.48, 3.95], [0.64, 4.42], [0.72, 4.85], [0.85, 5.3], [1, 5.32]]),
+    dist: kf([[0, 13.5], [0.14, 13.2], [0.2, 12.5], [0.4, 12.5], [0.48, 7.8], [0.64, 6.5], [0.72, 4.5], [0.85, 3.0], [1, 2.85]]),
+    ty: kf([[0, 2.95], [0.4, 2.95], [0.48, 3.8], [0.64, 4.3], [0.72, 4.75], [0.85, 5.13], [1, 5.15]]),
     el: kf([[0, 0.08], [0.5, 0.12], [0.72, 0.28], [0.85, 0.5], [1, 0.55]]),
     // lateral lens shift in world units at the target depth (negative = bottle to the right of the text)
     offx: kf([[0, -1.6], [0.14, -1.6], [0.2, 1.8], [0.4, 1.8], [0.46, -1.3], [0.64, -1.1], [0.72, 0], [0.88, 0], [1, -0.3]]),
@@ -455,7 +456,7 @@
   const glassRings = [
     pole(0), sq(0, HW - 0.12), sq(0.06, HW - 0.03), sq(0.16, HW), sq(Y0, HW),
     ...shoulderRings(HW, RN, C, true),
-    rd(Y1, RN), rd(5.16, RN), rd(5.2, RN + 0.025), rd(5.3, RN + 0.025), rd(5.34, RN), rd(5.5, RN), rd(5.5, RN - WALL), // neck; its glass bead hides under the cap
+    rd(Y1, RN), rd(YJ + 0.03, RN), rd(YJ + 0.06, RN + 0.02), rd(YJ + 0.14, RN + 0.02), rd(YJ + 0.17, RN), rd(YT - 0.04, RN), rd(YT - 0.04, RN - WALL), // neck; its glass bead hides under the cap
     rd(Y1, RN - WALL), ...shoulderRings(HW - WALL, RN - WALL, C + 0.586 * WALL, false),
     sq(Y0, HW - WALL, C + 0.586 * WALL), sq(0.42, HW - WALL, C + 0.586 * WALL), sq(0.36, HW - WALL - 0.06, C + 0.586 * WALL), rd(0.40, 0.35), pole(0.55),
   ];
@@ -470,7 +471,7 @@
   // the whisky: a transmissive volume that refracts the studio behind it and absorbs light along its thickness
   const liquidRings = [
     pole(0.56), rd(0.41, 0.35), sq(0.37, HWI - 0.06, CI), sq(0.43, HWI, CI), sq(Y0, HWI, CI),
-    ...shoulderRings(HWI, RNI, CI, true), rd(Y1, RNI), rd(5.2, RNI), pole(5.2),
+    ...shoulderRings(HWI, RNI, CI, true), rd(Y1, RNI), rd(YJ, RNI), pole(YJ),
   ];
   const liquid = new THREE.Mesh(ringMesh(liquidRings), injectLiquid(new THREE.MeshPhysicalMaterial({
     color: 0xfff3e0, roughness: 0.06, metalness: 0, ior: 1.36,
@@ -517,7 +518,7 @@
   capGroup.add(capBody);
   const capSkinTex = canvasTex(64, 1024, c => {
     const g = c.getContext('2d'); g.fillStyle = '#0a1a3a'; g.fillRect(0, 0, 64, 1024);
-    for (let y = 2; y < 952; y += 4) { g.fillStyle = (y >> 2) % 2 ? '#050d20' : '#163066'; g.fillRect(0, y, 64, 1.5); }
+    for (let y = 2, i = 0; y < 952; y += 7, i++) { g.fillStyle = i % 2 ? '#050d20' : '#163066'; g.fillRect(0, y, 64, 2.6); }
     g.fillStyle = '#03adf9'; g.fillRect(0, 960, 64, 9);
     g.fillStyle = '#061128'; g.fillRect(0, 976, 64, 48);
   });
@@ -526,17 +527,19 @@
     new THREE.MeshPhysicalMaterial({ map: capSkinTex, roughness: 0.4, metalness: 0.2, clearcoat: 0.5, clearcoatRoughness: 0.25, envMapIntensity: 1.0 }));
   capSkin.position.y = (YJ + YS) / 2; capGroup.add(capSkin); // a lateral reta, embaixo da borda arredondada
 
-  /* o lacre inteligente: uma tira só, exatamente o lacre do topo da página (printSVG em site.js, 2612 x 280):
-     verso (1000) + topo da tampa (612) + frente (1000). Sobe pelo gargalo atrás, cruza a junção tampa/gargalo (a ruptura
+  /* o lacre inteligente: uma tira só, exatamente o lacre do topo da página (printSVG em site.js, 2372 x 280):
+     verso (880) + topo da tampa (612) + frente (880). Sobe pelo gargalo atrás, cruza a junção tampa/gargalo (a ruptura
      do verso), sobe a lateral da tampa, passa por cima dela com o holograma no centro, desce a lateral da frente e cruza a
-     junção de novo até o gargalo. Abrir a tampa rasga a tira nas duas linhas de ruptura; o chip NFC e a antena ficam
-     laminados na ponta da frente. */
-  const SEAL_LEN = 2612, SEAL_MID = 1306, SEAL_FX = 1612, SEAL_NB = 345, SEAL_NF = 2267;   // como SW, MID, FX, NB e NF em site.js
+     junção de novo até o gargalo. Abrir a tampa rasga a tira nas duas linhas de ruptura. Por dentro, a antena NFC corre a
+     tira inteira e o chip (com o circuito de ruptura ao lado) fica no meio, embaixo do holograma. */
+  const SEAL_PL = 880, SEAL_NX = 420, SEAL_CTA = 598;                  // como PL, NX e CTA_V em site.js (uma ponta)
+  const SEAL_LEN = 2 * SEAL_PL + 612, SEAL_MID = SEAL_LEN / 2, SEAL_FX = SEAL_PL + 612;     // como SW, MID e FX
+  const SEAL_NB = SEAL_PL - SEAL_NX, SEAL_NF = SEAL_FX + SEAL_NX;                           // as duas rupturas
   const LIFT = 0.006;                                                  // a tira fica um fio acima da tampa e do vidro
   // caminho do eixo da tira no perfil, medido a partir do centro do topo (s ≥ 0; igual na frente e no verso):
   // topo plano → borda arredondada → lateral reta → degrau da tampa até o vidro do gargalo.
   // Devolve o raio e a altura do eixo e quanto a tira já abraça o cilindro (b: 0 no topo, 1 na lateral)
-  const A0 = CAP_R - CAP_RIM, A1 = A0 + PI * CAP_RIM / 2, A2 = A1 + 655 * SEAL_K;
+  const A0 = CAP_R - CAP_RIM, A1 = A0 + PI * CAP_RIM / 2, A2 = A1 + SEAL_NX * SEAL_K;
   function sealPath(s, lift) {
     const L = LIFT + lift;
     if (s <= A0) return { r: s, y: YT + L, b: 0 };
@@ -571,7 +574,7 @@
     return g;
   }
   const sealGeo = buildSeal();
-  const NFC_AT = sealPoint(SEAL_FX + 767.3, 183.3, 0.008);   // centro do oval do símbolo da frente (NFC_PING em site.js): os balões e as ondas da demonstração saem dali
+  const NFC_AT = sealPoint(SEAL_FX + SEAL_CTA - 2.7, 183.3, 0.008);   // centro do oval do símbolo da frente (NFC_PING em site.js): os balões e as ondas da demonstração saem dali
   // a arte, desenhada como o printSVG de site.js. Cada ponta: logo VeriSeal deitada, aviso da ruptura e o símbolo de
   // aproximação com a chamada, de pé na garrafa (girados no desenho); o verso é a frente girada 180°.
   // No topo, o holograma com o VS deitado ao longo da tira
@@ -580,13 +583,13 @@
   const HX = 142, HY = 140, HR = 94, HK = 1.12;              // holograma no desenho de origem, ampliado HK no topo (como em site.js)
   const atHolo = g => { g.translate(SEAL_MID, HY); g.scale(HK, HK); g.translate(-HX, -HY); };
   function drawSealEnd(g, ls) {
-    drawLogo(g, WM, 20, 140 - 598 * WM.h / WM.w / 2, 598, '#ffffff', '#03adf9');   // como WMX/WMW em site.js
-    g.save(); g.translate(641, 140); g.rotate(-PI / 2); g.fillStyle = 'rgba(255,255,255,.55)'; g.font = `400 9px ${MONO}`; g.textAlign = 'center'; g.textBaseline = 'alphabetic';
+    drawLogo(g, WM, -4, 140 - 380 * WM.h / WM.w / 2, 380, '#ffffff', '#03adf9');   // como WMX/WMW em site.js
+    g.save(); g.translate(SEAL_NX - 14, 140); g.rotate(-PI / 2); g.fillStyle = 'rgba(255,255,255,.55)'; g.font = `400 9px ${MONO}`; g.textAlign = 'center'; g.textBaseline = 'alphabetic';
     ls('2px'); g.fillText('ROMPE AO ABRIR', 0, 0); g.restore();
     g.save(); g.translate(0, 280); g.rotate(-PI / 2);
-    drawNfc(g, 140, 770, 112, '#ffffff');                   // como CTA_V/NFC_H em site.js
+    drawNfc(g, 140, SEAL_CTA, 112, '#ffffff');              // como CTA_V/NFC_H em site.js
     g.fillStyle = '#fff'; g.font = `700 34px ${SANS}`; g.textAlign = 'center'; g.textBaseline = 'alphabetic'; ls('0.7px');
-    g.fillText('APROXIME', 140, 885); g.fillText('O CELULAR', 140, 926);
+    g.fillText('APROXIME', 140, SEAL_CTA + 115); g.fillText('O CELULAR', 140, SEAL_CTA + 156);
     g.restore();
   }
   function drawSeal(c, orm) {
@@ -646,11 +649,11 @@
     [SEAL_NB, SEAL_NF].forEach(x => { g.moveTo(x, 18); g.lineTo(x, 262); }); g.stroke(); g.restore();
     // as duas pontas: a frente como está, o verso girado 180°
     g.save(); g.translate(SEAL_FX, 0); drawSealEnd(g, ls); g.restore();
-    g.save(); g.translate(1000, 280); g.rotate(PI); drawSealEnd(g, ls); g.restore();
+    g.save(); g.translate(SEAL_PL, 280); g.rotate(PI); drawSealEnd(g, ls); g.restore();
   }
   await idle();
-  const sealTex = canvasTex(4096, 439, c => drawSeal(c, false));
-  const sealOrm = canvasTex(2048, 220, c => drawSeal(c, true));
+  const sealTex = canvasTex(4096, Math.round(4096 * 280 / SEAL_LEN), c => drawSeal(c, false));
+  const sealOrm = canvasTex(2048, Math.round(2048 * 280 / SEAL_LEN), c => drawSeal(c, true));
   await idle();
   sealOrm.colorSpace = THREE.NoColorSpace;
   sealTex.anisotropy = maxAniso; lateRedraw.push(sealTex);
@@ -706,8 +709,8 @@
   // os pontos ficam nas bordas do lacre, do lado do balão: as linhas não cruzam o lacre e nada da arte fica coberto
   const callouts = {
     tear: { pos: sealPoint(SEAL_NF, 268, 0.008) },          // borda esquerda, na linha de ruptura da frente
-    nfc: { pos: sealPoint(SEAL_FX + 805, 268, 0.008) },     // borda esquerda, junto do símbolo (a antena fica embaixo dele)
-    cta: { pos: sealPoint(SEAL_FX + 770, 12, 0.008) },      // borda direita, ao lado do símbolo de aproximação
+    nfc: { pos: sealPoint(SEAL_FX + SEAL_CTA + 35, 268, 0.008) },     // borda esquerda, junto do símbolo (a antena passa embaixo dele)
+    cta: { pos: sealPoint(SEAL_FX + SEAL_CTA, 12, 0.008) },      // borda direita, ao lado do símbolo de aproximação
     top: { pos: sealPoint(SEAL_MID, 12, 0.01), up: true },  // borda direita, ao lado do holograma, em cima da tampa
   };
   for (const id in callouts) {
@@ -899,7 +902,7 @@
 
     // camera: a dolly toward the cap. The bottle is moved across the frame with a lens shift (no keystone), and on
     // narrow screens it is kept whole in frame and lifted above the text.
-    const distScale = aspect < 1 ? Math.pow(clamp(1 / aspect, 1, 2.4), 0.8) * (1 + (W >= 700 ? 0.5 : 0.14) * smoothstep(0.72, 0.85, pS)) : (aspect < 1.4 ? 1.1 : 1);   // em tela em pé, o close final afasta: no celular a tampa alta não encosta no botão de pular; no tablet ela cabe entre os balões
+    const distScale = aspect < 1 ? Math.pow(clamp(1 / aspect, 1, 2.4), 0.8) * (1 + (W >= 700 ? 0.5 : 0.14) * smoothstep(0.72, 0.85, pS) + 0.14 * smoothstep(0.4, 0.5, pS) * (1 - smoothstep(0.64, 0.74, pS))) : (aspect < 1.4 ? 1.1 : 1);   // em tela em pé a câmera afasta um pouco no capítulo "Identidade" e no close final, para a tampa não passar por trás do botão de pular (e, no tablet, caber entre os balões)
     const offFactor = aspect < 1 ? 0.1 : (aspect < 1.4 ? 0.55 : 1);
     const dist = K.dist(pS) * distScale, ty = K.ty(pS), el = K.el(pS), ox = K.offx(pS) * offFactor;
     pxS += (px - pxS) * (1 - Math.exp(-dt * 3)); pyS += (py - pyS) * (1 - Math.exp(-dt * 3));
@@ -929,7 +932,7 @@
     const spinTarget = turnBase + look + dragSpin + (reduceMotion ? 0 : 0.07 * Math.sin(t * 0.6));
     updatePhysics(dt, t, spinTarget, 0, 1);
     const narrow = aspect < 0.9;
-    const dist = narrow ? 7.6 : 6.3, ty = narrow ? 4.6 : 4.82, el = 0.12, ox = narrow ? 0.35 : 1.1;
+    const dist = narrow ? 7.6 : 6.3, ty = narrow ? 4.55 : 4.8, el = 0.12, ox = narrow ? 0.35 : 1.1;
     pxS += (px - pxS) * (1 - Math.exp(-dt * 3)); pyS += (py - pyS) * (1 - Math.exp(-dt * 3));
     const par = reduceMotion ? 0 : 0.18;
     camera.position.set(pxS * par, ty + dist * Math.sin(el) - pyS * 0.1, dist * Math.cos(el));
