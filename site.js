@@ -584,6 +584,145 @@
   })();
 
   /* ============================================================
+     CENAS QUE SE REPETEM — "Para que serve" e "Benefícios".
+     Cada passo acrescenta uma classe à cena (cumulativas: o CSS de um passo vale até o fim do ciclo) e os elementos com
+     data-on / data-off que citam o passo ganham is-on / is-off. O passo "out" apaga a cena; ela volta ao começo sem
+     transição (.snap) e reaparece. Só roda enquanto está na tela; com movimento reduzido, fica parada no estado final.
+     ============================================================ */
+  function loopScene(el, steps) {
+    const names = steps.map(s => s[0]).filter(Boolean), marks = $$('[data-on], [data-off]', el);
+    const cites = (m, k, n) => (m.dataset[k] || '').split(' ').includes(n);
+    function apply(n) {
+      el.classList.add(n);
+      marks.forEach(m => { if (cites(m, 'on', n)) m.classList.add('is-on'); if (cites(m, 'off', n)) m.classList.add('is-off'); });
+    }
+    if (reduce) { names.forEach(n => { if (n !== 'out') apply(n); }); return; }
+    let i = 0, timer = 0;
+    function reset() {
+      el.classList.add('snap');
+      names.forEach(n => { if (n !== 'out') el.classList.remove(n); });
+      marks.forEach(m => m.classList.remove('is-on', 'is-off'));
+      void el.getBoundingClientRect();
+      el.classList.remove('snap', 'out');   // sem o .snap, a opacidade volta com transição
+    }
+    function next() {
+      if (i === steps.length) { reset(); i = 0; }
+      const [n, ms, fn] = steps[i++];
+      if (n) apply(n);
+      if (fn) fn();
+      timer = setTimeout(next, ms);
+    }
+    new IntersectionObserver(es => es.forEach(e => {
+      clearTimeout(timer);
+      if (e.isIntersecting) timer = setTimeout(next, 200);
+      else if (i) { reset(); i = 0; }
+    }), { threshold: 0.4 }).observe(el);
+  }
+
+  // o selo do resultado em miniatura (o mesmo da demonstração): ok = ✓ verde, bad = ! vermelho, no = ✕ vermelho
+  const VD_T = 'transform="translate(22 22) scale(1.0769)" pathLength="1"';
+  const VD_MARK = {
+    ok: `<path class="vd-mark" d="M15 27.5l7.5 7.5L37.5 19.5" ${VD_T}/>`,
+    bad: `<path class="vd-mark" d="M26 14.5v15" ${VD_T}/><path class="vd-mark vd-dot" d="M26 37v.5" ${VD_T}/>`,
+    no: `<path class="vd-mark" d="M19 19l14 14" ${VD_T}/><path class="vd-mark vd-mark2" d="M33 19L19 33" ${VD_T}/>`,
+  };
+  const verdict = (kind, cx, cy, r, on) => `<g class="vd vd-${kind}" data-on="${on}" transform="translate(${cx - r} ${cy - r}) scale(${r / 50})">
+      <circle class="vd-glow" cx="50" cy="50" r="52.94"/><circle class="vd-track" cx="50" cy="50" r="50"/><circle class="vd-fill" cx="50" cy="50" r="50"/>
+      <path class="vd-ring" d="M50 1.2a48.8 48.8 0 1 1 0 97.6a48.8 48.8 0 1 1 0-97.6" pathLength="1"/>${VD_MARK[kind]}</g>`;
+
+  /* ============================================================
+     4 · PARA QUE SERVE — em cada cartão, a fraude acontece numa cena curta e o lacre denuncia
+     A garrafa é desenhada sempre em cx = 100 (o recorte #ill-body do sprite depende disso) e movida por um grupo.
+     O líquido nunca muda de cor: por fora, a garrafa adulterada é idêntica; só o lacre mostra a diferença.
+     ============================================================ */
+  (() => {
+    const BODY = 'M92 32V48C92 56 74 57 74 70V123Q74 130 81 130H119Q126 130 126 123V70C126 57 108 56 108 48V32Z';
+    // vidro, líquido, rótulo com o VS e a tampa com o lacre: a parte de cima da tira vai com a tampa, a de baixo fica no
+    // gargalo, e a ruptura é a junção das duas (y = 32)
+    const bottle = () => `
+      <ellipse cx="100" cy="131" rx="31" ry="3.5" fill="#0f1a2e" fill-opacity=".08"/>
+      <path d="${BODY}" fill="#fff" fill-opacity=".8"/>
+      <g clip-path="url(#ill-body)"><rect class="liq" x="70" y="60" width="60" height="72" fill="url(#ill-liq)"/></g>
+      <path d="${BODY}" fill="none" stroke="#a9b8cc" stroke-width="1.5"/>
+      <path d="M79.5 77V119" stroke="#fff" stroke-opacity=".55" stroke-width="3" stroke-linecap="round"/>
+      <rect x="82" y="88" width="36" height="26" rx="3" fill="#042555"/>
+      <svg x="89" y="95.6" width="22" height="11.8" viewBox="0 0 668 359"><use href="#vs-mark" style="--lg-ink:#fff"/></svg>
+      <rect x="97.4" y="32" width="5.2" height="13" rx="1" fill="#03adf9"/>
+      <path class="tear" d="M94.5 33l2.2-2.2 2.2 2.2 2.2-2.2 2.2 2.2 2.2-2.2" fill="none" stroke="#d93025" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/>
+      <g class="cap">
+        <rect x="90" y="12" width="20" height="20.5" rx="3" fill="#0b1d3d"/>
+        <path d="M93.5 15.5v13.5M106.5 15.5v13.5" stroke="#fff" stroke-opacity=".14" stroke-width="1.2"/>
+        <rect class="seal-up" x="97.4" y="11" width="5.2" height="21.5" rx="1" fill="#03adf9"/>
+      </g>`;
+    const at = (x, s, inner) => `<g transform="translate(${x} 132) scale(${s}) translate(-100 -132)">${inner}</g>`;
+    // celular que encosta no lacre; as ondas saem do lado indicado (l = esquerda, r = direita)
+    const phone = (x, y, side, on, off) => `<g class="ph" style="--x:${x}px;--y:${y}px" data-on="${on}"${off ? ` data-off="${off}"` : ''}>
+        <g class="ph-arcs" fill="none" stroke="#03adf9" stroke-width="1.6" stroke-linecap="round"${side === 'r' ? ' transform="matrix(-1 0 0 1 18 0)"' : ''}>
+          <path style="--k:0" d="M-4 11a7 7 0 0 0 0 10"/><path style="--k:1" d="M-8.5 7.5a12 12 0 0 0 0 17"/><path style="--k:2" d="M-13 4a17 17 0 0 0 0 24"/>
+        </g>
+        <rect width="18" height="32" rx="4" fill="#0f1a2e"/><rect x="1.6" y="1.6" width="14.8" height="28.8" rx="2.8" fill="#1f3f72"/>
+        <rect x="6.5" y="3.4" width="5" height="1.6" rx=".8" fill="#0f1a2e"/>
+      </g>`;
+    const pour = '<rect class="pour" x="99" y="0" width="2" height="64" rx="1" fill="#e9b866"/>';
+    const star = (cx, cy, R) => {
+      let d = '';
+      for (let i = 0; i < 10; i++) {
+        const a = -Math.PI / 2 + i * Math.PI / 5, r = i % 2 ? R * 0.47 : R;
+        d += (i ? 'L' : 'M') + (cx + r * Math.cos(a)).toFixed(2) + ' ' + (cy + r * Math.sin(a)).toFixed(2);
+      }
+      return d + 'Z';
+    };
+    const SCENES = {
+      adulteracao: {
+        svg: () => pour + bottle() + verdict('bad', 158, 58, 17, 'verdict'),
+        steps: [['', 900], ['open', 800], ['pour', 1300], ['close', 750], ['verdict', 2900], ['out', 450]],
+      },
+      falsificacao: {
+        svg: () => at(58, 0.8, bottle()) + at(142, 0.8, bottle())
+          + phone(78, 30, 'l', 'scanA', 'okA') + phone(164, 30, 'l', 'scanB', 'badB')
+          + verdict('ok', 58, 17, 12, 'okA') + verdict('no', 142, 17, 12, 'badB'),
+        steps: [['', 900], ['scanA', 1000], ['okA', 900], ['scanB', 1000], ['badB', 2900], ['out', 450]],
+      },
+      reutilizacao: {
+        svg: () => pour + bottle()
+          + '<g class="rf" data-on="drain" data-off="close" fill="none" stroke="#7d8aa0" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">'
+          + '<path d="M168 58a10 10 0 1 1-2.93-7.07"/><path d="M160.15 50.06L165.07 50.93L164.2 46.01"/></g>'
+          + verdict('bad', 158, 58, 17, 'verdict'),
+        steps: [['', 800], ['open', 750], ['drain', 1300], ['refill', 1600], ['close', 750], ['verdict', 2900], ['out', 450]],
+      },
+      procedencia: {
+        svg: () => bottle()
+          + `<g class="q" data-off="verdict"><circle cx="158" cy="58" r="16" fill="#fff" stroke="#9aa8bc" stroke-width="1.5" stroke-dasharray="3 3.5"/>
+             <text x="158" y="64.6" text-anchor="middle" font-family="${SANS}" font-size="19" font-weight="700" fill="#7d8aa0">?</text></g>`
+          + phone(54, 20, 'r', 'scan', 'verdict') + verdict('ok', 158, 58, 17, 'verdict'),
+        steps: [['', 1400], ['scan', 1200], ['verdict', 2900], ['out', 450]],
+      },
+      confianca: {
+        svg: () => `<g class="rv">
+            <rect x="34" y="30" width="132" height="82" rx="12" fill="#fff"/>
+            <circle cx="56" cy="52" r="10" fill="#dfe8f5"/><circle cx="56" cy="49.5" r="3.6" fill="#8aa0bf"/><path d="M49.6 59.4a6.4 6 0 0 1 12.8 0" fill="#8aa0bf"/>
+            <rect x="72" y="45" width="58" height="6" rx="3" fill="#dfe5ee"/><rect x="72" y="55" width="38" height="5" rx="2.5" fill="#e9edf3"/>
+            ${[0, 1, 2, 3, 4].map(k => `<path class="star" style="--k:${k}" d="${star(56 + k * 22, 88, 8)}" stroke-width="1.6" stroke-linejoin="round"/>`).join('')}
+          </g>` + verdict('ok', 162, 32, 13, 'restore'),
+        steps: [['', 1000], ['drop', 1700], ['restore', 2900], ['out', 450]],
+      },
+    };
+    $$('.scene[data-scene]').forEach(el => {
+      const sc = SCENES[el.dataset.scene];
+      if (!sc) return;
+      el.classList.add('sc-' + el.dataset.scene);
+      el.innerHTML = `<svg viewBox="0 0 200 140" xmlns="http://www.w3.org/2000/svg">${sc.svg()}</svg>`;
+      loopScene(el, sc.steps);
+    });
+    // a chamada: o lacre de verdade (do topo da tampa até a ponta da frente), flutuando
+    const ts = $('#tsSeal');
+    if (ts) {
+      const x0 = MID - 170;
+      ts.innerHTML = printSVG('ts').replace(`viewBox="0 0 ${SW} ${SH}"`, `viewBox="${x0} 0 ${SW - x0} ${SH}"`);
+    }
+  })();
+
+  /* ============================================================
      5 · A IDEIA — a frase acende palavra por palavra sozinha quando aparece (a rolagem fica livre)
      ============================================================ */
   (() => {

@@ -1768,23 +1768,6 @@ p {
   margin-top: clamp(36px, 6vh, 64px)
 }
 
-.threat-grid {
-  grid-template-columns: repeat(6, minmax(0, 1fr))
-}
-
-.threat-grid .tile {
-  grid-column: span 2
-}
-
-.threat-grid .tile:nth-child(4),
-.threat-grid .tile:nth-child(5) {
-  grid-column: span 3
-}
-
-.threat-grid .tile-statement {
-  grid-column: 1/-1
-}
-
 .tile {
   position: relative;
   overflow: hidden;
@@ -1867,18 +1850,6 @@ p {
 .tile-statement strong {
   color: #fff;
   font-weight: 600
-}
-
-.tile-statement::after {
-  content: "";
-  position: absolute;
-  right: -6%;
-  top: 50%;
-  width: 46%;
-  aspect-ratio: 668/359;
-  transform: translateY(-50%);
-  opacity: .07;
-  background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 10 10'%3E%3C/svg%3E")
 }
 
 /* ícones que se desenham ao aparecer — só com JS (sem ele os traços ficam completos) */
@@ -2991,55 +2962,6 @@ p {
   }
 }
 
-.ben-grid {
-  grid-template-columns: 1.25fr 1fr;
-  grid-template-rows: auto auto;
-  margin-top: 28px
-}
-
-.ben-grid .tile-lg {
-  grid-row: 1/3
-}
-
-.ben-grid-5 {
-  grid-template-columns: 1.25fr 1fr 1fr
-}
-
-.ben-grid-5 .tile-lg {
-  grid-row: 1/3
-}
-
-.tile-lg {
-  min-height: 340px;
-  align-content: end;
-  background: linear-gradient(160deg, #0b2f6b, var(--navy) 55%, #021433);
-  color: #fff
-}
-
-.light .tile-lg {
-  box-shadow: none
-}
-
-.tile-lg p {
-  color: rgba(255, 255, 255, .72)
-}
-
-.tile-lg .ic {
-  color: var(--cyan) !important;
-  position: absolute;
-  right: -4%;
-  top: -6%;
-  width: 62%;
-  height: auto;
-  aspect-ratio: 1;
-  opacity: .14;
-  stroke-width: 1
-}
-
-.tile-lg h3 {
-  font-size: clamp(26px, 2.6vw, 38px)
-}
-
 /* ---------------- 8 · IDENTIDADE DIGITAL (consumidor) ---------------- */
 .passport {
   padding: clamp(100px, 15vh, 180px) 0;
@@ -3505,32 +3427,6 @@ p {
     grid-template-columns: 1fr
   }
 
-  .threat-grid {
-    grid-template-columns: 1fr 1fr
-  }
-
-  .threat-grid .tile,
-  .threat-grid .tile:nth-child(4),
-  .threat-grid .tile:nth-child(5) {
-    grid-column: span 1
-  }
-
-  .threat-grid .tile:nth-child(5) {
-    grid-column: 1/-1
-  }
-
-  .ben-grid,
-  .ben-grid-5 {
-    grid-template-columns: 1fr 1fr
-  }
-
-  .ben-grid .tile-lg,
-  .ben-grid-5 .tile-lg {
-    grid-row: auto;
-    grid-column: 1/-1;
-    min-height: 260px
-  }
-
   .story-mark {
     max-width: 420px;
     margin: 0 auto
@@ -3731,19 +3627,6 @@ p {
 
   .fc-chips button:not([aria-current="true"]) i {
     display: none
-  }
-
-  .threat-grid {
-    grid-template-columns: 1fr
-  }
-
-  .threat-grid .tile:nth-child(5) {
-    grid-column: auto
-  }
-
-  .ben-grid,
-  .ben-grid-5 {
-    grid-template-columns: 1fr
   }
 
   .tabs {
@@ -3962,47 +3845,8 @@ p {
 }
 
 /* ---------------- conversão ---------------- */
-/* "para que serve": cinco cartões compactos + chamada */
-.threat-grid {
-  grid-template-columns: repeat(5, minmax(0, 1fr))
-}
-
-.threat-grid .tile,
-.threat-grid .tile:nth-child(4),
-.threat-grid .tile:nth-child(5) {
-  grid-column: auto
-}
-
-.tile-mini {
-  min-height: 190px;
-  align-content: space-between
-}
-
-.tile-mini h3 {
-  font-size: clamp(19px, 1.5vw, 22px)
-}
-
-.threat-grid .tile-statement {
-  grid-column: 1/-1;
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  justify-content: space-between;
-  gap: 20px
-}
-
 .tile-statement p {
   max-width: none
-}
-
-.tile-lg .btn {
-  justify-self: start;
-  margin-top: 10px
-}
-
-.ben-grid .tile:not(.tile-lg) {
-  min-height: 170px;
-  align-content: space-between
 }
 
 /* faixa de chamada no meio da página */
@@ -4206,30 +4050,12 @@ p {
     display: flex
   }
 
-  .threat-grid {
-    grid-template-columns: 1fr 1fr
-  }
-
-  .threat-grid .tile-mini:nth-child(5) {
-    grid-column: 1/-1
-  }
-
-  .tile-mini {
-    min-height: 150px
-  }
-
   .f-row {
     grid-template-columns: 1fr
   }
 
   .band-in {
     flex-direction: column
-  }
-}
-
-@media (min-width:720px) and (max-width:1100px) {
-  .threat-grid {
-    grid-template-columns: repeat(3, minmax(0, 1fr))
   }
 }
 
@@ -4551,4 +4377,390 @@ p {
 
 .how-gl {
   background: radial-gradient(70% 60% at 35% 45%, #ffffff, #f3f6fa 75%)
+}
+/* ---------------- 4 · PARA QUE SERVE: cenas curtas que se repetem (desenhadas em site.js) ----------------
+   Cada passo da cena acrescenta uma classe (cumulativas: .open, .pour, .close...); elementos com data-on / data-off
+   ganham .is-on / .is-off. .out apaga a cena antes de recomeçar e .snap volta ao início sem transição. */
+.threat-grid {
+  grid-template-columns: repeat(5, minmax(0, 1fr))
+}
+
+.threat-grid .tile-statement {
+  grid-column: 1/-1
+}
+
+.threat {
+  padding: 8px 8px 0;
+  gap: 0;
+  align-content: start
+}
+
+.threat h3 {
+  padding: 16px 14px 22px;
+  font-size: clamp(18px, 1.45vw, 21px);
+  line-height: 1.2
+}
+
+.scene {
+  border-radius: 20px;
+  aspect-ratio: 200/140;
+  background: radial-gradient(120% 95% at 50% 0%, #fff, #edf2f8 72%);
+  box-shadow: inset 0 0 0 1px rgba(15, 26, 46, .04);
+  overflow: hidden
+}
+
+.scene svg {
+  display: block;
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+  transition: opacity .4s ease
+}
+
+.scene.out svg {
+  opacity: 0
+}
+
+.snap,
+.snap * {
+  transition: none !important;
+  animation: none !important
+}
+
+/* peças que se mexem: a referência de giro é a própria peça */
+.scene .cap,
+.scene .seal-up,
+.scene .liq,
+.scene .pour,
+.scene .rv,
+.scene .ph,
+.scene .rf,
+.scene .q {
+  transform-box: fill-box;
+  transform-origin: center
+}
+
+.scene .cap {
+  transition: transform .75s var(--ease)
+}
+
+.scene .seal-up {
+  transition: transform .75s var(--ease)
+}
+
+.scene .tear {
+  opacity: 0;
+  transition: opacity .3s ease .3s
+}
+
+/* tampa sai para o lado; a parte de cima do lacre vai junto, a de baixo fica no gargalo */
+.scene.open .cap {
+  transform: translate(22px, -6px) rotate(24deg)
+}
+
+.scene.close .cap {
+  transform: none
+}
+
+/* ao fechar de novo, a tira da tampa não volta a encontrar a do gargalo: a ruptura fica à vista */
+.scene.close .seal-up {
+  transform: translateX(-4.5px) scaleX(.62)
+}
+
+.scene.close .tear {
+  opacity: 1
+}
+
+.scene .pour {
+  transform-origin: top;
+  transform: scaleY(0);
+  transition: transform .5s ease-in, opacity .3s ease
+}
+
+.sc-adulteracao.pour .pour,
+.sc-reutilizacao.refill .pour {
+  transform: none
+}
+
+.scene.close .pour {
+  opacity: 0
+}
+
+.scene .liq {
+  transition: transform 1.1s cubic-bezier(.5, 0, .75, 1)
+}
+
+.sc-reutilizacao.drain .liq {
+  transform: translateY(64px)
+}
+
+.sc-reutilizacao.refill .liq {
+  transform: none;
+  transition: transform 1.2s cubic-bezier(.25, .6, .35, 1) .25s
+}
+
+/* ícone de reabastecer: gira enquanto a garrafa esvazia e enche */
+.scene .rf {
+  opacity: 0;
+  transition: opacity .3s ease
+}
+
+.scene .rf.is-on {
+  opacity: 1;
+  animation: rfSpin 1.4s linear infinite
+}
+
+.scene .rf.is-off {
+  opacity: 0
+}
+
+@keyframes rfSpin {
+  to {
+    transform: rotate(360deg)
+  }
+}
+
+/* celular que aproxima e lê o lacre */
+.scene .ph {
+  opacity: 0;
+  transform: translate(calc(var(--x) + 10px), calc(var(--y) - 10px));
+  transition: opacity .35s ease, transform .6s var(--ease)
+}
+
+.scene .ph.is-on {
+  opacity: 1;
+  transform: translate(var(--x), var(--y))
+}
+
+.scene .ph.is-off {
+  opacity: 0
+}
+
+.scene .ph.is-on .ph-arcs path {
+  animation: arcPulse 1s ease-in-out infinite;
+  animation-delay: calc(var(--k) * .14s)
+}
+
+@keyframes arcPulse {
+
+  0%,
+  100% {
+    opacity: .15
+  }
+
+  50% {
+    opacity: 1
+  }
+}
+
+/* "?" da procedência desconhecida */
+.scene .q {
+  animation: qBob 2.4s ease-in-out infinite;
+  transition: opacity .3s ease
+}
+
+.scene .q.is-off {
+  opacity: 0
+}
+
+@keyframes qBob {
+  50% {
+    transform: translateY(-2.5px)
+  }
+}
+
+/* cartão de avaliação: as estrelas se apagam e voltam com o selo */
+.scene .rv {
+  filter: drop-shadow(0 6px 10px rgba(15, 26, 46, .1));
+  transition: transform .6s var(--ease)
+}
+
+.sc-confianca.drop .rv {
+  transform: translateY(3px) rotate(-2.5deg)
+}
+
+.sc-confianca.restore .rv {
+  transform: none
+}
+
+.scene .star {
+  fill: #f5b301;
+  stroke: #f5b301;
+  transition: fill .3s ease, stroke .3s ease
+}
+
+.sc-confianca.drop .star {
+  fill: #dde3ec;
+  stroke: #dde3ec;
+  transition-delay: calc((4 - var(--k)) * .16s)
+}
+
+.sc-confianca.restore .star {
+  fill: #f5b301;
+  stroke: #f5b301;
+  transition-delay: calc(var(--k) * .12s + .55s)
+}
+
+/* selo do resultado: o mesmo da demonstração, parado — o anel contorna, a cor cresce do centro e o símbolo se desenha */
+.vd {
+  --tone: 20, 166, 74;
+  opacity: 0;
+  transition: opacity .25s ease
+}
+
+.vd-bad,
+.vd-no {
+  --tone: 217, 48, 37
+}
+
+.vd.is-on {
+  opacity: 1
+}
+
+.vd-glow {
+  fill: none;
+  stroke: rgba(var(--tone), .14);
+  stroke-width: 6
+}
+
+.vd-track {
+  fill: rgba(var(--tone), .1)
+}
+
+.vd-fill {
+  fill: rgb(var(--tone));
+  transform-box: fill-box;
+  transform-origin: center
+}
+
+.vd path {
+  fill: none;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  stroke-dasharray: 1 2
+}
+
+.vd-ring {
+  stroke: rgb(var(--tone));
+  stroke-width: 3.4
+}
+
+.vd-mark {
+  stroke: #fff;
+  stroke-width: 8
+}
+
+.vd.is-on .vd-ring {
+  animation: strokeIn .6s var(--ease-io) both
+}
+
+.vd.is-on .vd-fill {
+  animation: fillIn .35s cubic-bezier(.3, .7, .4, 1) .45s both
+}
+
+.vd.is-on .vd-glow {
+  animation: glowIn .35s ease .55s both
+}
+
+.vd.is-on .vd-mark {
+  animation: strokeIn .3s var(--ease-io) .72s both
+}
+
+.vd.is-on .vd-mark2 {
+  animation-delay: .9s
+}
+
+.vd.is-on .vd-dot {
+  animation-duration: .1s;
+  animation-delay: 1s
+}
+
+/* chamada: texto à esquerda e o lacre de verdade flutuando à direita */
+.threat-grid .tile-statement {
+  display: grid;
+  grid-template-columns: minmax(0, 1.1fr) minmax(0, 1fr);
+  align-items: center;
+  gap: 24px 40px;
+  background: radial-gradient(60% 120% at 85% 50%, rgba(3, 173, 249, .2), transparent 70%), var(--navy)
+}
+
+.ts-copy {
+  display: grid;
+  justify-items: start;
+  gap: 22px
+}
+
+.ts-seal {
+  width: 112%;
+  margin-right: -14%;
+  justify-self: end;
+  transform: rotate(-7deg);
+  filter: drop-shadow(0 24px 30px rgba(0, 8, 30, .55));
+  -webkit-mask-image: linear-gradient(90deg, transparent, #000 22%);
+  mask-image: linear-gradient(90deg, transparent, #000 22%)
+}
+
+.ts-seal svg {
+  display: block;
+  width: 100%;
+  height: auto;
+  animation: tsFloat 6s ease-in-out infinite
+}
+
+@keyframes tsFloat {
+  50% {
+    transform: translateY(-6px) rotate(.6deg)
+  }
+}
+
+@media (min-width:720px) and (max-width:1100px) {
+  .threat-grid {
+    grid-template-columns: repeat(6, minmax(0, 1fr))
+  }
+
+  .threat-grid .threat {
+    grid-column: span 2
+  }
+
+  .threat-grid .threat:nth-child(4),
+  .threat-grid .threat:nth-child(5) {
+    grid-column: span 3
+  }
+
+  .threat-grid .threat:nth-child(4) .scene,
+  .threat-grid .threat:nth-child(5) .scene {
+    aspect-ratio: 300/140
+  }
+}
+
+@media (max-width:900px) {
+  .threat-grid .tile-statement {
+    grid-template-columns: 1fr
+  }
+
+  .ts-seal {
+    width: 100%;
+    margin: 0 0 -8px;
+    justify-self: center;
+    transform: rotate(-4deg)
+  }
+}
+
+/* celular: cartões deitados, cena à esquerda e o nome à direita */
+@media (max-width:719px) {
+  .threat-grid {
+    grid-template-columns: 1fr;
+    gap: 12px
+  }
+
+  .threat {
+    grid-template-columns: minmax(0, 1.15fr) minmax(0, 1fr);
+    align-items: center;
+    padding: 8px
+  }
+
+  .threat h3 {
+    padding: 0 8px 0 18px;
+    font-size: 19px
+  }
 }

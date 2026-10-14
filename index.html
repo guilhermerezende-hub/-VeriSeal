@@ -663,7 +663,7 @@
       </div>
     </section>
 
-    <!-- 7 · BENEFÍCIOS -->
+    <!-- 7 · BENEFÍCIOS: cada cartão tem uma mini-tela que se mexe sozinha (montadas em site.js) -->
     <section class="benefits light" id="beneficios" data-theme="light">
       <div class="wrap">
         <p class="eyebrow" data-reveal>Benefícios</p>
@@ -679,51 +679,47 @@
         <div class="panels" data-reveal style="--d:.16s">
           <div class="panel" role="tabpanel" id="pan-m" aria-labelledby="tab-m">
             <div class="bento ben-grid ben-grid-5">
-              <article class="tile tile-lg"><svg class="ic" aria-hidden="true">
-                  <use href="#i-star" />
-                </svg>
-                <h3>Reputação protegida</h3>
-                <p>Cada garrafa prova a própria origem.</p><a class="btn btn-primary btn-sm" href="#contato">Proteger
-                  minha marca</a>
+              <article class="tile ben-hero">
+                <div class="bh-visual" id="benBottle" aria-hidden="true"></div>
+                <div class="bh-copy">
+                  <h3>Reputação protegida</h3>
+                  <p>Cada garrafa prova a própria origem.</p>
+                  <a class="btn btn-primary btn-sm" href="#contato">Proteger minha marca</a>
+                </div>
               </article>
-              <article class="tile"><svg class="ic" aria-hidden="true">
-                  <use href="#i-search-bottle" />
-                </svg>
+              <article class="tile ben">
+                <div class="widget w-tear" data-tone="warn" aria-hidden="true"></div>
                 <h3>Reutilização identificada</h3>
               </article>
-              <article class="tile"><svg class="ic" aria-hidden="true">
-                  <use href="#i-shield" />
-                </svg>
+              <article class="tile ben">
+                <div class="widget w-codes" aria-hidden="true"></div>
                 <h3>Chip criptografado</h3>
               </article>
-              <article class="tile"><svg class="ic" aria-hidden="true">
-                  <use href="#i-people" />
-                </svg>
+              <article class="tile ben">
+                <div class="widget w-people" aria-hidden="true"></div>
                 <h3>Mais confiança do consumidor</h3>
               </article>
-              <article class="tile"><svg class="ic" aria-hidden="true">
-                  <use href="#i-chart" />
-                </svg>
+              <article class="tile ben">
+                <div class="widget w-chart" aria-hidden="true"></div>
                 <h3>Dados das verificações</h3>
               </article>
             </div>
           </div>
           <div class="panel" role="tabpanel" id="pan-c" aria-labelledby="tab-c" hidden>
             <div class="bento ben-grid">
-              <article class="tile tile-lg"><svg class="ic" aria-hidden="true">
-                  <use href="#i-phone" />
-                </svg>
-                <h3>Verificação no celular</h3>
-                <p>Origem confirmada em segundos, antes de beber.</p>
+              <article class="tile ben-hero">
+                <div class="bh-visual" id="benPhone" aria-hidden="true"></div>
+                <div class="bh-copy">
+                  <h3>Verificação no celular</h3>
+                  <p>Origem confirmada em segundos, antes de beber.</p>
+                </div>
               </article>
-              <article class="tile"><svg class="ic" aria-hidden="true">
-                  <use href="#i-eye" />
-                </svg>
+              <article class="tile ben">
+                <div class="widget w-tear" data-tone="bad" aria-hidden="true"></div>
                 <h3>Adulteração à vista</h3>
               </article>
-              <article class="tile"><svg class="ic" aria-hidden="true">
-                  <use href="#i-shield" />
-                </svg>
+              <article class="tile ben">
+                <div class="widget w-shield" aria-hidden="true"></div>
                 <h3>Compra mais segura</h3>
               </article>
             </div>
